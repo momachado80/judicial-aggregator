@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.routers import health, processes, stats, export
+from src.routes.auth import router as auth_router
 from src.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
@@ -19,7 +20,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rotas públicas
 app.include_router(health.router, tags=["Health"])
+app.include_router(auth_router)  # Autenticação
+
+# Rotas protegidas (vamos proteger depois)
 app.include_router(processes.router, prefix="/processes", tags=["Processes"])
 app.include_router(stats.router, tags=["Statistics"])
 app.include_router(export.router, tags=["Export"])
@@ -29,5 +34,6 @@ def root():
     return {
         "message": "Judicial Aggregator API v2.0",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
+        "auth": "/auth/login"
     }
