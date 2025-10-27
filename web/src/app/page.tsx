@@ -25,28 +25,47 @@ interface Processo {
 export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [processos, setProcessos] = useState<Processo[]>([]);
+  const [novosHoje, setNovosHoje] = useState(0);
   const [loading, setLoading] = useState(true);
+  
+  const [filtroTribunal, setFiltroTribunal] = useState('');
+  const [filtroRelevancia, setFiltroRelevancia] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const statsRes = await fetch('http://localhost:8000/processes/stats');
-        const statsData = await statsRes.json();
-        setStats(statsData);
-
-        const processosRes = await fetch('http://localhost:8000/processes?page_size=20');
-        const processosData = await processosRes.json();
-        setProcessos(processosData.items);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
-  }, []);
+  }, [filtroTribunal, filtroRelevancia, filtroTipo]);
 
-  if (loading) {
+  async function fetchData() {
+    try {
+      setLoading(true);
+      
+      const statsRes = await fetch('http://localhost:8000/processes/stats');
+      const statsData = await statsRes.json();
+      setStats(statsData);
+
+      const novosRes = await fetch('http://localhost:8000/processes/novos-hoje');
+      const novosData = await novosRes.json();
+      setNovosHoje(novosData.novos_hoje);
+
+      const params = new URLSearchParams();
+      params.append('page_size', '200');
+      if (filtroTribunal) params.append('tribunal', filtroTribunal);
+      if (filtroRelevancia) params.append('relevancia', filtroRelevancia);
+      if (filtroTipo) params.append('tipo_processo', filtroTipo);
+      
+      const processosRes = await fetch(`http://localhost:8000/processes?${params.toString()}`);
+      const processosData = await processosRes.json();
+      setProcessos(processosData.items || []);
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+      setProcessos([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading && !stats) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <div style={{ textAlign: 'center' }}>
@@ -61,11 +80,19 @@ export default function Home() {
     <div className="dashboard-container">
       <main className="dashboard-main">
         <h1 className="dashboard-title">📊 Dashboard - Processos Judiciais</h1>
-        
+
         <div className="kpis">
           <div className="kpi-card">
             <div className="kpi-value">{stats?.total || 0}</div>
             <div className="kpi-label">Total de Processos</div>
+          </div>
+          <div className="kpi-card kpi-new">
+            <div className="kpi-value" style={{ color: '#10b981' }}>{novosHoje}</div>
+            <div className="kpi-label">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                ✨ Novos Hoje
+              </span>
+            </div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{stats?.por_relevancia?.['Alta'] || 0}</div>
@@ -111,24 +138,71 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="processes-section">
-          <h2>📋 Últimos Processos</h2>
-          <div className="processes-grid">
-            {processos.map((processo) => (
-              <Link href={`/processo/${processo.id}`} key={processo.id} className="process-card">
-                <div className="process-header">
-                  <span className={`badge ${processo.relevance?.toLowerCase()}`}>{processo.relevance}</span>
-                  <span className="tribunal-badge">{processo.tribunal}</span>
-                </div>
-                <div className="process-number">{processo.numero_cnj}</div>
-                <div className="process-info">
-                  <div>📑 {processo.tipo_processo}</div>
-                  <div>🏛️ {processo.comarca}</div>
-                  {processo.valor_causa && (<div>💰 R$ {processo.valor_causa.toLocaleString('pt-BR')}</div>)}
-                </div>
-              </Link>
-            ))}
+        <div className="filters-section">
+          <h2>🔍 Filtrar Processos</h2>
+          <div className="filters-grid">
+            <div className="filter-group">
+              <label>Tribunal:</label>
+              <select value={filtroTribunal} onChange={(e) => setFiltroTribunal(e.target.value)} className="filter-select">
+                <option value="">Todos</option>
+                <option value="TJSP">TJSP</option>
+                <option value="TJBA">TJBA</option>
+              </select>
+            </div>
+            <div className="filter-group">
+              <label>Relevância:</label>
+              <select value={filtroRelevancia} onChange={(e) => setFiltroRelevancia(e.target.value)} className="filter-select">
+                <option value="">Todas</option>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </div>
+            <div className="filter-group">
+              <label>Tipo:</label>
+              <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)} className="filter-select">
+                <option value="">Todos</option>
+                <option value="Inventário">Inventário</option>
+                <option value="Divórcio">Divórcio</option>
+              </select>
+            </div>
           </div>
+          {(filtroTribunal || filtroRelevancia || filtroTipo) && (
+            <button 
+              onClick={() => { setFiltroTribunal(''); setFiltroRelevancia(''); setFiltroTipo(''); }} 
+              className="clear-filters-btn"
+            >
+              ✕ Limpar Filtros
+            </button>
+          )}
+        </div>
+
+        <div className="processes-section">
+          <h2>📋 Processos Encontrados: {processos?.length || 0}</h2>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>Carregando...</div>
+          ) : processos && processos.length > 0 ? (
+            <div className="processes-grid">
+              {processos.map((processo) => (
+                <Link href={`/processo/${processo.id}`} key={processo.id} className="process-card">
+                  <div className="process-header">
+                    <span className={`badge ${processo.relevance?.toLowerCase()}`}>{processo.relevance}</span>
+                    <span className="tribunal-badge">{processo.tribunal}</span>
+                  </div>
+                  <div className="process-number">{processo.numero_cnj}</div>
+                  <div className="process-info">
+                    <div>📑 {processo.tipo_processo}</div>
+                    <div>🏛️ {processo.comarca}</div>
+                    {processo.valor_causa && (<div>💰 R$ {processo.valor_causa.toLocaleString('pt-BR')}</div>)}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+              Nenhum processo encontrado com os filtros selecionados.
+            </div>
+          )}
         </div>
       </main>
     </div>

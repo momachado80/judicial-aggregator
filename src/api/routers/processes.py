@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from typing import Optional
 from src.database import get_db
 from src.models import Processo
 
@@ -9,10 +10,10 @@ router = APIRouter()
 @router.get("")
 def list_processes(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    tribunal: str = None,
-    tipo_processo: str = None,
-    relevancia: str = None,
+    page_size: int = Query(20, ge=1, le=200),
+    tribunal: Optional[str] = None,
+    tipo_processo: Optional[str] = None,
+    relevancia: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     """Lista processos com filtros opcionais"""
@@ -57,19 +58,16 @@ def list_processes(
 def get_stats(db: Session = Depends(get_db)):
     """Estatísticas dos processos"""
     
-    # Por tribunal
     por_tribunal = db.query(
         Processo.tribunal,
         func.count(Processo.id).label('count')
     ).group_by(Processo.tribunal).all()
     
-    # Por relevância
     por_relevancia = db.query(
         Processo.relevancia,
         func.count(Processo.id).label('count')
     ).group_by(Processo.relevancia).all()
     
-    # Por tipo
     por_tipo = db.query(
         Processo.tipo_processo,
         func.count(Processo.id).label('count')
@@ -82,12 +80,23 @@ def get_stats(db: Session = Depends(get_db)):
         "total": db.query(func.count(Processo.id)).scalar()
     }
 
+@router.get("/novos-hoje")
+def get_novos_hoje(db: Session = Depends(get_db)):
+    """Processos adicionados hoje"""
+    from datetime import datetime
+    hoje = datetime.now().date()
+    
+    count = db.query(func.count(Processo.id)).filter(
+        func.date(Processo.created_at) == hoje
+    ).scalar()
+    
+    return {"novos_hoje": count or 0, "data": hoje.isoformat()}
+
 @router.get("/{process_id}")
 def get_process(process_id: int, db: Session = Depends(get_db)):
     """Buscar processo por ID"""
     processo = db.query(Processo).filter(Processo.id == process_id).first()
     if not processo:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Processo não encontrado")
     
     return {
@@ -103,4 +112,19 @@ def get_process(process_id: int, db: Session = Depends(get_db)):
         "valor_causa": processo.valor_causa,
         "created_at": processo.created_at.isoformat() if processo.created_at else None,
         "updated_at": processo.updated_at.isoformat() if processo.updated_at else None,
+    }
+
+from src.utils.tribunal_links import gerar_link_tribunal
+
+@router.get("/{process_id}/link")
+def get_link_tribunal(process_id: int, db: Session = Depends(get_db)):
+    """Retorna link para consulta no tribunal"""
+    processo = db.query(Processo).filter(Processo.id == process_id).first()
+    if not processo:
+        raise HTTPException(status_code=404, detail="Processo não encontrado")
+    
+    return {
+        "link": gerar_link_tribunal(processo.numero_processo, processo.tribunal),
+        "tribunal": processo.tribunal,
+        "numero": processo.numero_processo
     }
