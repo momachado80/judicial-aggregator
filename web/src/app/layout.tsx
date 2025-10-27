@@ -1,9 +1,22 @@
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Judicial Aggregator",
+  description: "Sistema de agregação de processos judiciais",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={inter.className}>
         {children}
       </body>
     </html>

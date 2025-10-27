@@ -1,3 +1,5 @@
-from src.models.user import User
+from src.database import Base
+from .processo import Processo
+from .user import User
 
-__all__ = ["User"]
+__all__ = ["Base", "Processo", "User"]
