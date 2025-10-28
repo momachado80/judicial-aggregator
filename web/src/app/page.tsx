@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import AdvancedFilters, { FilterValues } from '@/components/AdvancedFilters';
 import './dashboard.css';
 
 interface Stats {
@@ -20,6 +21,7 @@ interface Processo {
   comarca: string;
   relevance: string;
   valor_causa: number | null;
+  data_ajuizamento: string | null;
 }
 
 export default function Home() {
@@ -27,14 +29,14 @@ export default function Home() {
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [novosHoje, setNovosHoje] = useState(0);
   const [loading, setLoading] = useState(true);
-  
-  const [filtroTribunal, setFiltroTribunal] = useState('');
-  const [filtroRelevancia, setFiltroRelevancia] = useState('');
-  const [filtroTipo, setFiltroTipo] = useState('');
+  const [filters, setFilters] = useState<FilterValues>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchData();
-  }, [filtroTribunal, filtroRelevancia, filtroTipo]);
+  }, [filters, currentPage]);
 
   async function fetchData() {
     try {
@@ -48,163 +50,164 @@ export default function Home() {
       const novosData = await novosRes.json();
       setNovosHoje(novosData.novos_hoje);
 
-      const params = new URLSearchParams();
-      params.append('page_size', '200');
-      if (filtroTribunal) params.append('tribunal', filtroTribunal);
-      if (filtroRelevancia) params.append('relevancia', filtroRelevancia);
-      if (filtroTipo) params.append('tipo_processo', filtroTipo);
-      
-      const processosRes = await fetch(`http://localhost:8000/processes?${params.toString()}`);
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        page_size: '20',
+      });
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+          queryParams.append(key, value);
+        }
+      });
+
+      const processosRes = await fetch(`http://localhost:8000/processes?${queryParams.toString()}`);
       const processosData = await processosRes.json();
-      setProcessos(processosData.items || []);
+      setProcessos(processosData.items);
+      setTotalPages(processosData.total_pages);
+      setTotal(processosData.total);
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
-      setProcessos([]);
+      console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  if (loading && !stats) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚖️</div>
-          <div>Carregando dados...</div>
-        </div>
-      </div>
-    );
-  }
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="dashboard-container">
-      <main className="dashboard-main">
-        <h1 className="dashboard-title">📊 Dashboard - Processos Judiciais</h1>
+      <div className="dashboard-main">
+        <h1 className="dashboard-title">⚖️ Judicial Aggregator</h1>
 
-        <div className="kpis">
-          <div className="kpi-card">
-            <div className="kpi-value">{stats?.total || 0}</div>
-            <div className="kpi-label">Total de Processos</div>
-          </div>
-          <div className="kpi-card kpi-new">
-            <div className="kpi-value" style={{ color: '#10b981' }}>{novosHoje}</div>
-            <div className="kpi-label">
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                ✨ Novos Hoje
-              </span>
+        {/* KPIs */}
+        {stats && (
+          <div className="kpis">
+            <div className="kpi-card">
+              <div className="kpi-value">{stats.total.toLocaleString()}</div>
+              <div className="kpi-label">TOTAL DE PROCESSOS</div>
             </div>
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-value">{stats?.por_relevancia?.['Alta'] || 0}</div>
-            <div className="kpi-label">Alta Relevância</div>
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-value">{stats?.por_tribunal?.['TJSP'] || 0}</div>
-            <div className="kpi-label">TJSP</div>
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-value">{stats?.por_tribunal?.['TJBA'] || 0}</div>
-            <div className="kpi-label">TJBA</div>
-          </div>
-        </div>
-
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h3>📍 Por Tribunal</h3>
-            {stats && Object.entries(stats.por_tribunal).map(([tribunal, count]) => (
-              <div key={tribunal} className="stat-item">
-                <span>{tribunal}</span>
-                <strong>{count}</strong>
+            <div className="kpi-card">
+              <div className="kpi-value">{novosHoje}</div>
+              <div className="kpi-label">NOVOS HOJE</div>
+            </div>
+            <div className="kpi-card">
+              <div className="kpi-value">{stats.por_relevancia['Alta'] || stats.por_relevancia['alta'] || 0}</div>
+              <div className="kpi-label">ALTA RELEVÂNCIA</div>
+            </div>
+            <div className="kpi-card">
+              <div className="kpi-value">
+                TJSP: {stats.por_tribunal['TJSP'] || 0}<br/>
+                TJBA: {stats.por_tribunal['TJBA'] || 0}
               </div>
-            ))}
+              <div className="kpi-label">TRIBUNAIS</div>
+            </div>
           </div>
-          <div className="stat-card">
-            <h3>🔥 Por Relevância</h3>
-            {stats && Object.entries(stats.por_relevancia).map(([relevancia, count]) => (
-              <div key={relevancia} className="stat-item">
-                <span>{relevancia}</span>
-                <strong>{count}</strong>
+        )}
+
+        {/* Filtros */}
+        <AdvancedFilters onFilterChange={handleFilterChange} currentFilters={filters} />
+
+        {/* Contador */}
+        <div style={{ 
+          background: 'white', 
+          padding: '16px 24px', 
+          borderRadius: '8px', 
+          marginBottom: '24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>
+              {total.toLocaleString()} processo(s) encontrado(s)
+            </div>
+            {Object.keys(filters).filter(k => filters[k as keyof FilterValues]).length > 0 && (
+              <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
+                {Object.keys(filters).filter(k => filters[k as keyof FilterValues]).length} filtro(s) ativo(s)
               </div>
-            ))}
+            )}
           </div>
-          <div className="stat-card">
-            <h3>📑 Por Tipo</h3>
-            {stats && Object.entries(stats.por_tipo).map(([tipo, count]) => (
-              <div key={tipo} className="stat-item">
-                <span>{tipo}</span>
-                <strong>{count}</strong>
-              </div>
-            ))}
-          </div>
+          {loading && <div style={{ color: '#3b82f6' }}>Carregando...</div>}
         </div>
 
-        <div className="filters-section">
-          <h2>🔍 Filtrar Processos</h2>
-          <div className="filters-grid">
-            <div className="filter-group">
-              <label>Tribunal:</label>
-              <select value={filtroTribunal} onChange={(e) => setFiltroTribunal(e.target.value)} className="filter-select">
-                <option value="">Todos</option>
-                <option value="TJSP">TJSP</option>
-                <option value="TJBA">TJBA</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>Relevância:</label>
-              <select value={filtroRelevancia} onChange={(e) => setFiltroRelevancia(e.target.value)} className="filter-select">
-                <option value="">Todas</option>
-                <option value="Alta">Alta</option>
-                <option value="Média">Média</option>
-                <option value="Baixa">Baixa</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>Tipo:</label>
-              <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)} className="filter-select">
-                <option value="">Todos</option>
-                <option value="Inventário">Inventário</option>
-                <option value="Divórcio">Divórcio</option>
-              </select>
-            </div>
-          </div>
-          {(filtroTribunal || filtroRelevancia || filtroTipo) && (
-            <button 
-              onClick={() => { setFiltroTribunal(''); setFiltroRelevancia(''); setFiltroTipo(''); }} 
-              className="clear-filters-btn"
-            >
-              ✕ Limpar Filtros
-            </button>
-          )}
+        {/* Processos */}
+        <div className="processes-grid">
+          {processos.map((p) => (
+            <Link key={p.id} href={`/processo/${p.id}`} className="process-card">
+              <div className="process-header">
+                <span className={`badge ${p.relevance?.toLowerCase()}`}>
+                  {p.relevance}
+                </span>
+                <span className="tribunal-badge">{p.tribunal}</span>
+              </div>
+              <div className="process-number">{p.numero_cnj}</div>
+              <div className="process-info">
+                <div><strong>Tipo:</strong> {p.tipo_processo}</div>
+                <div><strong>Comarca:</strong> {p.comarca || 'N/A'}</div>
+                <div><strong>Data:</strong> {p.data_ajuizamento ? new Date(p.data_ajuizamento).toLocaleDateString('pt-BR') : 'N/A'}</div>
+                {p.valor_causa && (
+                  <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
+                )}
+              </div>
+            </Link>
+          ))}
         </div>
 
-        <div className="processes-section">
-          <h2>📋 Processos Encontrados: {processos?.length || 0}</h2>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>Carregando...</div>
-          ) : processos && processos.length > 0 ? (
-            <div className="processes-grid">
-              {processos.map((processo) => (
-                <Link href={`/processo/${processo.id}`} key={processo.id} className="process-card">
-                  <div className="process-header">
-                    <span className={`badge ${processo.relevance?.toLowerCase()}`}>{processo.relevance}</span>
-                    <span className="tribunal-badge">{processo.tribunal}</span>
-                  </div>
-                  <div className="process-number">{processo.numero_cnj}</div>
-                  <div className="process-info">
-                    <div>📑 {processo.tipo_processo}</div>
-                    <div>🏛️ {processo.comarca}</div>
-                    {processo.valor_causa && (<div>💰 R$ {processo.valor_causa.toLocaleString('pt-BR')}</div>)}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-              Nenhum processo encontrado com os filtros selecionados.
-            </div>
-          )}
+        {/* Paginação */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '12px',
+          marginTop: '32px',
+          paddingBottom: '32px'
+        }}>
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            style={{
+              padding: '10px 20px',
+              background: currentPage === 1 ? '#e2e8f0' : '#3b82f6',
+              color: currentPage === 1 ? '#94a3b8' : 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+            }}
+          >
+            ← Anterior
+          </button>
+          <div style={{
+            padding: '10px 20px',
+            background: 'white',
+            borderRadius: '8px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            Página {currentPage} de {totalPages}
+          </div>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages}
+            style={{
+              padding: '10px 20px',
+              background: currentPage >= totalPages ? '#e2e8f0' : '#3b82f6',
+              color: currentPage >= totalPages ? '#94a3b8' : 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Próxima →
+          </button>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

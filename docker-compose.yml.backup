@@ -1,0 +1,76 @@
+services:
+  app:
+    build: .
+    container_name: agg-app
+    command: uvicorn src.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./:/app
+
+  worker:
+    build: .
+    container_name: agg-worker
+    command: celery -A src.jobs.celery_app.celery_app worker --loglevel=INFO
+    env_file: .env
+    depends_on:
+      - app
+      - redis
+      - db
+    volumes:
+      - ./:/app
+
+  beat:
+    build: .
+    container_name: agg-beat
+    command: celery -A src.jobs.celery_app.celery_app beat --loglevel=INFO
+    env_file: .env
+    depends_on:
+      - worker
+      - redis
+      - db
+    volumes:
+      - ./:/app
+
+  db:
+    image: postgres:15
+    container_name: agg-db
+    environment:
+      POSTGRES_DB: jud_agg
+      POSTGRES_USER: jud_user
+      POSTGRES_PASSWORD: jud_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: agg-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  web:
+    build: ./web
+    container_name: agg-web
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  web_node_modules:
