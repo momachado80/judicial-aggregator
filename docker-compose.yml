@@ -15,7 +15,7 @@ services:
   worker:
     build: .
     container_name: agg-worker
-    command: celery -A src.jobs.celery_app.celery_app worker --loglevel=INFO
+    command: celery -A src.jobs.daily_collector worker --loglevel=INFO
     env_file: .env
     depends_on:
       - app
@@ -27,7 +27,7 @@ services:
   beat:
     build: .
     container_name: agg-beat
-    command: celery -A src.jobs.celery_app.celery_app beat --loglevel=INFO
+    command: celery -A src.jobs.daily_collector beat --loglevel=INFO
     env_file: .env
     depends_on:
       - worker
