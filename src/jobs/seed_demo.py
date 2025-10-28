@@ -5,119 +5,106 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Adicionar o diretório raiz ao path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
 from src.normalization.models import Base, Process, Party, Movement
 
-# Configuração do banco
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql+psycopg2://jud_user:jud_pass@db:5432/jud_agg')
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
-def generate_cnj():
-    """Gera um número CNJ fictício"""
+def gerar_cnj_correto(tribunal):
+    """Gera número CNJ no formato: NNNNNNN-DD.AAAA.J.TT.OOOO"""
+    seq = random.randint(100000, 999999)
+    dv = random.randint(10, 99)
     ano = random.randint(2023, 2025)
-    seq = random.randint(1, 999999)
-    origem = random.choice(['8.26', '8.05'])  # TJSP ou TJBA
-    comarca = random.randint(1, 9999)
-    return f"{seq:07d}-{random.randint(10,99)}.{ano}.{origem}.{comarca:04d}"
+    codigo = '26' if tribunal == 'TJSP' else '05'
+    vara = random.randint(100, 9999)
+    return f"{seq:07d}-{dv}.{ano}.8.{codigo}.{vara:04d}"
 
 def seed_processes():
-    """Popula o banco com processos de demonstração"""
     db = SessionLocal()
-    
     try:
-        print("🌱 Iniciando seed de dados...")
+        print("🧹 Limpando banco...")
+        db.query(Movement).delete()
+        db.query(Party).delete()
+        db.query(Process).delete()
+        db.commit()
         
-        tribunais = ['TJSP', 'TJBA']
-        classes = [
-            {'codigo': '8015', 'nome': 'Divórcio', 'assunto': '1175'},
-            {'codigo': '8016', 'nome': 'Inventário', 'assunto': '1176'}
-        ]
-        comarcas = ['São Paulo', 'Salvador', 'Campinas', 'Feira de Santana', 'Santos', 'Camaçari']
-        relevances = ['Alta', 'Média', 'Baixa']
+        print("🌱 Criando 100 processos com números CNJ CORRETOS...")
         
-        processos_criados = 0
-        
-        for i in range(50):  # Criar 50 processos
-            tribunal = random.choice(tribunais)
-            classe = random.choice(classes)
+        for i in range(100):
+            tribunal = random.choice(['TJSP', 'TJBA'])
+            numero = gerar_cnj_correto(tribunal)
             
             process = Process(
-                numero_cnj=generate_cnj(),
+                numero_cnj=numero,
                 tribunal=tribunal,
-                classe_tpu=classe['codigo'],
-                assunto_tpu=[classe['assunto']],
+                classe_tpu='8015' if i % 2 == 0 else '8016',
+                assunto_tpu=['1175'],
                 orgao=f"{random.randint(1,10)}ª Vara",
-                vara=f"Vara de Família e Sucessões",
-                comarca=random.choice(comarcas),
-                valor_causa=round(random.uniform(10000, 500000), 2) if random.random() > 0.3 else None,
-                relevance=random.choice(relevances)
+                vara="Vara de Família",
+                comarca=random.choice(['São Paulo', 'Salvador']),
+                valor_causa=round(random.uniform(10000, 500000), 2),
+                relevance=random.choice(['Alta', 'Média', 'Baixa'])
             )
-            
             db.add(process)
             db.flush()
             
-            # Adicionar partes
-            num_partes = random.randint(2, 4)
-            tipos_parte = ['Autor', 'Réu', 'Interessado', 'Inventariante', 'Herdeiro']
-            nomes = [
-                'João da Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa',
-                'Carlos Souza', 'Juliana Lima', 'Roberto Alves', 'Fernanda Rocha'
-            ]
-            
-            for j in range(num_partes):
+            # Partes
+            for j in range(random.randint(2, 4)):
                 party = Party(
                     process_id=process.id,
-                    tipo=random.choice(tipos_parte),
-                    nome=random.choice(nomes),
+                    tipo=random.choice(['Autor', 'Réu']),
+                    nome=random.choice(['João Silva', 'Maria Santos']),
                     documento_hash=f"hash_{random.randint(10000,99999)}"
                 )
                 db.add(party)
             
-            # Adicionar movimentos
-            num_movimentos = random.randint(3, 10)
-            tipos_movimento = [
-                'Distribuição', 'Despacho', 'Intimação', 'Sentença',
-                'Conclusão', 'Juntada de Petição', 'Decisão', 'Penhora',
-                'Homologação', 'Partilha'
-            ]
-            
-            base_date = datetime.now() - timedelta(days=random.randint(30, 365))
-            
-            for k in range(num_movimentos):
-                movement_date = base_date + timedelta(days=k * random.randint(5, 30))
-                tipo = random.choice(tipos_movimento)
-                
+            # Movimentos
+            base_date = datetime.now() - timedelta(days=random.randint(30, 200))
+            for k in range(random.randint(3, 8)):
                 movement = Movement(
                     process_id=process.id,
-                    data=movement_date,
+                    data=base_date + timedelta(days=k*10),
                     tipo_tpu=str(random.randint(1, 999)),
-                    descricao_raw=f"{tipo} - Movimento processual registrado",
-                    descricao_norm=f"{tipo}",
-                    relevance=random.choice(relevances),
-                    hash_idem=f"hash_{process.id}_{k}_{random.randint(1000,9999)}"
+                    descricao_raw="Movimento processual",
+                    descricao_norm="Movimento",
+                    relevance=random.choice(['Alta', 'Média', 'Baixa']),
+                    hash_idem=f"hash_{process.id}_{k}"
                 )
                 db.add(movement)
             
-            processos_criados += 1
-            
-            if processos_criados % 10 == 0:
-                print(f"✓ {processos_criados} processos criados...")
+            if (i + 1) % 20 == 0:
+                print(f"✅ {i + 1} processos criados...")
         
         db.commit()
-        print(f"\n✅ Seed concluído! {processos_criados} processos criados com sucesso!")
-        print(f"📊 Acesse http://localhost:3000 para visualizar")
+        
+        # VERIFICAÇÃO DOS CÓDIGOS
+        print("\n📊 VERIFICANDO CÓDIGOS DOS TRIBUNAIS:")
+        result = db.execute("""
+            SELECT 
+                tribunal,
+                SUBSTRING(numero_cnj FROM 15 FOR 4) as codigo,
+                COUNT(*) as qtd
+            FROM processes 
+            GROUP BY tribunal, codigo
+            ORDER BY tribunal, qtd DESC
+        """)
+        
+        for row in result:
+            emoji = "✅" if row[1] in ['8.26', '8.05'] else "❌"
+            print(f"{emoji} {row[0]}: código '{row[1]}' = {row[2]} processos")
+        
+        total = db.query(Process).count()
+        print(f"\n🎉 CONCLUÍDO! {total} processos no banco.")
         
     except Exception as e:
+        print(f"❌ ERRO: {e}")
+        import traceback
+        traceback.print_exc()
         db.rollback()
-        print(f"❌ Erro ao criar seed: {e}")
-        raise
     finally:
         db.close()
 
 if __name__ == '__main__':
-    # Criar tabelas se não existirem
-    Base.metadata.create_all(engine)
     seed_processes()
