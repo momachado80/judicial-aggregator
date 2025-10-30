@@ -33,3 +33,20 @@ def root():
         "version": "1.0.0",
         "docs": "/docs"
     }
+
+# Endpoints para scraping
+from fastapi import BackgroundTasks, Depends
+from sqlalchemy.orm import Session
+from src.database import get_db
+from src.scrapers.datajud_scraper import DataJudScraper
+
+@app.post("/api/scrape")
+async def scrape_processos(max_por_tipo: int = 5000, db: Session = Depends(get_db)):
+    """Coletar processos reais da API do DataJud"""
+    scraper = DataJudScraper()
+    novos, duplicados = scraper.coletar_todos(max_por_tipo)
+    return {
+        "message": "Scraping concluído!",
+        "processos_novos": novos,
+        "processos_duplicados": duplicados
+    }
