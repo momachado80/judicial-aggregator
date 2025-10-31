@@ -37,7 +37,7 @@ export default function AnalyticsDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get<Stats>('http://localhost:8000/stats');
+      const response = await axios.get<Stats>('https://judicial-aggregator-production.up.railway.app/stats');
       setStats(response.data);
       setError(null);
     } catch (err) {

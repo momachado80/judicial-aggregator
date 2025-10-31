@@ -47,7 +47,7 @@ export default function ProcessDetailPage() {
   const fetchProcessDetail = async (id: string) => {
     try {
       setLoading(true);
-      const response = await axios.get<ProcessDetail>(`http://localhost:8000/processes/${id}`);
+      const response = await axios.get<ProcessDetail>(`https://judicial-aggregator-production.up.railway.app/processes/${id}`);
       setProcess(response.data);
       setError(null);
     } catch (err) {

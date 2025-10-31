@@ -10,7 +10,7 @@ export default function ProcessoPage() {
   const [mostrarOpcoesTJBA, setMostrarOpcoesTJBA] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/processes/${params.id}`)
+    fetch(`https://judicial-aggregator-production.up.railway.app/processes/${params.id}`)
       .then(res => res.json())
       .then(data => { setProcesso(data); setLoading(false); })
       .catch(() => setLoading(false));
@@ -59,7 +59,7 @@ export default function ProcessoPage() {
       window.open(link, '_blank');
       setMostrarOpcoesTJBA(false);
     } else {
-      const res = await fetch(`http://localhost:8000/processes/${params.id}/link`);
+      const res = await fetch(`https://judicial-aggregator-production.up.railway.app/processes/${params.id}/link`);
       const data = await res.json();
       if (data.link) window.open(data.link, '_blank');
     }

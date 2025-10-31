@@ -20,7 +20,7 @@ export default function LoginPage() {
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch('https://judicial-aggregator-production.up.railway.app/auth/login', {
         method: 'POST',
         body: formData,
       });

@@ -42,11 +42,11 @@ export default function Home() {
     try {
       setLoading(true);
       
-      const statsRes = await fetch('http://localhost:8000/processes/stats');
+      const statsRes = await fetch('https://judicial-aggregator-production.up.railway.app/processes/stats');
       const statsData = await statsRes.json();
       setStats(statsData);
 
-      const novosRes = await fetch('http://localhost:8000/processes/novos-hoje');
+      const novosRes = await fetch('https://judicial-aggregator-production.up.railway.app/processes/novos-hoje');
       const novosData = await novosRes.json();
       setNovosHoje(novosData.novos_hoje);
 
@@ -61,7 +61,7 @@ export default function Home() {
         }
       });
 
-      const processosRes = await fetch(`http://localhost:8000/processes?${queryParams.toString()}`);
+      const processosRes = await fetch(`https://judicial-aggregator-production.up.railway.app/processes?${queryParams.toString()}`);
       const processosData = await processosRes.json();
       setProcessos(processosData.items);
       setTotalPages(processosData.total_pages);
