@@ -135,7 +135,7 @@ export default function Home() {
 
         <div className="processes-grid">
           {processos.map((p) => {
-            const { comarca, ano } = extrairComarcaEData(p.numero_cnj, p.tribunal);
+            const { comarca, data } = extrairComarcaEData(p.numero_cnj, p.tribunal);
             return (
               <Link key={p.id} href={`/processo/${p.id}`} className="process-card">
                 <div className="process-header">
@@ -148,7 +148,7 @@ export default function Home() {
                 <div className="process-info">
                   <div><strong>Tipo:</strong> {p.tipo_processo}</div>
                   <div><strong>Comarca:</strong> {comarca}</div>
-                  <div><strong>Data:</strong> {ano || 'N/A'}</div>
+                  <div><strong>Data:</strong> {data || 'N/A'}</div>
                   {p.valor_causa && (
                     <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
                   )}
