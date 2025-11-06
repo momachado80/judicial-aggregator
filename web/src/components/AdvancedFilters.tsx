@@ -30,7 +30,7 @@ export default function AdvancedFilters({ onFilterChange, currentFilters }: Adva
 
   const loadComarcas = async () => {
     try {
-      const res = await fetch('/api/processes/comarcas');
+      const res = await fetch('https://judicial-aggregator-production.up.railway.app/processes/comarcas');
       const data = await res.json();
       setComarcas(data.comarcas || []);
     } catch (error) {
@@ -147,8 +147,8 @@ export default function AdvancedFilters({ onFilterChange, currentFilters }: Adva
               <label style={labelStyle}>🏛️ Tribunal</label>
               <select value={filters.tribunal || ''} onChange={(e) => handleFilterChange('tribunal', e.target.value)} style={inputStyle}>
                 <option value="">Todos os tribunais</option>
-                <option value="8.13">TJSP - São Paulo</option>
-                <option value="8.05">TJBA - Bahia</option>
+                <option value="TJSP">TJSP - São Paulo</option>
+                <option value="TJBA">TJBA - Bahia</option>
               </select>
             </div>
 
@@ -156,9 +156,9 @@ export default function AdvancedFilters({ onFilterChange, currentFilters }: Adva
               <label style={labelStyle}>⚠️ Relevância</label>
               <select value={filters.relevancia || ''} onChange={(e) => handleFilterChange('relevancia', e.target.value)} style={inputStyle}>
                 <option value="">Todas</option>
-                <option value="alta">🔴 Alta</option>
-                <option value="media">🟡 Média</option>
-                <option value="baixa">🟢 Baixa</option>
+                <option value="Alta">🔴 Alta</option>
+                <option value="Média">🟡 Média</option>
+                <option value="Baixa">🟢 Baixa</option>
               </select>
             </div>
 
@@ -166,8 +166,8 @@ export default function AdvancedFilters({ onFilterChange, currentFilters }: Adva
               <label style={labelStyle}>📋 Tipo de Processo</label>
               <select value={filters.tipo_processo || ''} onChange={(e) => handleFilterChange('tipo_processo', e.target.value)} style={inputStyle}>
                 <option value="">Todos os tipos</option>
-                <option value="inventario">Inventário</option>
-                <option value="divorcio">Divórcio</option>
+                <option value="Inventário">Inventário</option>
+                <option value="Divórcio">Divórcio</option>
               </select>
             </div>
           </div>
@@ -241,13 +241,21 @@ export default function AdvancedFilters({ onFilterChange, currentFilters }: Adva
           {/* Linha 4: Localização e Busca */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
-              <label style={labelStyle}>📍 Comarca</label>
-              <select value={filters.comarca || ''} onChange={(e) => handleFilterChange('comarca', e.target.value)} style={inputStyle}>
-                <option value="">Todas as comarcas</option>
+              <label style={labelStyle}>📍 Comarca ({comarcas.length} disponíveis)</label>
+              <input
+                type="text"
+                list="comarcas-list"
+                value={filters.comarca || ''}
+                onChange={(e) => handleFilterChange('comarca', e.target.value)}
+                placeholder="Digite para buscar... (ex: São Paulo)"
+                style={inputStyle}
+              />
+              <datalist id="comarcas-list">
+                <option value="">✓ Todas as comarcas</option>
                 {comarcas.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
-              </select>
+              </datalist>
             </div>
 
             <div>
