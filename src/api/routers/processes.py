@@ -16,6 +16,7 @@ def list_processes(
     tribunal: Optional[str] = None,
     tipo_processo: Optional[str] = None,
     relevancia: Optional[str] = None,
+    status: Optional[str] = Query(None, description="Filtrar por status"),
     data_ajuizamento_inicio: Optional[date] = Query(None, description="Data inicial (YYYY-MM-DD)"),
     data_ajuizamento_fim: Optional[date] = Query(None, description="Data final (YYYY-MM-DD)"),
     valor_causa_min: Optional[float] = Query(None, ge=0, description="Valor mínimo"),
@@ -36,6 +37,8 @@ def list_processes(
         query = query.filter(Processo.tipo_processo == tipo_processo)
     if relevancia:
         query = query.filter(Processo.relevancia == relevancia)
+    if status:
+        query = query.filter(Processo.status == status)
     
     if data_ajuizamento_inicio:
         query = query.filter(Processo.data_ajuizamento >= data_ajuizamento_inicio)
@@ -104,6 +107,7 @@ def list_processes(
                 "vara": p.vara if hasattr(p, 'vara') else None,
                 "relevance": p.relevancia,
                 "score_relevancia": p.score_relevancia,
+                "status": p.status if hasattr(p, 'status') else 'pendente',
                 "data_ajuizamento": p.data_ajuizamento.isoformat() if p.data_ajuizamento else None,
                 "valor_causa": float(p.valor_causa) if p.valor_causa else None,
                 "created_at": p.created_at.isoformat() if p.created_at else None,

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AdvancedFilters, { FilterValues } from '@/components/AdvancedFilters';
+import { extrairComarcaEData } from '@/utils/cnj';
 import './dashboard.css';
 
 interface Stats {
@@ -83,7 +84,6 @@ export default function Home() {
       <div className="dashboard-main">
         <h1 className="dashboard-title">⚖️ Judicial Aggregator</h1>
 
-        {/* KPIs */}
         {stats && (
           <div className="kpis">
             <div className="kpi-card">
@@ -108,10 +108,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Filtros */}
         <AdvancedFilters onFilterChange={handleFilterChange} currentFilters={filters} />
 
-        {/* Contador */}
         <div style={{ 
           background: 'white', 
           padding: '16px 24px', 
@@ -135,30 +133,31 @@ export default function Home() {
           {loading && <div style={{ color: '#3b82f6' }}>Carregando...</div>}
         </div>
 
-        {/* Processos */}
         <div className="processes-grid">
-          {processos.map((p) => (
-            <Link key={p.id} href={`/processo/${p.id}`} className="process-card">
-              <div className="process-header">
-                <span className={`badge ${p.relevance?.toLowerCase()}`}>
-                  {p.relevance}
-                </span>
-                <span className="tribunal-badge">{p.tribunal}</span>
-              </div>
-              <div className="process-number">{p.numero_cnj}</div>
-              <div className="process-info">
-                <div><strong>Tipo:</strong> {p.tipo_processo}</div>
-                <div><strong>Comarca:</strong> {p.comarca || 'N/A'}</div>
-                <div><strong>Data:</strong> {p.data_ajuizamento ? new Date(p.data_ajuizamento).toLocaleDateString('pt-BR') : 'N/A'}</div>
-                {p.valor_causa && (
-                  <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
-                )}
-              </div>
-            </Link>
-          ))}
+          {processos.map((p) => {
+            const { comarca, data } = extrairComarcaEData(p.numero_cnj, p.tribunal);
+            return (
+              <Link key={p.id} href={`/processo/${p.id}`} className="process-card">
+                <div className="process-header">
+                  <span className={`badge ${p.relevance?.toLowerCase()}`}>
+                    {p.relevance}
+                  </span>
+                  <span className="tribunal-badge">{p.tribunal}</span>
+                </div>
+                <div className="process-number">{p.numero_cnj}</div>
+                <div className="process-info">
+                  <div><strong>Tipo:</strong> {p.tipo_processo}</div>
+                  <div><strong>Comarca:</strong> {comarca}</div>
+                  <div><strong>Data:</strong> {data || 'N/A'}</div>
+                  {p.valor_causa && (
+                    <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Paginação */}
         <div style={{
           display: 'flex',
           justifyContent: 'center',
