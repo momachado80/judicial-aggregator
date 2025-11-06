@@ -112,6 +112,7 @@ def list_processes(
                 "valor_causa": float(p.valor_causa) if p.valor_causa else None,
                 "created_at": p.created_at.isoformat() if p.created_at else None,
                 "updated_at": p.updated_at.isoformat() if p.updated_at else None,
+                "movimentacoes": p.movimentacoes,
             }
             for p in processos
         ]
@@ -225,6 +226,7 @@ def get_process(process_id: int, db: Session = Depends(get_db)):
         "valor_causa": processo.valor_causa,
         "created_at": processo.created_at.isoformat() if processo.created_at else None,
         "updated_at": processo.updated_at.isoformat() if processo.updated_at else None,
+        "movimentacoes": processo.movimentacoes,
     }
 
 @router.get("/{process_id}/link")
