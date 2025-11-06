@@ -81,8 +81,15 @@ export default function Home() {
   };
 
   const handleStatusChange = async (processoId: number, novoStatus: string, event: React.MouseEvent) => {
-    event.preventDefault(); // Previne navegação do Link
+    event.preventDefault();
     event.stopPropagation();
+    
+    // Pegar status atual do processo
+    const processoAtual = processos.find(p => p.id === processoId);
+    const statusAtual = processoAtual?.status || 'pendente';
+    
+    // Se clicar no mesmo botão, desmarcar (volta para pendente)
+    const statusFinal = statusAtual === novoStatus ? 'pendente' : novoStatus;
     
     try {
       const response = await fetch(`https://judicial-aggregator-production.up.railway.app/processes/${processoId}/status`, {
@@ -90,13 +97,13 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: novoStatus }),
+        body: JSON.stringify({ status: statusFinal }),
       });
 
       if (response.ok) {
         // Atualizar o status localmente
         setProcessos(processos.map(p => 
-          p.id === processoId ? { ...p, status: novoStatus } : p
+          p.id === processoId ? { ...p, status: statusFinal } : p
         ));
       }
     } catch (error) {
@@ -207,6 +214,7 @@ export default function Home() {
                       alignItems: 'center',
                       gap: '4px'
                     }}
+                    title={statusAtual === 'interesse' ? 'Clique para desmarcar' : 'Marcar como interesse'}
                   >
                     {statusAtual === 'interesse' ? '✓' : '⭐'} Interesse
                   </button>
@@ -227,6 +235,7 @@ export default function Home() {
                       alignItems: 'center',
                       gap: '4px'
                     }}
+                    title={statusAtual === 'descartado' ? 'Clique para desmarcar' : 'Marcar como descartado'}
                   >
                     {statusAtual === 'descartado' ? '✓' : '❌'} Descartar
                   </button>
