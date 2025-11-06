@@ -23,6 +23,7 @@ interface Processo {
   relevance: string;
   valor_causa: number | null;
   data_ajuizamento: string | null;
+  status?: string;
 }
 
 export default function Home() {
@@ -77,6 +78,31 @@ export default function Home() {
   const handleFilterChange = (newFilters: FilterValues) => {
     setFilters(newFilters);
     setCurrentPage(1);
+  };
+
+  const handleStatusChange = async (processoId: number, novoStatus: string, event: React.MouseEvent) => {
+    event.preventDefault(); // Previne navegação do Link
+    event.stopPropagation();
+    
+    try {
+      const response = await fetch(`https://judicial-aggregator-production.up.railway.app/processes/${processoId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: novoStatus }),
+      });
+
+      if (response.ok) {
+        // Atualizar o status localmente
+        setProcessos(processos.map(p => 
+          p.id === processoId ? { ...p, status: novoStatus } : p
+        ));
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      alert('Erro ao atualizar status');
+    }
   };
 
   return (
@@ -136,24 +162,76 @@ export default function Home() {
         <div className="processes-grid">
           {processos.map((p) => {
             const { comarca, data } = extrairComarcaEData(p.numero_cnj, p.tribunal);
+            const statusAtual = p.status || 'pendente';
+            
             return (
-              <Link key={p.id} href={`/processo/${p.id}`} className="process-card">
-                <div className="process-header">
-                  <span className={`badge ${p.relevance?.toLowerCase()}`}>
-                    {p.relevance}
-                  </span>
-                  <span className="tribunal-badge">{p.tribunal}</span>
+              <div key={p.id} style={{ position: 'relative' }}>
+                <Link href={`/processo/${p.id}`} className="process-card">
+                  <div className="process-header">
+                    <span className={`badge ${p.relevance?.toLowerCase()}`}>
+                      {p.relevance}
+                    </span>
+                    <span className="tribunal-badge">{p.tribunal}</span>
+                  </div>
+                  <div className="process-number">{p.numero_cnj}</div>
+                  <div className="process-info">
+                    <div><strong>Tipo:</strong> {p.tipo_processo}</div>
+                    <div><strong>Comarca:</strong> {comarca}</div>
+                    <div><strong>Data:</strong> {data || 'N/A'}</div>
+                    {p.valor_causa && (
+                      <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
+                    )}
+                  </div>
+                </Link>
+                
+                {/* BOTÕES DE STATUS */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginTop: '12px',
+                  justifyContent: 'center'
+                }}>
+                  <button
+                    onClick={(e) => handleStatusChange(p.id, 'interesse', e)}
+                    style={{
+                      padding: '8px 16px',
+                      background: statusAtual === 'interesse' ? '#10b981' : '#e0e7ff',
+                      color: statusAtual === 'interesse' ? 'white' : '#4f46e5',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {statusAtual === 'interesse' ? '✓' : '⭐'} Interesse
+                  </button>
+                  
+                  <button
+                    onClick={(e) => handleStatusChange(p.id, 'descartado', e)}
+                    style={{
+                      padding: '8px 16px',
+                      background: statusAtual === 'descartado' ? '#ef4444' : '#fee2e2',
+                      color: statusAtual === 'descartado' ? 'white' : '#dc2626',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    {statusAtual === 'descartado' ? '✓' : '❌'} Descartar
+                  </button>
                 </div>
-                <div className="process-number">{p.numero_cnj}</div>
-                <div className="process-info">
-                  <div><strong>Tipo:</strong> {p.tipo_processo}</div>
-                  <div><strong>Comarca:</strong> {comarca}</div>
-                  <div><strong>Data:</strong> {data || 'N/A'}</div>
-                  {p.valor_causa && (
-                    <div><strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.valor_causa)}</div>
-                  )}
-                </div>
-              </Link>
+              </div>
             );
           })}
         </div>
