@@ -235,3 +235,50 @@ def get_link_tribunal(process_id: int, db: Session = Depends(get_db)):
         "tribunal": processo.tribunal,
         "numero": processo.numero_processo
     }
+
+# ========================================
+# ENDPOINT DE STATUS
+# ========================================
+
+from pydantic import BaseModel
+from typing import Literal
+
+class StatusUpdate(BaseModel):
+    status: Literal["pendente", "interesse", "descartado"]
+
+@router.patch("/{process_id}/status")
+def update_process_status(
+    process_id: int,
+    status_update: StatusUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    Atualiza o status de marcação de um processo.
+    
+    Status possíveis:
+    - pendente: Não analisado (padrão)
+    - interesse: Processo interessante
+    - descartado: Processo descartado
+    """
+    processo = db.query(Processo).filter(Processo.id == process_id).first()
+    
+    if not processo:
+        raise HTTPException(status_code=404, detail="Processo não encontrado")
+    
+    # Atualizar status
+    processo.status = status_update.status
+    
+    try:
+        db.commit()
+        db.refresh(processo)
+        
+        return {
+            "success": True,
+            "id": processo.id,
+            "numero_cnj": processo.numero_processo,
+            "status": processo.status,
+            "message": f"Status atualizado para '{processo.status}'"
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))

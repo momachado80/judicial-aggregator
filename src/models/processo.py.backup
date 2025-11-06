@@ -20,7 +20,6 @@ class Processo(Base):
     movimentacoes = Column(Text)  # JSON string
     relevancia = Column(String(20), index=True)  # Alta, Média, Baixa
     score_relevancia = Column(Float)
-    status = Column(String(20), index=True, default="pendente")  # pendente, interesse, descartado
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
