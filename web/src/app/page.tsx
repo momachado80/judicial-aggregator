@@ -26,6 +26,8 @@ interface Processo {
   status?: string;
 }
 
+type StatusTab = 'todos' | 'interesse' | 'descartado' | 'pendente';
+
 export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [processos, setProcessos] = useState<Processo[]>([]);
@@ -35,10 +37,11 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
+  const [activeTab, setActiveTab] = useState<StatusTab>('todos');
 
   useEffect(() => {
     fetchData();
-  }, [filters, currentPage]);
+  }, [filters, currentPage, activeTab]);
 
   async function fetchData() {
     try {
@@ -56,6 +59,10 @@ export default function Home() {
         page: currentPage.toString(),
         page_size: '20',
       });
+
+      if (activeTab !== 'todos') {
+        queryParams.append('status', activeTab);
+      }
 
       Object.entries(filters).forEach(([key, value]) => {
         if (value) {
@@ -80,15 +87,17 @@ export default function Home() {
     setCurrentPage(1);
   };
 
+  const handleTabChange = (tab: StatusTab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
   const handleStatusChange = async (processoId: number, novoStatus: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     
-    // Pegar status atual do processo
     const processoAtual = processos.find(p => p.id === processoId);
     const statusAtual = processoAtual?.status || 'pendente';
-    
-    // Se clicar no mesmo botão, desmarcar (volta para pendente)
     const statusFinal = statusAtual === novoStatus ? 'pendente' : novoStatus;
     
     try {
@@ -101,10 +110,14 @@ export default function Home() {
       });
 
       if (response.ok) {
-        // Atualizar o status localmente
         setProcessos(processos.map(p => 
           p.id === processoId ? { ...p, status: statusFinal } : p
         ));
+        
+        if (activeTab === statusAtual && statusFinal === 'pendente') {
+          setProcessos(processos.filter(p => p.id !== processoId));
+          setTotal(total - 1);
+        }
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -140,6 +153,82 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* ABAS DE FILTRO POR STATUS */}
+        <div style={{
+          background: 'white',
+          padding: '8px',
+          borderRadius: '8px',
+          marginBottom: '24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          display: 'flex',
+          gap: '8px'
+        }}>
+          <button
+            onClick={() => handleTabChange('todos')}
+            style={{
+              padding: '12px 24px',
+              background: activeTab === 'todos' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'todos' ? 'white' : '#64748b',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            📋 Todos
+          </button>
+          <button
+            onClick={() => handleTabChange('pendente')}
+            style={{
+              padding: '12px 24px',
+              background: activeTab === 'pendente' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'pendente' ? 'white' : '#64748b',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            ⏳ Pendentes
+          </button>
+          <button
+            onClick={() => handleTabChange('interesse')}
+            style={{
+              padding: '12px 24px',
+              background: activeTab === 'interesse' ? '#10b981' : 'transparent',
+              color: activeTab === 'interesse' ? 'white' : '#64748b',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            ⭐ De Interesse
+          </button>
+          <button
+            onClick={() => handleTabChange('descartado')}
+            style={{
+              padding: '12px 24px',
+              background: activeTab === 'descartado' ? '#ef4444' : 'transparent',
+              color: activeTab === 'descartado' ? 'white' : '#64748b',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            ❌ Descartados
+          </button>
+        </div>
 
         <AdvancedFilters onFilterChange={handleFilterChange} currentFilters={filters} />
 
@@ -191,7 +280,6 @@ export default function Home() {
                   </div>
                 </Link>
                 
-                {/* BOTÕES DE STATUS */}
                 <div style={{
                   display: 'flex',
                   gap: '8px',
