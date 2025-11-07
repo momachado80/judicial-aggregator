@@ -53,15 +53,14 @@ async def scrape_processos(max_por_tipo: int = 5000, db: Session = Depends(get_d
     }
 
 # ========================================
-# ENDPOINT DE ATUALIZAÇÃO DE COMARCAS
+# ENDPOINT DE ATUALIZAÇÃO DE COMARCAS V2
 # ========================================
 @app.post("/api/atualizar-comarcas-massa")
 async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
-    """
-    Atualiza comarca de TODOS os processos do banco
-    usando extração do número CNJ
-    """
+    """Atualiza comarca de TODOS os processos usando mapeamento completo"""
     try:
+        from src.utils.comarcas_data import COMARCAS_TJSP, COMARCAS_TJBA
+        
         processos = db.query(Processo).all()
         atualizados = 0
         
@@ -69,20 +68,9 @@ async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
             numero_limpo = ''.join(c for c in p.numero_processo if c.isdigit())
             
             if len(numero_limpo) >= 20:
-                # Extrair código da comarca (últimos 4 dígitos)
                 codigo = numero_limpo[-4:]
                 
-                # Mapeamento básico inicial (você pode expandir depois)
-                comarcas_map = {
-                    "TJSP": {
-                        "0026": "São Paulo", "0109": "Campinas", "0372": "Nova Campina"
-                    },
-                    "TJBA": {
-                        "0001": "Salvador", "0002": "Alagoinhas"
-                    }
-                }
-                
-                mapa = comarcas_map.get(p.tribunal, {})
+                mapa = COMARCAS_TJSP if p.tribunal == "TJSP" else COMARCAS_TJBA
                 comarca_nova = mapa.get(codigo, f"Comarca {codigo}")
                 
                 if comarca_nova != p.comarca:
@@ -95,12 +83,10 @@ async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
             "success": True,
             "total_processos": len(processos),
             "comarcas_atualizadas": atualizados,
-            "message": f"✅ {atualizados} comarcas atualizadas com sucesso!"
+            "message": f"✅ {atualizados} comarcas atualizadas!"
         }
     
     except Exception as e:
         db.rollback()
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
