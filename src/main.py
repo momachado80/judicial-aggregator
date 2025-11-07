@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.routers import processes
 from src.api import health
 from src.database import engine, Base
+from src.models.processo import Processo
 
 app = FastAPI(
     title="Judicial Aggregator API",
