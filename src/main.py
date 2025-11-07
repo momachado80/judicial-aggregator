@@ -50,3 +50,56 @@ async def scrape_processos(max_por_tipo: int = 5000, db: Session = Depends(get_d
         "processos_novos": novos,
         "processos_duplicados": duplicados
     }
+
+# ========================================
+# ENDPOINT DE ATUALIZAÇÃO DE COMARCAS
+# ========================================
+@app.post("/api/atualizar-comarcas-massa")
+async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
+    """
+    Atualiza comarca de TODOS os processos do banco
+    usando extração do número CNJ
+    """
+    try:
+        processos = db.query(Processo).all()
+        atualizados = 0
+        
+        for p in processos:
+            numero_limpo = ''.join(c for c in p.numero_processo if c.isdigit())
+            
+            if len(numero_limpo) >= 20:
+                # Extrair código da comarca (últimos 4 dígitos)
+                codigo = numero_limpo[-4:]
+                
+                # Mapeamento básico inicial (você pode expandir depois)
+                comarcas_map = {
+                    "TJSP": {
+                        "0026": "São Paulo", "0109": "Campinas", "0372": "Nova Campina"
+                    },
+                    "TJBA": {
+                        "0001": "Salvador", "0002": "Alagoinhas"
+                    }
+                }
+                
+                mapa = comarcas_map.get(p.tribunal, {})
+                comarca_nova = mapa.get(codigo, f"Comarca {codigo}")
+                
+                if comarca_nova != p.comarca:
+                    p.comarca = comarca_nova
+                    atualizados += 1
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "total_processos": len(processos),
+            "comarcas_atualizadas": atualizados,
+            "message": f"✅ {atualizados} comarcas atualizadas com sucesso!"
+        }
+    
+    except Exception as e:
+        db.rollback()
+        return {
+            "success": False,
+            "error": str(e)
+        }
