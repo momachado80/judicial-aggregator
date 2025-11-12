@@ -90,3 +90,7 @@ async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
         db.rollback()
         return {"success": False, "error": str(e)}
 
+
+# Router de busca sob demanda
+from src.api.routers import buscar_processos
+app.include_router(buscar_processos.router, prefix="/api/buscar-processos", tags=["Busca Sob Demanda"])
