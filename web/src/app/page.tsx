@@ -66,6 +66,7 @@ export default function Home() {
       body: JSON.stringify({ status: 'interesse' })
     });
     const novos = new Set(interesseIds);
+              comarcas: comarcasSelecionadas.length > 0 ? comarcasSelecionadas : undefined,
     novos.add(id);
     localStorage.setItem('judicial_interesse', JSON.stringify(Array.from(novos)));
     setInteresseIds(novos);
@@ -78,6 +79,7 @@ export default function Home() {
       body: JSON.stringify({ status: 'descartado' })
     });
     const novos = new Set(descartadosIds);
+              comarcas: comarcasSelecionadas.length > 0 ? comarcasSelecionadas : undefined,
     novos.add(id);
     localStorage.setItem('judicial_descartados', JSON.stringify(Array.from(novos)));
     setDescartadosIds(novos);
@@ -101,6 +103,7 @@ export default function Home() {
             body: JSON.stringify({
               tribunal: trib,
               tipo_processo: tipo,
+              comarcas: comarcasSelecionadas.length > 0 ? comarcasSelecionadas : undefined,
               valor_causa_min: valorMin ? Number(valorMin) : undefined,
               valor_causa_max: valorMax ? Number(valorMax) : undefined,
               limit: Math.floor(quantidade / (tribunaisSelecionados.length * tiposSelecionados.length))
