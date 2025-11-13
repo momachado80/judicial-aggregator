@@ -3,11 +3,6 @@ import { useState, useEffect } from 'react';
 
 type Tab = 'busca' | 'interesse' | 'descartados';
 
-const COMARCAS_PRINCIPAIS = [
-  'São Paulo', 'Campinas', 'Guarulhos', 'Santos', 'Ribeirão Preto', 'Sorocaba',
-  'Salvador', 'Feira de Santana', 'Vitória da Conquista', 'Camaçari', 'Ilhéus'
-];
-
 export default function Home() {
   const [processos, setProcessos] = useState([]);
   const [interesseIds, setInteresseIds] = useState<Set<number>>(new Set());
@@ -16,21 +11,52 @@ export default function Home() {
   const [searched, setSearched] = useState(false);
   const [stats, setStats] = useState(null);
   const [activeTab, setActiveTab] = useState<Tab>('busca');
+  const [todasComarcas, setTodasComarcas] = useState<string[]>([]);
   
   const [tribunais, setTribunais] = useState({ TJSP: true, TJBA: false });
   const [tipos, setTipos] = useState({ 'Inventário': true, 'Divórcio Litigioso': false, 'Divórcio Consensual': false });
-  const [comarcasSelecionadas, setComarcasSelecionadas] = useState<Set<string>>(new Set());
+  const [comarcasInput, setComarcasInput] = useState('');
+  const [comarcasSelecionadas, setComarcasSelecionadas] = useState<string[]>([]);
+  const [sugestoes, setSugestoes] = useState<string[]>([]);
   const [valorMin, setValorMin] = useState('');
   const [valorMax, setValorMax] = useState('');
   const [ano, setAno] = useState('');
   const [quantidade, setQuantidade] = useState(500);
 
   useEffect(() => {
+    fetch('https://judicial-aggregator-production.up.railway.app/processes/comarcas')
+      .then(r => r.json())
+      .then(data => setTodasComarcas(data.comarcas || []));
+    
     const saved = localStorage.getItem('judicial_interesse');
     if (saved) setInteresseIds(new Set(JSON.parse(saved)));
     const desc = localStorage.getItem('judicial_descartados');
     if (desc) setDescartadosIds(new Set(JSON.parse(desc)));
   }, []);
+
+  const handleComarcaInput = (value: string) => {
+    setComarcasInput(value);
+    if (value.trim().length > 1) {
+      const filtradas = todasComarcas.filter(c => 
+        c.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 10);
+      setSugestoes(filtradas);
+    } else {
+      setSugestoes([]);
+    }
+  };
+
+  const adicionarComarca = (comarca: string) => {
+    if (!comarcasSelecionadas.includes(comarca)) {
+      setComarcasSelecionadas([...comarcasSelecionadas, comarca]);
+    }
+    setComarcasInput('');
+    setSugestoes([]);
+  };
+
+  const removerComarca = (comarca: string) => {
+    setComarcasSelecionadas(comarcasSelecionadas.filter(c => c !== comarca));
+  };
 
   const marcarInteresse = async (id: number) => {
     await fetch(`https://judicial-aggregator-production.up.railway.app/processes/${id}/status`, {
@@ -54,16 +80,6 @@ export default function Home() {
     novos.add(id);
     localStorage.setItem('judicial_descartados', JSON.stringify(Array.from(novos)));
     setDescartadosIds(novos);
-  };
-
-  const toggleComarca = (comarca: string) => {
-    const novas = new Set(comarcasSelecionadas);
-    if (novas.has(comarca)) {
-      novas.delete(comarca);
-    } else {
-      novas.add(comarca);
-    }
-    setComarcasSelecionadas(novas);
   };
 
   async function handleBuscar() {
@@ -97,10 +113,9 @@ export default function Home() {
         }
       }
       
-      // Filtrar por comarcas se selecionadas
-      if (comarcasSelecionadas.size > 0) {
+      if (comarcasSelecionadas.length > 0) {
         todosProcessos = todosProcessos.filter(p => 
-          Array.from(comarcasSelecionadas).some(c => p.comarca?.includes(c))
+          comarcasSelecionadas.some(c => p.comarca?.toLowerCase().includes(c.toLowerCase()))
         );
       }
       
@@ -165,15 +180,48 @@ export default function Home() {
           </div>
 
           <div style={{marginBottom: '1.5rem'}}>
-            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>Comarcas (opcional - selecione uma ou mais)</label>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem'}}>
-              {COMARCAS_PRINCIPAIS.map(comarca => (
-                <label key={comarca} style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: comarcasSelecionadas.has(comarca) ? '#dbeafe' : '#f9fafb', borderRadius: '6px'}}>
-                  <input type="checkbox" checked={comarcasSelecionadas.has(comarca)} onChange={() => toggleComarca(comarca)} style={{width: '18px', height: '18px'}} />
-                  <span style={{fontSize: '0.9375rem'}}>{comarca}</span>
-                </label>
-              ))}
+            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>
+              Comarcas (opcional - digite para buscar, clique para adicionar)
+            </label>
+            <div style={{position: 'relative'}}>
+              <input 
+                type="text" 
+                value={comarcasInput}
+                onChange={(e) => handleComarcaInput(e.target.value)}
+                placeholder="Digite o nome da comarca... Ex: São Paulo, Santos, Salvador"
+                style={{width: '100%', padding: '0.875rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+              />
+              {sugestoes.length > 0 && (
+                <div style={{position: 'absolute', top: '100%', left: 0, right: 0, background: 'white', border: '2px solid #e5e7eb', borderTop: 'none', borderRadius: '0 0 8px 8px', maxHeight: '200px', overflowY: 'auto', zIndex: 10}}>
+                  {sugestoes.map(comarca => (
+                    <div 
+                      key={comarca}
+                      onClick={() => adicionarComarca(comarca)}
+                      style={{padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', fontSize: '0.9375rem'}}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                    >
+                      {comarca}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+            {comarcasSelecionadas.length > 0 && (
+              <div style={{marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem'}}>
+                {comarcasSelecionadas.map(comarca => (
+                  <span key={comarca} style={{background: '#dbeafe', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.9375rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                    {comarca}
+                    <button onClick={() => removerComarca(comarca)} style={{background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.125rem', color: '#ef4444'}}>
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p style={{fontSize: '0.8125rem', color: '#6b7280', marginTop: '0.5rem'}}>
+              💡 {todasComarcas.length} comarcas disponíveis (SP + BA). Digite para buscar e adicionar múltiplas comarcas.
+            </p>
           </div>
 
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '1.5rem'}}>
