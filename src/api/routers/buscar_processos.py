@@ -43,11 +43,11 @@ def buscar_processos(request: BuscaProcessosRequest, db: Session = Depends(get_d
     
     must_clauses = [{"match": {"classe.nome": request.tipo_processo}}]
     
-    # Adicionar filtro de comarcas se fornecido
+    # Filtro de comarcas - testar diferentes campos possíveis
     if request.comarcas and len(request.comarcas) > 0:
         should_comarcas = []
         for comarca in request.comarcas:
-            should_comarcas.append({"match": {"orgaoJulgador.comarca": comarca}})
+            should_comarcas.append({"match_phrase": {"orgaoJulgador.nomeOrgao": comarca}})
         must_clauses.append({"bool": {"should": should_comarcas, "minimum_should_match": 1}})
     
     if request.valor_causa_min or request.valor_causa_max:
@@ -91,11 +91,13 @@ def buscar_processos(request: BuscaProcessosRequest, db: Session = Depends(get_d
                 inativos += 1
                 continue
             
+            # CORRIGIDO: usar numero_processo ao invés de numero_cnj
             processo_existente = db.query(Processo).filter(
-                Processo.numero_cnj == numero_cnj
+                Processo.numero_processo == numero_cnj
             ).first()
             
-            comarca = source.get("orgaoJulgador", {}).get("comarca", "")
+            orgao = source.get("orgaoJulgador", {})
+            comarca = orgao.get("nomeOrgao", "")
             tipo_processo = source.get("classe", {}).get("nome", "")
             valor_causa = source.get("valorCausa")
             data_ajuizamento = source.get("dataAjuizamento")
@@ -115,14 +117,14 @@ def buscar_processos(request: BuscaProcessosRequest, db: Session = Depends(get_d
             else:
                 try:
                     novo_processo = Processo(
-                        numero_cnj=numero_cnj,
+                        numero_processo=numero_cnj,
                         tribunal=request.tribunal,
                         tipo_processo=tipo_processo,
                         comarca=comarca,
                         valor_causa=valor_causa,
                         data_ajuizamento=data_ajuizamento,
                         classe=source.get("classe", {}).get("codigo", ""),
-                        relevance="alta"
+                        relevancia="alta"
                     )
                     db.add(novo_processo)
                     db.commit()
