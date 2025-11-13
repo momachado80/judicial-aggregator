@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import httpx
 from datetime import datetime
-.comarca_codes import build_processo_pattern, get_comarca_code, get_all_comarcas
+from .comarca_codes import build_processo_pattern, get_comarca_code, get_all_comarcas
 
 router = APIRouter()
 
