@@ -36,7 +36,7 @@ export function ProcessCard({ process, onSelect, onDiscard }: Props) {
             )}
             {process.valor_causa && process.valor_causa > 1000000 && (
               <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded font-bold">
-                💎 ALTO VALOR
+                ALTO VALOR
               </span>
             )}
           </div>
@@ -57,23 +57,23 @@ export function ProcessCard({ process, onSelect, onDiscard }: Props) {
       <div className="flex gap-2 mt-4">
         <button
           onClick={() => onSelect(process.id)}
-          className="flex-1 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+          className="flex-1 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
         >
-          ⭐ Selecionar
+          Selecionar
         </button>
         <button
           onClick={() => onDiscard(process.id)}
-          className="flex-1 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors"
+          className="flex-1 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
         >
-          🗑️ Descartar
+          Descartar
         </button>
         
           href={`https://judicial-aggregator-production.up.railway.app/processes/${process.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-colors"
+          className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700"
         >
-          👁️
+          Ver
         </a>
       </div>
     </div>
