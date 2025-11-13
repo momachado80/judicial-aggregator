@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 import requests
 from src.database import get_db
 from src.models import Processo
@@ -12,6 +12,7 @@ router = APIRouter()
 class BuscaProcessosRequest(BaseModel):
     tribunal: Literal["TJSP", "TJBA"]
     tipo_processo: Literal["Inventário", "Divórcio Litigioso", "Divórcio Consensual"]
+    comarcas: Optional[List[str]] = None
     valor_causa_min: Optional[float] = None
     valor_causa_max: Optional[float] = None
     limit: int = 500
@@ -42,6 +43,13 @@ def buscar_processos(request: BuscaProcessosRequest, db: Session = Depends(get_d
     
     must_clauses = [{"match": {"classe.nome": request.tipo_processo}}]
     
+    # Adicionar filtro de comarcas se fornecido
+    if request.comarcas and len(request.comarcas) > 0:
+        should_comarcas = []
+        for comarca in request.comarcas:
+            should_comarcas.append({"match": {"orgaoJulgador.comarca": comarca}})
+        must_clauses.append({"bool": {"should": should_comarcas, "minimum_should_match": 1}})
+    
     if request.valor_causa_min or request.valor_causa_max:
         range_filter = {}
         if request.valor_causa_min:
@@ -50,55 +58,100 @@ def buscar_processos(request: BuscaProcessosRequest, db: Session = Depends(get_d
             range_filter["lte"] = request.valor_causa_max
         must_clauses.append({"range": {"valorCausa": range_filter}})
     
-    payload = {
+    query = {
+        "size": request.limit,
         "query": {"bool": {"must": must_clauses}},
-        "size": min(request.limit, 1000),
         "sort": [{"dataAjuizamento": {"order": "desc"}}]
     }
     
     try:
-        response = requests.post(urls[request.tribunal], json=payload, headers=headers, timeout=30)
+        response = requests.post(
+            urls[request.tribunal],
+            headers=headers,
+            json=query,
+            timeout=30
+        )
+        response.raise_for_status()
         data = response.json()
-        hits = data.get("hits", {}).get("hits", [])
         
-        processos_salvos = []
-        stats = {"novos": 0, "duplicados": 0, "inativos": 0}
+        processos_encontrados = []
+        novos = 0
+        duplicados = 0
+        inativos = 0
         
-        for hit in hits:
+        for hit in data.get("hits", {}).get("hits", []):
             source = hit.get("_source", {})
-            numero = source.get("numeroProcesso", "")
+            numero_cnj = source.get("numeroProcesso")
+            
+            if not numero_cnj:
+                continue
+            
             movimentos = source.get("movimentos", [])
-            
-            if not numero or not processo_esta_ativo(movimentos):
-                stats["inativos"] += 1
+            if not processo_esta_ativo(movimentos):
+                inativos += 1
                 continue
             
-            existe = db.query(Processo).filter(Processo.numero_processo == numero).first()
+            processo_existente = db.query(Processo).filter(
+                Processo.numero_cnj == numero_cnj
+            ).first()
             
-            if existe:
-                stats["duplicados"] += 1
-                processos_salvos.append({"id": existe.id, "numero_cnj": existe.numero_processo, "novo": False})
-                continue
+            comarca = source.get("orgaoJulgador", {}).get("comarca", "")
+            tipo_processo = source.get("classe", {}).get("nome", "")
+            valor_causa = source.get("valorCausa")
+            data_ajuizamento = source.get("dataAjuizamento")
             
-            processo = Processo(
-                numero_processo=numero,
-                tribunal=request.tribunal,
-                tipo_processo=request.tipo_processo,
-                classe=request.tipo_processo,
-                comarca="A definir",
-                valor_causa=source.get("valorCausa"),
-                relevancia="Alta",
-                status="pendente"
-            )
-            
-            db.add(processo)
-            db.flush()
-            stats["novos"] += 1
-            processos_salvos.append({"id": processo.id, "numero_cnj": processo.numero_processo, "novo": True})
+            if processo_existente:
+                duplicados += 1
+                processos_encontrados.append({
+                    "id": processo_existente.id,
+                    "numero_cnj": numero_cnj,
+                    "tribunal": request.tribunal,
+                    "tipo_processo": tipo_processo,
+                    "comarca": comarca,
+                    "valor_causa": valor_causa,
+                    "data_ajuizamento": data_ajuizamento,
+                    "novo": False
+                })
+            else:
+                try:
+                    novo_processo = Processo(
+                        numero_cnj=numero_cnj,
+                        tribunal=request.tribunal,
+                        tipo_processo=tipo_processo,
+                        comarca=comarca,
+                        valor_causa=valor_causa,
+                        data_ajuizamento=data_ajuizamento,
+                        classe=source.get("classe", {}).get("codigo", ""),
+                        relevance="alta"
+                    )
+                    db.add(novo_processo)
+                    db.commit()
+                    db.refresh(novo_processo)
+                    
+                    novos += 1
+                    processos_encontrados.append({
+                        "id": novo_processo.id,
+                        "numero_cnj": numero_cnj,
+                        "tribunal": request.tribunal,
+                        "tipo_processo": tipo_processo,
+                        "comarca": comarca,
+                        "valor_causa": valor_causa,
+                        "data_ajuizamento": data_ajuizamento,
+                        "novo": True
+                    })
+                except IntegrityError:
+                    db.rollback()
+                    duplicados += 1
         
-        db.commit()
-        return {"success": True, "stats": stats, "processos": processos_salvos}
-        
+        return {
+            "success": True,
+            "stats": {
+                "novos": novos,
+                "duplicados": duplicados,
+                "inativos": inativos
+            },
+            "processos": processos_encontrados
+        }
+    
     except Exception as e:
-        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
