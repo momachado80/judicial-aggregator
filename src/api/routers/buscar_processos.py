@@ -1,6 +1,6 @@
 """
 Router para busca de processos sob demanda na API DataJud do CNJ.
-VERSÃO FINAL COM COMARCA FUNCIONANDO
+VERSÃO COM FILTRO DE COMARCA NO BACKEND (após buscar da API)
 """
 
 from fastapi import APIRouter, HTTPException
@@ -45,7 +45,10 @@ class ProcessoResponse(BaseModel):
 
 @router.post("/api/buscar-processos", response_model=List[ProcessoResponse])
 async def buscar_processos(request: BuscarProcessosRequest):
-    """Busca processos na API DataJud do CNJ com filtros incluindo comarca."""
+    """
+    Busca processos na API DataJud do CNJ com filtros.
+    ESTRATÉGIA: Busca mais processos da API e filtra comarca no backend.
+    """
     
     todos_processos = []
     
@@ -64,23 +67,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
             must_clauses.append({
                 "bool": {"should": tipo_clauses, "minimum_should_match": 1}
             })
-        
-        # Filtro de comarca usando código OOOO no numeroProcesso
-        if request.comarcas:
-            comarca_patterns = []
-            for comarca in request.comarcas:
-                pattern = build_processo_pattern(comarca, tribunal)
-                if pattern:
-                    comarca_patterns.append({
-                        "wildcard": {"numeroProcesso": pattern}
-                    })
-                else:
-                    print(f"⚠️  Comarca '{comarca}' não encontrada no mapeamento {tribunal}")
-            
-            if comarca_patterns:
-                must_clauses.append({
-                    "bool": {"should": comarca_patterns, "minimum_should_match": 1}
-                })
         
         # Filtro de valor da causa
         if request.valor_min is not None or request.valor_max is not None:
@@ -106,8 +92,15 @@ async def buscar_processos(request: BuscarProcessosRequest):
             {"match": {"movimentos.nome": "Arquivamento"}}
         ]
         
+        # MUDANÇA: Se tem filtro de comarca, buscar MAIS processos para garantir quantidade
+        quantidade_buscar = request.quantidade
+        if request.comarcas:
+            # Buscar 10x mais para ter margem após filtrar
+            quantidade_buscar = min(request.quantidade * 10, 1000)
+            print(f"⚠️  Filtro de comarca ativado: buscando {quantidade_buscar} processos para filtrar no backend")
+        
         query = {
-            "size": request.quantidade,
+            "size": quantidade_buscar,
             "query": {
                 "bool": {
                     "must": must_clauses,
@@ -136,29 +129,55 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 data = response.json()
                 hits = data.get("hits", {}).get("hits", [])
                 
-                print(f"✅ {tribunal}: {len(hits)} processos encontrados")
+                print(f"✅ {tribunal}: {len(hits)} processos retornados da API")
+                
+                # Processar e FILTRAR por comarca se necessário
+                processos_filtrados = []
                 
                 for hit in hits:
                     source = hit.get("_source", {})
                     numero_cnj = source.get("numeroProcesso", "")
-                    comarca = extrair_comarca_do_numero(numero_cnj, tribunal)
+                    
+                    # Extrair comarca do número CNJ
+                    comarca_nome = extrair_comarca_do_numero(numero_cnj, tribunal)
+                    codigo_comarca = numero_cnj[-4:] if len(numero_cnj) >= 4 else None
+                    
+                    # FILTRO DE COMARCA NO BACKEND
+                    if request.comarcas:
+                        comarca_match = False
+                        for comarca_filtro in request.comarcas:
+                            codigo_esperado = get_comarca_code(comarca_filtro, tribunal)
+                            if codigo_esperado and codigo_comarca == codigo_esperado:
+                                comarca_match = True
+                                break
+                        
+                        # Pular se não bater com nenhuma comarca solicitada
+                        if not comarca_match:
+                            continue
                     
                     processo = ProcessoResponse(
                         numero=numero_cnj,
                         tribunal=tribunal,
                         tipo=source.get("classe", {}).get("nome", ""),
-                        comarca=comarca,
+                        comarca=comarca_nome,
                         valor_causa=source.get("valorCausa"),
                         data_ajuizamento=source.get("dataAjuizamento"),
                         url_tjsp=f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.numero={numero_cnj}" if tribunal == "TJSP" else None
                     )
-                    todos_processos.append(processo)
+                    processos_filtrados.append(processo)
+                    
+                    # Parar quando atingir quantidade solicitada
+                    if len(processos_filtrados) >= request.quantidade:
+                        break
+                
+                print(f"✅ {tribunal}: {len(processos_filtrados)} processos após filtro de comarca")
+                todos_processos.extend(processos_filtrados)
         
         except Exception as e:
             print(f"❌ Erro ao buscar {tribunal}: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Erro ao buscar processos: {str(e)}")
     
-    return todos_processos
+    return todos_processos[:request.quantidade]
 
 
 def extrair_comarca_do_numero(numero_cnj: str, tribunal: str) -> Optional[str]:
