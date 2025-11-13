@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import httpx
-from comarca_codes import build_processo_pattern, get_comarca_code, get_all_comarcas
+from src.comarca_codes import build_processo_pattern, get_comarca_code, get_all_comarcas
 
 router = APIRouter()
 
