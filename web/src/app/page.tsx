@@ -3,6 +3,11 @@ import { useState, useEffect } from 'react';
 
 type Tab = 'busca' | 'interesse' | 'descartados';
 
+const COMARCAS_PRINCIPAIS = [
+  'São Paulo', 'Campinas', 'Guarulhos', 'Santos', 'Ribeirão Preto', 'Sorocaba',
+  'Salvador', 'Feira de Santana', 'Vitória da Conquista', 'Camaçari', 'Ilhéus'
+];
+
 export default function Home() {
   const [processos, setProcessos] = useState([]);
   const [interesseIds, setInteresseIds] = useState<Set<number>>(new Set());
@@ -13,9 +18,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('busca');
   
   const [tribunais, setTribunais] = useState({ TJSP: true, TJBA: false });
-  const [tipo, setTipo] = useState('Inventário');
-  const [comarcas, setComarcas] = useState<string[]>([]);
-  const [comarcaInput, setComarcaInput] = useState('');
+  const [tipos, setTipos] = useState({ 'Inventário': true, 'Divórcio Litigioso': false, 'Divórcio Consensual': false });
+  const [comarcasSelecionadas, setComarcasSelecionadas] = useState<Set<string>>(new Set());
   const [valorMin, setValorMin] = useState('');
   const [valorMax, setValorMax] = useState('');
   const [ano, setAno] = useState('');
@@ -28,16 +32,6 @@ export default function Home() {
     if (desc) setDescartadosIds(new Set(JSON.parse(desc)));
   }, []);
 
-  const salvarInteresse = (ids: Set<number>) => {
-    localStorage.setItem('judicial_interesse', JSON.stringify(Array.from(ids)));
-    setInteresseIds(new Set(ids));
-  };
-
-  const salvarDescartados = (ids: Set<number>) => {
-    localStorage.setItem('judicial_descartados', JSON.stringify(Array.from(ids)));
-    setDescartadosIds(new Set(ids));
-  };
-
   const marcarInteresse = async (id: number) => {
     await fetch(`https://judicial-aggregator-production.up.railway.app/processes/${id}/status`, {
       method: 'PATCH',
@@ -46,7 +40,8 @@ export default function Home() {
     });
     const novos = new Set(interesseIds);
     novos.add(id);
-    salvarInteresse(novos);
+    localStorage.setItem('judicial_interesse', JSON.stringify(Array.from(novos)));
+    setInteresseIds(novos);
   };
 
   const descartar = async (id: number) => {
@@ -57,46 +52,56 @@ export default function Home() {
     });
     const novos = new Set(descartadosIds);
     novos.add(id);
-    salvarDescartados(novos);
+    localStorage.setItem('judicial_descartados', JSON.stringify(Array.from(novos)));
+    setDescartadosIds(novos);
   };
 
-  const adicionarComarca = () => {
-    if (comarcaInput.trim() && !comarcas.includes(comarcaInput.trim())) {
-      setComarcas([...comarcas, comarcaInput.trim()]);
-      setComarcaInput('');
+  const toggleComarca = (comarca: string) => {
+    const novas = new Set(comarcasSelecionadas);
+    if (novas.has(comarca)) {
+      novas.delete(comarca);
+    } else {
+      novas.add(comarca);
     }
-  };
-
-  const removerComarca = (c: string) => {
-    setComarcas(comarcas.filter(x => x !== c));
+    setComarcasSelecionadas(novas);
   };
 
   async function handleBuscar() {
     setLoading(true);
     setSearched(true);
     const tribunaisSelecionados = Object.keys(tribunais).filter(k => tribunais[k]);
+    const tiposSelecionados = Object.keys(tipos).filter(k => tipos[k]);
     
     try {
       let todosProcessos = [];
       let todosStats = { novos: 0, duplicados: 0, inativos: 0 };
       
       for (const trib of tribunaisSelecionados) {
-        const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/buscar-processos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tribunal: trib,
-            tipo_processo: tipo,
-            valor_causa_min: valorMin ? Number(valorMin) : undefined,
-            valor_causa_max: valorMax ? Number(valorMax) : undefined,
-            limit: quantidade
-          })
-        });
-        const data = await response.json();
-        todosProcessos = [...todosProcessos, ...(data.processos || [])];
-        todosStats.novos += data.stats?.novos || 0;
-        todosStats.duplicados += data.stats?.duplicados || 0;
-        todosStats.inativos += data.stats?.inativos || 0;
+        for (const tipo of tiposSelecionados) {
+          const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/buscar-processos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tribunal: trib,
+              tipo_processo: tipo,
+              valor_causa_min: valorMin ? Number(valorMin) : undefined,
+              valor_causa_max: valorMax ? Number(valorMax) : undefined,
+              limit: Math.floor(quantidade / (tribunaisSelecionados.length * tiposSelecionados.length))
+            })
+          });
+          const data = await response.json();
+          todosProcessos = [...todosProcessos, ...(data.processos || [])];
+          todosStats.novos += data.stats?.novos || 0;
+          todosStats.duplicados += data.stats?.duplicados || 0;
+          todosStats.inativos += data.stats?.inativos || 0;
+        }
+      }
+      
+      // Filtrar por comarcas se selecionadas
+      if (comarcasSelecionadas.size > 0) {
+        todosProcessos = todosProcessos.filter(p => 
+          Array.from(comarcasSelecionadas).some(c => p.comarca?.includes(c))
+        );
       }
       
       setProcessos(todosProcessos);
@@ -116,6 +121,9 @@ export default function Home() {
     return !descartadosIds.has(p.id);
   });
 
+  const algumTribunalSelecionado = tribunais.TJSP || tribunais.TJBA;
+  const algumTipoSelecionado = tipos['Inventário'] || tipos['Divórcio Litigioso'] || tipos['Divórcio Consensual'];
+
   return (
     <div style={{minHeight: '100vh', background: '#f3f4f6', padding: '2rem'}}>
       <div style={{maxWidth: '1400px', margin: '0 auto'}}>
@@ -125,7 +133,7 @@ export default function Home() {
           <h2 style={{fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1.5rem'}}>🔍 Buscar Processos Ativos</h2>
           
           <div style={{marginBottom: '1.5rem'}}>
-            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>Tribunais *</label>
+            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>Tribunais * (selecione um ou mais)</label>
             <div style={{display: 'flex', gap: '2rem'}}>
               <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'}}>
                 <input type="checkbox" checked={tribunais.TJSP} onChange={(e) => setTribunais({...tribunais, TJSP: e.target.checked})} style={{width: '20px', height: '20px'}} />
@@ -138,23 +146,44 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '1.5rem'}}>
-            <div>
-              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Tipo *</label>
-              <select value={tipo} onChange={(e) => setTipo(e.target.value)} style={{width: '100%', padding: '0.875rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}>
-                <option value="Inventário">Inventário</option>
-                <option value="Divórcio Litigioso">Divórcio Litigioso</option>
-                <option value="Divórcio Consensual">Divórcio Consensual</option>
-              </select>
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>Tipos de Processo * (selecione um ou mais)</label>
+            <div style={{display: 'flex', gap: '2rem', flexWrap: 'wrap'}}>
+              <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'}}>
+                <input type="checkbox" checked={tipos['Inventário']} onChange={(e) => setTipos({...tipos, 'Inventário': e.target.checked})} style={{width: '20px', height: '20px'}} />
+                <span style={{fontSize: '1.125rem'}}>Inventário</span>
+              </label>
+              <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'}}>
+                <input type="checkbox" checked={tipos['Divórcio Litigioso']} onChange={(e) => setTipos({...tipos, 'Divórcio Litigioso': e.target.checked})} style={{width: '20px', height: '20px'}} />
+                <span style={{fontSize: '1.125rem'}}>Divórcio Litigioso</span>
+              </label>
+              <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer'}}>
+                <input type="checkbox" checked={tipos['Divórcio Consensual']} onChange={(e) => setTipos({...tipos, 'Divórcio Consensual': e.target.checked})} style={{width: '20px', height: '20px'}} />
+                <span style={{fontSize: '1.125rem'}}>Divórcio Consensual</span>
+              </label>
             </div>
-            
+          </div>
+
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem'}}>Comarcas (opcional - selecione uma ou mais)</label>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem'}}>
+              {COMARCAS_PRINCIPAIS.map(comarca => (
+                <label key={comarca} style={{display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: comarcasSelecionadas.has(comarca) ? '#dbeafe' : '#f9fafb', borderRadius: '6px'}}>
+                  <input type="checkbox" checked={comarcasSelecionadas.has(comarca)} onChange={() => toggleComarca(comarca)} style={{width: '18px', height: '18px'}} />
+                  <span style={{fontSize: '0.9375rem'}}>{comarca}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '1.5rem'}}>
             <div>
               <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Quantidade *</label>
               <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{width: '100%', padding: '0.875rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}>
-                <option value="50">50 processos</option>
-                <option value="100">100 processos</option>
-                <option value="500">500 processos</option>
-                <option value="1000">1.000 processos</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
               </select>
             </div>
             
@@ -167,21 +196,21 @@ export default function Home() {
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Valor Mínimo (R$)</label>
+              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Valor Mín (R$)</label>
               <input type="number" value={valorMin} onChange={(e) => setValorMin(e.target.value)} placeholder="100000" style={{width: '100%', padding: '0.875rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}} />
             </div>
 
             <div>
-              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Valor Máximo (R$)</label>
+              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: '600'}}>Valor Máx (R$)</label>
               <input type="number" value={valorMax} onChange={(e) => setValorMax(e.target.value)} placeholder="5000000" style={{width: '100%', padding: '0.875rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}} />
             </div>
           </div>
 
           <div style={{background: '#eff6ff', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.875rem', color: '#1e40af'}}>
-            ℹ️ <strong>Filtra automaticamente:</strong> Apenas processos ATIVOS (exclui extintos, suspensos, arquivados)
+            ℹ️ <strong>Filtro automático:</strong> Apenas processos ATIVOS (exclui extintos, suspensos, arquivados)
           </div>
           
-          <button onClick={handleBuscar} disabled={loading || (!tribunais.TJSP && !tribunais.TJBA)} style={{width: '100%', background: (loading || (!tribunais.TJSP && !tribunais.TJBA)) ? '#9ca3af' : '#2563eb', color: 'white', padding: '1.25rem', borderRadius: '10px', fontSize: '1.25rem', fontWeight: 'bold', border: 'none', cursor: (loading || (!tribunais.TJSP && !tribunais.TJBA)) ? 'not-allowed' : 'pointer'}}>
+          <button onClick={handleBuscar} disabled={loading || !algumTribunalSelecionado || !algumTipoSelecionado} style={{width: '100%', background: (loading || !algumTribunalSelecionado || !algumTipoSelecionado) ? '#9ca3af' : '#2563eb', color: 'white', padding: '1.25rem', borderRadius: '10px', fontSize: '1.25rem', fontWeight: 'bold', border: 'none', cursor: (loading || !algumTribunalSelecionado || !algumTipoSelecionado) ? 'not-allowed' : 'pointer'}}>
             {loading ? '🔄 Buscando...' : '🔍 BUSCAR PROCESSOS'}
           </button>
         </div>
@@ -189,7 +218,7 @@ export default function Home() {
         {stats && (
           <div style={{background: 'white', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
             <h3 style={{fontWeight: 'bold', marginBottom: '1rem'}}>📊 Resultados:</h3>
-            <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
+            <div style={{display: 'flex', gap: '1rem'}}>
               <div style={{background: '#d1fae5', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: '600'}}>✅ Novos: {stats.novos}</div>
               <div style={{background: '#dbeafe', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: '600'}}>🔄 Duplicados: {stats.duplicados}</div>
               <div style={{background: '#fee2e2', padding: '0.75rem 1.5rem', borderRadius: '8px', fontWeight: '600'}}>❌ Inativos: {stats.inativos}</div>
@@ -214,17 +243,11 @@ export default function Home() {
         {!searched && !loading && (
           <div style={{background: 'white', borderRadius: '12px', padding: '4rem', textAlign: 'center'}}>
             <div style={{fontSize: '4rem', marginBottom: '1rem'}}>🔍</div>
-            <p style={{fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem'}}>Pronto para buscar</p>
-            <p style={{color: '#6b7280'}}>Configure os filtros e clique em BUSCAR</p>
+            <p style={{fontSize: '1.5rem', fontWeight: '600'}}>Pronto para buscar</p>
           </div>
         )}
 
-        {loading && (
-          <div style={{textAlign: 'center', padding: '6rem'}}>
-            <div style={{fontSize: '5rem', marginBottom: '1rem'}}>🔄</div>
-            <p style={{fontSize: '1.75rem', fontWeight: '600'}}>Buscando processos ativos...</p>
-          </div>
-        )}
+        {loading && <div style={{textAlign: 'center', padding: '6rem', fontSize: '5rem'}}>🔄</div>}
 
         {processosFiltrados.length > 0 && (
           <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
@@ -238,12 +261,13 @@ export default function Home() {
                 <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', color: '#6b7280', marginBottom: '1.5rem'}}>
                   <p><strong>Tipo:</strong> {p.tipo_processo}</p>
                   <p><strong>Tribunal:</strong> {p.tribunal}</p>
+                  {p.comarca && <p><strong>Comarca:</strong> {p.comarca}</p>}
                 </div>
                 
-                {activeTab === 'busca' && !interesseIds.has(p.id) && !descartadosIds.has(p.id) && (
+                {activeTab === 'busca' && !interesseIds.has(p.id) && (
                   <div style={{display: 'flex', gap: '1rem'}}>
                     <button onClick={() => marcarInteresse(p.id)} style={{flex: 1, background: '#10b981', color: 'white', padding: '0.875rem', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer'}}>
-                      ⭐ Marcar Interesse
+                      ⭐ Interesse
                     </button>
                     <button onClick={() => descartar(p.id)} style={{flex: 1, background: '#ef4444', color: 'white', padding: '0.875rem', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer'}}>
                       🗑️ Descartar
@@ -257,7 +281,6 @@ export default function Home() {
 
         {searched && processosFiltrados.length === 0 && !loading && (
           <div style={{background: 'white', borderRadius: '12px', padding: '4rem', textAlign: 'center'}}>
-            <div style={{fontSize: '4rem', marginBottom: '1rem'}}>📭</div>
             <p style={{fontSize: '1.5rem', fontWeight: '600'}}>Nenhum processo nesta aba</p>
           </div>
         )}
