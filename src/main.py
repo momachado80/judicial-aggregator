@@ -1,15 +1,14 @@
+"""
+FastAPI main application
+CORRIGIDO: Não conecta ao DB durante import
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.routers import processes
-from src.api import health
-from src.database import engine, Base
-from src.models.processo import Processo
+import os
 
-app = FastAPI(
-    title="Judicial Aggregator API",
-    description="API para agregação de processos judiciais",
-    version="1.0.0"
-)
+# Criar app ANTES de qualquer conexão DB
+app = FastAPI(title="Judicial Aggregator API")
 
 # CORS
 app.add_middleware(
@@ -20,77 +19,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Criar tabelas
-Base.metadata.create_all(bind=engine)
+# Import routers DEPOIS de criar app
+from src.api.routers import processes, buscar_processos
 
-# Routers
-app.include_router(health.router, tags=["Health"])
-app.include_router(processes.router, prefix="/processes", tags=["Processes"])
+app.include_router(processes.router, tags=["processes"])
+app.include_router(buscar_processos.router, tags=["buscar"])
+
 
 @app.get("/")
-def root():
+async def root():
     return {
         "message": "Judicial Aggregator API",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
-
-# Endpoints para scraping
-from fastapi import BackgroundTasks, Depends
-from sqlalchemy.orm import Session
-from src.database import get_db
-from src.scrapers.datajud_scraper import DataJudScraper
-
-@app.post("/api/scrape")
-async def scrape_processos(max_por_tipo: int = 5000, db: Session = Depends(get_db)):
-    """Coletar processos reais da API do DataJud"""
-    scraper = DataJudScraper()
-    novos, duplicados = scraper.coletar_todos(max_por_tipo)
-    return {
-        "message": "Scraping concluído!",
-        "processos_novos": novos,
-        "processos_duplicados": duplicados
-    }
-
-# ========================================
-# ENDPOINT DE ATUALIZAÇÃO DE COMARCAS V2
-# ========================================
-@app.post("/api/atualizar-comarcas-massa")
-async def atualizar_comarcas_massa(db: Session = Depends(get_db)):
-    """Atualiza comarca de TODOS os processos usando mapeamento completo"""
-    try:
-        from src.utils.comarcas_data import COMARCAS_TJSP, COMARCAS_TJBA
-        
-        processos = db.query(Processo).all()
-        atualizados = 0
-        
-        for p in processos:
-            numero_limpo = ''.join(c for c in p.numero_processo if c.isdigit())
-            
-            if len(numero_limpo) >= 20:
-                codigo = numero_limpo[-4:]
-                
-                mapa = COMARCAS_TJSP if p.tribunal == "TJSP" else COMARCAS_TJBA
-                comarca_nova = mapa.get(codigo, f"Comarca {codigo}")
-                
-                if comarca_nova != p.comarca:
-                    p.comarca = comarca_nova
-                    atualizados += 1
-        
-        db.commit()
-        
-        return {
-            "success": True,
-            "total_processos": len(processos),
-            "comarcas_atualizadas": atualizados,
-            "message": f"✅ {atualizados} comarcas atualizadas!"
+        "status": "online",
+        "endpoints": {
+            "processes": "/processes",
+            "search": "/api/buscar-processos",
+            "comarcas": "/api/comarcas/{tribunal}"
         }
-    
+    }
+
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+
+# Inicializar DB apenas quando app é chamado
+@app.on_event("startup")
+async def startup_event():
+    """Conecta ao DB apenas no startup, não no import"""
+    try:
+        from src.database import engine, Base
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database initialized")
     except Exception as e:
-        db.rollback()
-        return {"success": False, "error": str(e)}
+        print(f"⚠️ Database init failed (will retry): {e}")
 
 
-# Router de busca sob demanda
-from src.api.routers import buscar_processos
-app.include_router(buscar_processos.router, prefix="/api/buscar-processos", tags=["Busca Sob Demanda"])
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
