@@ -27,13 +27,16 @@ TIPOS_PROCESSO_MAPPING = {
     "Divórcio Consensual": "1108"
 }
 
+# Chave pública da API DataJud
+DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
+
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
     """
     Busca processos judiciais ativos na API DataJud
     """
     try:
-        print(f"🔍 Recebido request: {request}")
+        print(f"🔍 Recebido request: tribunais={request.tribunais}, tipos={request.tipos_processo}, comarcas={request.comarcas}")
         todos_processos = []
         
         for tribunal in request.tribunais:
@@ -51,6 +54,12 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 
                 # Buscar na API DataJud
                 url = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsp/_search"
+                
+                # Headers com autenticação
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"APIKey {DATAJUD_API_KEY}"
+                }
                 
                 query = {
                     "query": {
@@ -75,13 +84,13 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "sort": [{"dataAjuizamento": {"order": "desc"}}]
                 }
                 
-                print(f"📡 Chamando API DataJud...")
-                response = requests.post(url, json=query, timeout=30)
+                print(f"📡 Chamando API DataJud com autenticação...")
+                response = requests.post(url, headers=headers, json=query, timeout=30)
                 
                 print(f"📥 Status code: {response.status_code}")
                 
                 if response.status_code != 200:
-                    print(f"❌ Erro na API: {response.text[:200]}")
+                    print(f"❌ Erro na API: {response.text[:500]}")
                     continue
                     
                 data = response.json()
@@ -93,11 +102,16 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     source = hit.get("_source", {})
                     numero = source.get("numeroProcesso", "")
                     
+                    if not numero:
+                        continue
+                    
                     # Extrair código da comarca do número do processo
                     codigo_comarca = extrair_codigo_comarca(numero)
                     
                     # Obter nome da comarca
                     nome_comarca = get_nome_comarca(codigo_comarca, tribunal)
+                    
+                    print(f"🏛️ Processo {numero} - Comarca: {nome_comarca} (código: {codigo_comarca})")
                     
                     # Se tem filtro de comarca, verificar
                     if request.comarcas:
@@ -107,6 +121,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                             for c in request.comarcas
                         )
                         if not comarca_match:
+                            print(f"  ⏭️ Comarca não corresponde ao filtro")
                             continue
                     
                     # Filtrar por valor
@@ -135,6 +150,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     }
                     
                     todos_processos.append(processo)
+                    print(f"  ✅ Adicionado! Total: {len(todos_processos)}")
                     
                     if len(todos_processos) >= request.quantidade:
                         break
