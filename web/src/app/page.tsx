@@ -131,7 +131,6 @@ export default function Home() {
 
   const formatarData = (data) => {
     if (!data) return 'Não informada';
-    // Formato: 20240913215252 -> 13/09/2024
     const ano = data.substring(0, 4);
     const mes = data.substring(4, 6);
     const dia = data.substring(6, 8);
@@ -139,86 +138,122 @@ export default function Home() {
   };
 
   const ProcessoCard = ({ processo, onInteresse, onDescartar }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow">
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-sm text-gray-600">Número:</p>
-          <a 
-            href={processo.url_tjsp} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 font-mono text-sm font-semibold hover:underline"
-          >
-            {processo.numero}
-          </a>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Tribunal:</p>
-          <p className="font-semibold">{processo.tribunal}</p>
-        </div>
+    <div style={{
+      backgroundColor: 'white',
+      padding: '24px',
+      borderRadius: '12px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      border: '1px solid #e5e7eb'
+    }}>
+      <div style={{ marginBottom: '16px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
+        <a 
+          href={processo.url_tjsp} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            color: '#2563eb',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            fontWeight: '600',
+            textDecoration: 'none'
+          }}
+        >
+          {processo.numero}
+        </a>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-sm text-gray-600">Tipo:</p>
-          <p className="font-semibold">{processo.tipo}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Comarca:</p>
-          <p className="font-semibold text-purple-700">{processo.comarca}</p>
-        </div>
+      <div style={{ marginBottom: '12px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280' }}>Tipo:</p>
+        <p style={{ fontWeight: '600' }}>{processo.tipo}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-sm text-gray-600">Valor da Causa:</p>
-          <p className="font-semibold text-green-700">{formatarValor(processo.valor_causa)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Data Ajuizamento:</p>
-          <p className="font-semibold">{formatarData(processo.data_ajuizamento)}</p>
-        </div>
+      <div style={{ marginBottom: '12px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280' }}>Comarca:</p>
+        <p style={{ fontWeight: '600', color: '#7c3aed' }}>{processo.comarca}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-4">
+      <div style={{ marginBottom: '12px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280' }}>Tribunal:</p>
+        <p style={{ fontWeight: '600' }}>{processo.tribunal}</p>
+      </div>
+
+      <div style={{ marginBottom: '12px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280' }}>Valor da Causa:</p>
+        <p style={{ fontWeight: '600', color: '#059669' }}>{formatarValor(processo.valor_causa)}</p>
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <p style={{ fontSize: '12px', color: '#6b7280' }}>Data Ajuizamento:</p>
+        <p style={{ fontWeight: '600' }}>{formatarData(processo.data_ajuizamento)}</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <button
           onClick={() => onInteresse(processo.numero)}
-          className="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: '#10b981',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
         >
-          <span>⭐</span> Interesse
+          ⭐ Interesse
         </button>
         <button
           onClick={() => onDescartar(processo.numero)}
-          className="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: '#ef4444',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
         >
-          <span>🗑️</span> Descartar
+          🗑️ Descartar
         </button>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <nav className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 shadow-lg">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)' }}>
+      <nav style={{
+        background: 'linear-gradient(to right, #4f46e5, #7c3aed)',
+        color: 'white',
+        padding: '24px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '30px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '12px', margin: 0 }}>
             <span>⚖️</span> Judicial Aggregator
           </h1>
         </div>
       </nav>
 
-      <div className="container mx-auto p-6">
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          padding: '32px',
+          marginBottom: '32px'
+        }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>🔍</span> Buscar Processos Ativos
           </h2>
 
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
-              <label className="block font-semibold mb-2">Tribunais *</label>
-              <div className="flex gap-4">
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Tribunais *</label>
+              <div style={{ display: 'flex', gap: '16px' }}>
                 {['TJSP', 'TJBA'].map(t => (
-                  <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={tribunaisSelecionados.includes(t)}
@@ -229,7 +264,7 @@ export default function Home() {
                           setTribunaisSelecionados(tribunaisSelecionados.filter(x => x !== t));
                         }
                       }}
-                      className="w-4 h-4"
+                      style={{ width: '16px', height: '16px' }}
                     />
                     <span>{t}</span>
                   </label>
@@ -238,10 +273,10 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-2">Tipos *</label>
-              <div className="flex gap-4">
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Tipos *</label>
+              <div style={{ display: 'flex', gap: '16px' }}>
                 {['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual'].map(t => (
-                  <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={tiposSelecionados.includes(t)}
@@ -252,7 +287,7 @@ export default function Home() {
                           setTiposSelecionados(tiposSelecionados.filter(x => x !== t));
                         }
                       }}
-                      className="w-4 h-4"
+                      style={{ width: '16px', height: '16px' }}
                     />
                     <span>{t}</span>
                   </label>
@@ -261,7 +296,7 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-2">
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
                 Comarcas - {TJSP_COMARCAS.length} SP + {TJBA_COMARCAS.length} BA = {TJSP_COMARCAS.length + TJBA_COMARCAS.length} total
               </label>
               <input
@@ -270,62 +305,105 @@ export default function Home() {
                 onChange={(e) => setInputComarca(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(inputComarca)}
                 placeholder="Digite: Piracicaba, Americana, Salvador..."
-                className="w-full p-3 border rounded-lg"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}
                 list="comarcas-list"
               />
               <datalist id="comarcas-list">
                 {comarcasDisponiveis.map(c => <option key={c} value={c} />)}
               </datalist>
               
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
                 {comarcasSelecionadas.map(c => (
-                  <span key={c} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2">
+                  <span key={c} style={{
+                    backgroundColor: '#dbeafe',
+                    color: '#1e40af',
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
                     {c}
-                    <button onClick={() => removerComarca(c)} className="text-red-600 font-bold">×</button>
+                    <button onClick={() => removerComarca(c)} style={{
+                      color: '#dc2626',
+                      fontWeight: 'bold',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}>×</button>
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
               <div>
-                <label className="block font-semibold mb-2">Quantidade *</label>
-                <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} className="w-full p-3 border rounded-lg">
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade *</label>
+                <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}>
                   {[50, 100, 200, 500, 1000].map(q => <option key={q} value={q}>{q}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Ano</label>
-                <select value={ano} onChange={(e) => setAno(e.target.value)} className="w-full p-3 border rounded-lg">
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Ano</label>
+                <select value={ano} onChange={(e) => setAno(e.target.value)} style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}>
                   <option>Todos</option>
                   {anos.map(a => <option key={a}>{a}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Valor Mín (R$)</label>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor Mín (R$)</label>
                 <input
                   type="number"
                   value={valorMin}
                   onChange={(e) => setValorMin(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px'
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Valor Máx (R$)</label>
+                <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor Máx (R$)</label>
                 <input
                   type="number"
                   value={valorMax}
                   onChange={(e) => setValorMax(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px'
+                  }}
                 />
               </div>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div style={{
+              backgroundColor: '#eff6ff',
+              padding: '16px',
+              borderRadius: '8px'
+            }}>
+              <p style={{ fontSize: '14px', color: '#1e40af', margin: 0 }}>
                 ℹ️ Apenas processos ATIVOS (exclui extintos, suspensos, arquivados)
               </p>
             </div>
@@ -333,58 +411,93 @@ export default function Home() {
             <button
               onClick={buscarProcessos}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-6 rounded-lg font-bold text-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              style={{
+                width: '100%',
+                background: 'linear-gradient(to right, #2563eb, #4f46e5)',
+                color: 'white',
+                padding: '16px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                fontWeight: 'bold',
+                fontSize: '18px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1
+              }}
             >
               {loading ? '⏳ Buscando...' : '🔍 BUSCAR PROCESSOS'}
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          padding: '32px'
+        }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>📊</span> Resultados:
           </h2>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-green-50 p-4 rounded-lg">
-              <p className="text-green-800 font-semibold flex items-center gap-2">
-                <span>✅</span> Novos: {stats.novos}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '8px' }}>
+              <p style={{ color: '#166534', fontWeight: '600', margin: 0 }}>
+                ✅ Novos: {stats.novos}
               </p>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-blue-800 font-semibold flex items-center gap-2">
-                <span>🔁</span> Duplicados: {stats.duplicados}
+            <div style={{ backgroundColor: '#eff6ff', padding: '16px', borderRadius: '8px' }}>
+              <p style={{ color: '#1e40af', fontWeight: '600', margin: 0 }}>
+                🔁 Duplicados: {stats.duplicados}
               </p>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg">
-              <p className="text-red-800 font-semibold flex items-center gap-2">
-                <span>❌</span> Inativos: {stats.inativos}
+            <div style={{ backgroundColor: '#fef2f2', padding: '16px', borderRadius: '8px' }}>
+              <p style={{ color: '#991b1b', fontWeight: '600', margin: 0 }}>
+                ❌ Inativos: {stats.inativos}
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <button 
-              onClick={() => {}} 
-              className="bg-blue-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
-            >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <button style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}>
               📋 Busca ({processosBusca.length})
             </button>
-            <button 
-              onClick={() => {}} 
-              className="bg-yellow-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
-            >
+            <button style={{
+              backgroundColor: '#eab308',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}>
               ⭐ Interesse ({processosInteresse.length})
             </button>
-            <button 
-              onClick={() => {}} 
-              className="bg-gray-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
-            >
+            <button style={{
+              backgroundColor: '#6b7280',
+              color: 'white',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}>
               🗑️ Descartados ({processosDescartados.length})
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: '24px'
+          }}>
             {processosBusca.map(p => (
               <ProcessoCard 
                 key={p.numero} 
@@ -396,8 +509,8 @@ export default function Home() {
           </div>
 
           {processosBusca.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <p className="text-xl">Nenhum processo nesta aba</p>
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>
+              <p style={{ fontSize: '20px', margin: 0 }}>Nenhum processo nesta aba</p>
             </div>
           )}
         </div>
