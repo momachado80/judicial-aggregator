@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import requests
-from src.utils.comarcas import get_nome_comarca, extrair_codigo_comarca, formatar_numero_cnj
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj
 
 router = APIRouter()
 
@@ -73,7 +73,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     
                     # Extrair comarca
                     codigo_comarca = extrair_codigo_comarca(numero)
-                    nome_comarca = get_nome_comarca(codigo_comarca, tribunal)
+                    nome_comarca = get_comarca_nome(codigo_comarca, tribunal)
                     
                     # CONTAR CÓDIGOS
                     if codigo_comarca not in codigos_encontrados:
