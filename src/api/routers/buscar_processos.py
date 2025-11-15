@@ -15,81 +15,103 @@ class BuscarProcessosRequest(BaseModel):
     ano: Optional[int] = None
     quantidade: int = 50
 
-# Chave pública da API DataJud
+TIPOS_PROCESSO_MAPPING = {
+    "Inventário": "289",
+    "Divórcio Litigioso": "1107", 
+    "Divórcio Consensual": "1108"
+}
+
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
-    """
-    Busca processos judiciais ativos na API DataJud
-    """
     try:
-        print(f"🔍 Request: {request}")
+        print(f"🔍 Request: tribunais={request.tribunais}, tipos={request.tipos_processo}, comarcas={request.comarcas}")
         todos_processos = []
         
         for tribunal in request.tribunais:
-            # URL da API por tribunal
-            url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
-            
-            # Headers com autenticação
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"APIKey {DATAJUD_API_KEY}"
-            }
-            
-            # Query SIMPLES apenas para testar
-            query = {
-                "query": {
-                    "match_all": {}
-                },
-                "size": request.quantidade
-            }
-            
-            print(f"📡 Chamando {url}")
-            response = requests.post(url, headers=headers, json=query, timeout=30)
-            
-            print(f"📥 Status: {response.status_code}")
-            
-            if response.status_code != 200:
-                print(f"❌ Erro: {response.text[:500]}")
-                continue
+            for tipo in request.tipos_processo:
+                print(f"📋 Buscando: {tribunal} - {tipo}")
                 
-            data = response.json()
-            hits = data.get("hits", {}).get("hits", [])
-            
-            print(f"✅ Encontrados {len(hits)} processos")
-            
-            for hit in hits:
-                source = hit.get("_source", {})
-                numero = source.get("numeroProcesso", "")
+                tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, "289")
                 
-                if not numero:
-                    continue
+                url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
                 
-                # Extrair comarca
-                codigo_comarca = extrair_codigo_comarca(numero)
-                nome_comarca = get_nome_comarca(codigo_comarca, tribunal)
-                
-                # Filtrar por comarca se solicitado
-                if request.comarcas:
-                    comarca_match = any(
-                        c.lower() in nome_comarca.lower()
-                        for c in request.comarcas
-                    )
-                    if not comarca_match:
-                        continue
-                
-                processo = {
-                    "numero": numero,
-                    "tribunal": tribunal,
-                    "tipo": source.get("classe", {}).get("nome", ""),
-                    "comarca": nome_comarca,
-                    "valor_causa": source.get("valorCausa"),
-                    "data_ajuizamento": source.get("dataAjuizamento"),
-                    "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.numero={numero}" if tribunal == "TJSP" else None
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"APIKey {DATAJUD_API_KEY}"
                 }
                 
-                todos_processos.append(processo)
+                # Query com filtro de tipo
+                query = {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {"term": {"classe.codigo": tipo_cod}}
+                            ]
+                        }
+                    },
+                    "size": request.quantidade * 10,
+                    "sort": [{"dataAjuizamento": {"order": "desc"}}]
+                }
+                
+                print(f"📡 Chamando {url}")
+                response = requests.post(url, headers=headers, json=query, timeout=30)
+                
+                print(f"📥 Status: {response.status_code}")
+                
+                if response.status_code != 200:
+                    print(f"❌ Erro: {response.text[:500]}")
+                    continue
+                    
+                data = response.json()
+                hits = data.get("hits", {}).get("hits", [])
+                
+                print(f"✅ Encontrados {len(hits)} processos")
+                
+                for hit in hits:
+                    source = hit.get("_source", {})
+                    numero = source.get("numeroProcesso", "")
+                    
+                    if not numero:
+                        continue
+                    
+                    codigo_comarca = extrair_codigo_comarca(numero)
+                    nome_comarca = get_nome_comarca(codigo_comarca, tribunal)
+                    
+                    # Filtrar por comarca
+                    if request.comarcas:
+                        comarca_match = any(
+                            c.lower() in nome_comarca.lower()
+                            for c in request.comarcas
+                        )
+                        if not comarca_match:
+                            continue
+                    
+                    # Filtrar por valor
+                    valor_causa = source.get("valorCausa")
+                    if request.valor_causa_min and valor_causa:
+                        if valor_causa < request.valor_causa_min:
+                            continue
+                    if request.valor_causa_max and valor_causa:
+                        if valor_causa > request.valor_causa_max:
+                            continue
+                    
+                    processo = {
+                        "numero": numero,
+                        "tribunal": tribunal,
+                        "tipo": tipo,
+                        "comarca": nome_comarca,
+                        "valor_causa": valor_causa,
+                        "data_ajuizamento": source.get("dataAjuizamento"),
+                        "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.numero={numero}" if tribunal == "TJSP" else None
+                    }
+                    
+                    todos_processos.append(processo)
+                    print(f"  ✅ {nome_comarca} - Total: {len(todos_processos)}")
+                    
+                    if len(todos_processos) >= request.quantidade:
+                        break
                 
                 if len(todos_processos) >= request.quantidade:
                     break
