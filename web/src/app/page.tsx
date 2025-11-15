@@ -101,19 +101,16 @@ export default function Home() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              tribunal: trib,
-              tipo_processo: tipo,
+              tribunais: [trib],
+              tipos_processo: [tipo],
               comarcas: comarcasSelecionadas.length > 0 ? comarcasSelecionadas : undefined,
               valor_causa_min: valorMin ? Number(valorMin) : undefined,
               valor_causa_max: valorMax ? Number(valorMax) : undefined,
-              limit: Math.floor(quantidade / (tribunaisSelecionados.length * tiposSelecionados.length))
+              quantidade: Math.floor(quantidade / (tribunaisSelecionados.length * tiposSelecionados.length))
             })
           });
           const data = await response.json();
-          todosProcessos = [...todosProcessos, ...(data.processos || [])];
-          todosStats.novos += data.stats?.novos || 0;
-          todosStats.duplicados += data.stats?.duplicados || 0;
-          todosStats.inativos += data.stats?.inativos || 0;
+          todosProcessos = [...todosProcessos, ...(Array.isArray(data) ? data : [])];
         }
       }
       
@@ -124,9 +121,14 @@ export default function Home() {
       }
       
       setProcessos(todosProcessos);
-      setStats(todosStats);
+      setStats({
+        novos: todosProcessos.length,
+        duplicados: 0,
+        inativos: 0
+      });
     } catch (error) {
-      alert('Erro ao buscar');
+      console.error('Erro ao buscar:', error);
+      alert('Erro ao buscar processos');
     }
     setLoading(false);
   }
