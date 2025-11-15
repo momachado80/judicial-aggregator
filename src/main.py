@@ -48,3 +48,25 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+@app.get("/debug/test-comarca")
+async def test_comarca():
+    from src.utils.comarcas import extrair_codigo_comarca, get_nome_comarca
+    
+    testes = [
+        "1003711-15.2025.8.26.0650",
+        "1004602-24.2025.8.26.0266",
+        "1007829-84.2025.8.26.0019"
+    ]
+    
+    resultados = []
+    for num in testes:
+        codigo = extrair_codigo_comarca(num)
+        nome = get_nome_comarca(codigo, "TJSP")
+        resultados.append({
+            "numero": num,
+            "codigo": codigo,
+            "comarca": nome
+        })
+    
+    return resultados
