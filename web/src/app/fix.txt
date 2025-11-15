@@ -1,0 +1,36 @@
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tribunais: [trib],
+              tipos_processo: [tipo],
+              comarcas: comarcasSelecionadas.length > 0 ? comarcasSelecionadas : undefined,
+              valor_causa_min: valorMin ? Number(valorMin) : undefined,
+              valor_causa_max: valorMax ? Number(valorMax) : undefined,
+              quantidade: Math.floor(quantidade / (tribunaisSelecionados.length * tiposSelecionados.length))
+            })
+          });
+          const data = await response.json();
+          todosProcessos = [...todosProcessos, ...(Array.isArray(data) ? data : [])];
+        }
+      }
+      
+      if (comarcasSelecionadas.length > 0) {
+        todosProcessos = todosProcessos.filter(p => 
+          comarcasSelecionadas.some(c => p.comarca?.toLowerCase().includes(c.toLowerCase()))
+        );
+      }
+      
+      setProcessos(todosProcessos);
+      setStats({
+        novos: todosProcessos.length,
+        duplicados: 0,
+        inativos: 0
+      });
+    } catch (error) {
+      console.error('Erro ao buscar:', error);
+      alert('Erro ao buscar processos');
+    }
+    setLoading(false);
+  }
+
+  const anos = [];
+  for (let i = 2025; i >= 2000; i--) anos.push(i);
