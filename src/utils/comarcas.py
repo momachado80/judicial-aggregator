@@ -9,13 +9,21 @@ TJSP_COMARCAS = {
     "0650": "Taboão da Serra",
     "0266": "Itaquaquecetuba",
     "0047": "São Vicente",
-    # ... (cole aqui a lista completa que criamos antes)
+    "0002": "Santos",
+    "0003": "Guarulhos",
+    "0127": "Mogi das Cruzes",
+    "0223": "Piracicaba",
+    "0286": "Ribeirão Preto",
+    "0309": "Campinas",
+    "0344": "Sorocaba",
+    "0361": "São José dos Campos",
+    "0477": "Taubaté"
 }
 
 TJBA_COMARCAS = {
     "0001": "Salvador",
     "0002": "Feira de Santana",
-    # ... (lista TJBA)
+    "0003": "Vitória da Conquista"
 }
 
 def get_nome_comarca(codigo: str, tribunal: str) -> str:
@@ -29,23 +37,21 @@ def get_nome_comarca(codigo: str, tribunal: str) -> str:
 
 def extrair_codigo_comarca(numero_processo: str) -> str:
     """
-    Extrai o código da comarca do número do processo CNJ
-    
+    Extrai código comarca do número CNJ
     Formato: NNNNNNN-DD.AAAA.J.TR.OOOO
     Exemplo: 1003711-15.2025.8.26.0650
                                   ^^^^
     """
     try:
-        # Remover traços e pontos extras
-        numero_limpo = numero_processo.replace('-', '').replace('.', '')
+        # Separar por ponto
+        partes = numero_processo.split('.')
         
-        # Pegar últimos 4 dígitos
-        if len(numero_limpo) >= 4:
-            codigo = numero_limpo[-4:]
-            print(f"  📍 Extraído código {codigo} de {numero_processo}")
-            return codigo
+        # Último elemento = código comarca
+        if len(partes) >= 5:
+            codigo = partes[-1]
+            return codigo.zfill(4)
         
         return "0000"
     except Exception as e:
-        print(f"  ❌ Erro ao extrair comarca de {numero_processo}: {e}")
+        print(f"Erro extrair comarca {numero_processo}: {e}")
         return "0000"
