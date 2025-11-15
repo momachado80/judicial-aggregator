@@ -36,8 +36,9 @@ export default function Home() {
     : TJBA_COMARCAS;
 
   const adicionarComarca = (comarca) => {
-    if (comarca && !comarcasSelecionadas.includes(comarca)) {
-      setComarcasSelecionadas([...comarcasSelecionadas, comarca]);
+    const comarcaTrimmed = comarca.trim();
+    if (comarcaTrimmed && !comarcasSelecionadas.includes(comarcaTrimmed)) {
+      setComarcasSelecionadas([...comarcasSelecionadas, comarcaTrimmed]);
       setInputComarca('');
     }
   };
@@ -96,12 +97,6 @@ export default function Home() {
           const data = await response.json();
           todosProcessos = [...todosProcessos, ...(Array.isArray(data) ? data : [])];
         }
-      }
-      
-      if (comarcasSelecionadas.length > 0) {
-        todosProcessos = todosProcessos.filter(p =>
-          comarcasSelecionadas.some(c => p.comarca?.toLowerCase().includes(c.toLowerCase()))
-        );
       }
       
       setProcessos(todosProcessos);
@@ -299,20 +294,36 @@ export default function Home() {
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
                 Comarcas - {TJSP_COMARCAS.length} SP + {TJBA_COMARCAS.length} BA = {TJSP_COMARCAS.length + TJBA_COMARCAS.length} total
               </label>
-              <input
-                type="text"
-                value={inputComarca}
-                onChange={(e) => setInputComarca(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(inputComarca)}
-                placeholder="Digite: Piracicaba, Americana, Salvador..."
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px'
-                }}
-                list="comarcas-list"
-              />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={inputComarca}
+                  onChange={(e) => setInputComarca(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(inputComarca)}
+                  placeholder="Digite: Piracicaba, Americana, Salvador..."
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px'
+                  }}
+                  list="comarcas-list"
+                />
+                <button
+                  onClick={() => adicionarComarca(inputComarca)}
+                  style={{
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    padding: '0 24px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  + Adicionar
+                </button>
+              </div>
               <datalist id="comarcas-list">
                 {comarcasDisponiveis.map(c => <option key={c} value={c} />)}
               </datalist>
@@ -322,11 +333,13 @@ export default function Home() {
                   <span key={c} style={{
                     backgroundColor: '#dbeafe',
                     color: '#1e40af',
-                    padding: '4px 12px',
+                    padding: '8px 16px',
                     borderRadius: '9999px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600'
                   }}>
                     {c}
                     <button onClick={() => removerComarca(c)} style={{
@@ -334,11 +347,25 @@ export default function Home() {
                       fontWeight: 'bold',
                       background: 'none',
                       border: 'none',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      fontSize: '18px'
                     }}>×</button>
                   </span>
                 ))}
               </div>
+
+              {comarcasSelecionadas.length > 0 && (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '12px',
+                  backgroundColor: '#dcfce7',
+                  borderRadius: '8px'
+                }}>
+                  <p style={{ fontSize: '14px', color: '#166534', margin: 0, fontWeight: '600' }}>
+                    ✅ Filtro ativo: apenas processos de {comarcasSelecionadas.join(', ')}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
