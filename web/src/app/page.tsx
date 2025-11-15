@@ -1,20 +1,5 @@
 'use client';
-import { useState } from 'react';
-
-const TJSP_COMARCAS = [
-  "Americana", "Araçatuba", "Araraquara", "Bauru", "Campinas", "Franca",
-  "Guarulhos", "Itaquaquecetuba", "Jundiaí", "Limeira", "Marília",
-  "Mogi das Cruzes", "Osasco", "Piracicaba", "Presidente Prudente",
-  "Ribeirão Preto", "Santo André", "Santos", "São Bernardo do Campo",
-  "São Caetano do Sul", "São José do Rio Preto", "São José dos Campos",
-  "São Paulo", "Sorocaba", "Suzano", "Taboão da Serra", "Taubaté"
-];
-
-const TJBA_COMARCAS = [
-  "Salvador", "Feira de Santana", "Vitória da Conquista", "Camaçari",
-  "Itabuna", "Juazeiro", "Lauro de Freitas", "Ilhéus", "Jequié",
-  "Teixeira de Freitas", "Alagoinhas", "Barreiras", "Paulo Afonso"
-];
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [tribunaisSelecionados, setTribunaisSelecionados] = useState(['TJSP']);
@@ -28,12 +13,32 @@ export default function Home() {
   const [processos, setProcessos] = useState([]);
   const [stats, setStats] = useState({ novos: 0, duplicados: 0, inativos: 0 });
   const [loading, setLoading] = useState(false);
+  
+  // Estados para comarcas dinâmicas
+  const [tjspComarcas, setTjspComarcas] = useState([]);
+  const [tjbaComarcas, setTjbaComarcas] = useState([]);
+  const [comarcasLoading, setComarcasLoading] = useState(true);
+
+  // Buscar comarcas da API ao carregar
+  useEffect(() => {
+    fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
+      .then(res => res.json())
+      .then(data => {
+        setTjspComarcas(data.TJSP || []);
+        setTjbaComarcas(data.TJBA || []);
+        setComarcasLoading(false);
+      })
+      .catch(err => {
+        console.error('Erro ao carregar comarcas:', err);
+        setComarcasLoading(false);
+      });
+  }, []);
   const [interesseIds, setInteresseIds] = useState(new Set());
   const [descartadosIds, setDescartadosIds] = useState(new Set());
 
   const comarcasDisponiveis = tribunaisSelecionados.includes('TJSP') 
-    ? TJSP_COMARCAS 
-    : TJBA_COMARCAS;
+    ? tjspComarcas 
+    : tjbaComarcas;
 
   const adicionarComarca = (comarca) => {
     const comarcaTrimmed = comarca.trim();
@@ -292,7 +297,7 @@ export default function Home() {
 
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
-                Comarcas - {TJSP_COMARCAS.length} SP + {TJBA_COMARCAS.length} BA = {TJSP_COMARCAS.length + TJBA_COMARCAS.length} total
+                Comarcas - {tjspComarcas.length} SP + {tjbaComarcas.length} BA = {tjspComarcas.length + tjbaComarcas.length} total
               </label>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input
