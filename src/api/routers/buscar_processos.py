@@ -33,15 +33,20 @@ async def buscar_processos(request: BuscarProcessosRequest):
     Busca processos judiciais ativos na API DataJud
     """
     try:
+        print(f"🔍 Recebido request: {request}")
         todos_processos = []
         
         for tribunal in request.tribunais:
             for tipo in request.tipos_processo:
+                print(f"📋 Buscando: {tribunal} - {tipo}")
+                
                 # Montar query
                 tribunal_cod = TRIBUNAL_SIGLAS.get(tribunal, "8.26")
                 tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, "289")
                 
-                # Calcular quantidade por combinação
+                print(f"🎯 Códigos: tribunal={tribunal_cod}, tipo={tipo_cod}")
+                
+                # Calcular quantidade
                 quantidade_por_busca = max(10, request.quantidade * 10)
                 
                 # Buscar na API DataJud
@@ -70,13 +75,19 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "sort": [{"dataAjuizamento": {"order": "desc"}}]
                 }
                 
+                print(f"📡 Chamando API DataJud...")
                 response = requests.post(url, json=query, timeout=30)
                 
+                print(f"📥 Status code: {response.status_code}")
+                
                 if response.status_code != 200:
+                    print(f"❌ Erro na API: {response.text[:200]}")
                     continue
                     
                 data = response.json()
                 hits = data.get("hits", {}).get("hits", [])
+                
+                print(f"✅ Encontrados {len(hits)} processos na API")
                 
                 for hit in hits:
                     source = hit.get("_source", {})
@@ -90,7 +101,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     
                     # Se tem filtro de comarca, verificar
                     if request.comarcas:
-                        # Filtrar por nome ou código
                         comarca_match = any(
                             c.lower() in nome_comarca.lower() or 
                             c == codigo_comarca
@@ -126,7 +136,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     
                     todos_processos.append(processo)
                     
-                    # Parar quando atingir quantidade desejada
                     if len(todos_processos) >= request.quantidade:
                         break
                 
@@ -136,10 +145,15 @@ async def buscar_processos(request: BuscarProcessosRequest):
             if len(todos_processos) >= request.quantidade:
                 break
         
-        # Limitar ao número solicitado
+        # Limitar
         todos_processos = todos_processos[:request.quantidade]
+        
+        print(f"🎉 Retornando {len(todos_processos)} processos")
         
         return todos_processos
         
     except Exception as e:
+        print(f"💥 ERRO: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
