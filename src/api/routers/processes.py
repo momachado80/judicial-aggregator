@@ -198,6 +198,18 @@ def get_novos_hoje(db: Session = Depends(get_db)):
     
     return {"novos_hoje": count or 0, "data": hoje.isoformat()}
 
+@router.get("/comarcas")
+async def listar_comarcas():
+    """Retorna lista de todas as comarcas TJSP e TJBA"""
+    from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
+    
+    # Ordenar alfabeticamente
+    tjsp_sorted = sorted(set(COMARCAS_TJSP.values()))
+    tjba_sorted = sorted(set(COMARCAS_TJBA.values()))
+    
+    return {
+        "TJSP": tjsp_sorted,
+        "TJBA": tjba_sorted,
 @router.get("/{process_id}")
 def get_process(process_id: int, db: Session = Depends(get_db)):
     """Buscar processo por ID"""
@@ -282,17 +294,5 @@ def update_process_status(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/comarcas")
-async def listar_comarcas():
-    """Retorna lista de todas as comarcas TJSP e TJBA"""
-    from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
-    
-    # Ordenar alfabeticamente
-    tjsp_sorted = sorted(set(COMARCAS_TJSP.values()))
-    tjba_sorted = sorted(set(COMARCAS_TJBA.values()))
-    
-    return {
-        "TJSP": tjsp_sorted,
-        "TJBA": tjba_sorted,
         "total": len(tjsp_sorted) + len(tjba_sorted)
     }
