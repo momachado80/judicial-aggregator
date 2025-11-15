@@ -14,10 +14,13 @@ TJSP_COMARCAS = {
     "0127": "Mogi das Cruzes",
     "0223": "Piracicaba",
     "0286": "Ribeirão Preto",
-    "0309": "Campinas",
-    "0344": "Sorocaba",
-    "0361": "São José dos Campos",
-    "0477": "Taubaté"
+    "0602": "Guarulhos",
+    "0228": "Araraquara",
+    "0562": "Tatuí",
+    "0050": "Itapetininga",
+    "0438": "Mogi-Guaçu",
+    "0530": "São Pedro",
+    "0224": "Araras"
 }
 
 TJBA_COMARCAS = {
@@ -25,6 +28,22 @@ TJBA_COMARCAS = {
     "0002": "Feira de Santana",
     "0003": "Vitória da Conquista"
 }
+
+def formatar_numero_cnj(numero: str) -> str:
+    """
+    Formata número para padrão CNJ
+    Entrada: 10368157920248260602 (20 dígitos)
+    Saída: 1036815-79.2024.8.26.0602
+    """
+    # Remove tudo que não é dígito
+    digitos = ''.join(c for c in numero if c.isdigit())
+    
+    # Aplica máscara: NNNNNNN-DD.AAAA.J.TR.OOOO
+    if len(digitos) == 20:
+        return f"{digitos[0:7]}-{digitos[7:9]}.{digitos[9:13]}.{digitos[13]}.{digitos[14:16]}.{digitos[16:20]}"
+    
+    return numero
+
 
 def get_nome_comarca(codigo: str, tribunal: str) -> str:
     """Retorna o nome da comarca pelo código"""
@@ -38,13 +57,13 @@ def get_nome_comarca(codigo: str, tribunal: str) -> str:
 def extrair_codigo_comarca(numero_processo: str) -> str:
     """
     Extrai código comarca do número CNJ
-    Formato: NNNNNNN-DD.AAAA.J.TR.OOOO
-    Exemplo: 1003711-15.2025.8.26.0650
-                                  ^^^^
     """
     try:
-        # Separar por ponto
-        partes = numero_processo.split('.')
+        # Primeiro formata o número
+        numero_formatado = formatar_numero_cnj(numero_processo)
+        
+        # Separa por ponto
+        partes = numero_formatado.split('.')
         
         # Último elemento = código comarca
         if len(partes) >= 5:
