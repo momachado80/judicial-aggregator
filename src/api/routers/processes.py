@@ -118,13 +118,6 @@ def list_processes(
         ]
     }
 
-@router.get("/comarcas")
-def get_comarcas(db: Session = Depends(get_db)):
-    """Lista todas as comarcas únicas"""
-    comarcas = db.query(Processo.comarca).distinct().filter(Processo.comarca.isnot(None)).all()
-    return {
-        "comarcas": sorted([c[0] for c in comarcas if c[0]])
-    }
 
 @router.get("/varas")
 def get_varas(
