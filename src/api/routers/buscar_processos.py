@@ -28,6 +28,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
     try:
         print(f"🔍 Buscando: {request.comarcas}")
         todos_processos = []
+        codigos_encontrados = {}  # Para ver quais códigos aparecem
         
         for tribunal in request.tribunais:
             for tipo in request.tipos_processo:
@@ -40,7 +41,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "Authorization": f"APIKey {DATAJUD_API_KEY}"
                 }
                 
-                # Buscar muito mais para poder filtrar depois
                 query = {
                     "query": {
                         "bool": {
@@ -49,7 +49,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                             ]
                         }
                     },
-                    "size": 1000,  # Buscar 1000 para ter certeza
+                    "size": 1000,
                     "sort": [{"dataAjuizamento": {"order": "desc"}}]
                 }
                 
@@ -75,18 +75,22 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     codigo_comarca = extrair_codigo_comarca(numero)
                     nome_comarca = get_nome_comarca(codigo_comarca, tribunal)
                     
-                    # FILTRO RIGOROSO: Se tem comarcas selecionadas, APENAS essas comarcas
+                    # CONTAR CÓDIGOS
+                    if codigo_comarca not in codigos_encontrados:
+                        codigos_encontrados[codigo_comarca] = {"nome": nome_comarca, "count": 0}
+                    codigos_encontrados[codigo_comarca]["count"] += 1
+                    
+                    # FILTRO: Se tem comarcas selecionadas
                     if request.comarcas and len(request.comarcas) > 0:
                         comarca_aceita = False
                         
                         for comarca_filtro in request.comarcas:
-                            # Match exato (ignora maiúsculas/minúsculas)
                             if comarca_filtro.lower() == nome_comarca.lower():
                                 comarca_aceita = True
                                 break
                         
                         if not comarca_aceita:
-                            continue  # PULA este processo
+                            continue
                     
                     # Filtrar por valor
                     valor_causa = source.get("valorCausa")
@@ -97,7 +101,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                         if valor_causa > request.valor_causa_max:
                             continue
                     
-                    # Formatar número para URL
                     numero_formatado = formatar_numero_cnj(numero)
                     
                     processo = {
@@ -111,7 +114,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     }
                     
                     todos_processos.append(processo)
-                    print(f"  ✅ {nome_comarca} - Total: {len(todos_processos)}")
                     
                     if len(todos_processos) >= request.quantidade:
                         break
@@ -121,6 +123,12 @@ async def buscar_processos(request: BuscarProcessosRequest):
             
             if len(todos_processos) >= request.quantidade:
                 break
+        
+        # MOSTRAR TOP 20 CÓDIGOS
+        print(f"📊 Top 20 códigos de comarca encontrados:")
+        sorted_codigos = sorted(codigos_encontrados.items(), key=lambda x: x[1]["count"], reverse=True)
+        for codigo, info in sorted_codigos[:20]:
+            print(f"   {codigo}: {info['nome']} ({info['count']} processos)")
         
         print(f"🎉 Retornando {len(todos_processos)} processos")
         return todos_processos[:request.quantidade]
