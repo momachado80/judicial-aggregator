@@ -70,3 +70,44 @@ async def test_comarca():
         })
     
     return resultados
+
+@app.get("/debug/listar-comarcas")
+async def listar_comarcas():
+    """Lista todos os códigos de comarca encontrados na API"""
+    import requests
+    from src.utils.comarcas import extrair_codigo_comarca, get_nome_comarca
+    
+    url = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsp/_search"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "APIKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
+    }
+    
+    query = {
+        "query": {"bool": {"must": [{"term": {"classe.codigo": "289"}}]}},
+        "size": 1000
+    }
+    
+    response = requests.post(url, headers=headers, json=query, timeout=30)
+    data = response.json()
+    hits = data.get("hits", {}).get("hits", [])
+    
+    codigos = {}
+    for hit in hits:
+        numero = hit.get("_source", {}).get("numeroProcesso", "")
+        if numero:
+            codigo = extrair_codigo_comarca(numero)
+            nome = get_nome_comarca(codigo, "TJSP")
+            if codigo not in codigos:
+                codigos[codigo] = {"nome": nome, "count": 0}
+            codigos[codigo]["count"] += 1
+    
+    sorted_codigos = sorted(codigos.items(), key=lambda x: x[1]["count"], reverse=True)
+    
+    return {
+        "total_codigos": len(codigos),
+        "top_50": [
+            {"codigo": k, "nome": v["nome"], "processos": v["count"]}
+            for k, v in sorted_codigos[:50]
+        ]
+    }
