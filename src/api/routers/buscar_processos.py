@@ -16,9 +16,9 @@ class BuscarProcessosRequest(BaseModel):
     quantidade: int = 50
 
 TIPOS_PROCESSO_MAPPING = {
-    "Inventário": "289",
-    "Divórcio Litigioso": "1107", 
-    "Divórcio Consensual": "1108"
+    "Inventário": "39",
+    "Divórcio Litigioso": "99", 
+    "Divórcio Consensual": "98"
 }
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
