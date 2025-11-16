@@ -64,17 +64,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 query = {
                     "query": {
                         "bool": {
-                            "must": must_filters,
-                            "must_not": [
-                                {"terms": {"movimento.nome.keyword": [
-                                    "Arquivado Definitivamente", 
-                                    "Processo Extinto", 
-                                    "Remetido ao Arquivo", 
-                                    "Baixado Definitivamente",
-                                    "Baixado",
-                                    "Arquivado"
-                                ]}}
-                            ]
+                            "must": must_filters
                         }
                     },
                     "size": min(request.quantidade, 1000),
