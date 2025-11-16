@@ -297,5 +297,3 @@ def update_process_status(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-        "total": len(tjsp_sorted) + len(tjba_sorted)
-    }
