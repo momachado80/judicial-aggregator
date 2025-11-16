@@ -602,7 +602,7 @@ def expandir_sao_paulo(comarcas):
     """Se 'São Paulo' estiver na lista, expande para todos os foros da capital"""
     resultado = []
     for comarca in comarcas:
-        if comarca.lower() in ["são paulo", "sao paulo", "sp capital"]:
+        if comarca.lower() in ["são paulo", "sao paulo", "sp capital", "são paulo (capital)", "sao paulo (capital)"]:
             # Adicionar todos os foros
             for codigo in FOROS_SAO_PAULO_CAPITAL:
                 nome = COMARCAS_TJSP.get(codigo)
