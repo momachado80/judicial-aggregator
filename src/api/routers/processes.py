@@ -210,6 +210,9 @@ async def listar_comarcas():
     return {
         "TJSP": tjsp_sorted,
         "TJBA": tjba_sorted,
+        "total": len(tjsp_sorted) + len(tjba_sorted)
+    }
+
 @router.get("/{process_id}")
 def get_process(process_id: int, db: Session = Depends(get_db)):
     """Buscar processo por ID"""
