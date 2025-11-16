@@ -27,6 +27,10 @@ DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 async def buscar_processos(request: BuscarProcessosRequest):
     try:
         print(f"🔍 Buscando: {request.comarcas}")
+        # Expandir "São Paulo" para todos os foros da capital
+        from src.utils.comarcas import expandir_sao_paulo
+        if request.comarcas:
+            request.comarcas = expandir_sao_paulo(request.comarcas)
         todos_processos = []
         codigos_encontrados = {}  # Para ver quais códigos aparecem
         

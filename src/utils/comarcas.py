@@ -3,6 +3,7 @@
 # Fonte: TJBA - Portal da Corregedoria TJBA
 
 COMARCAS_TJSP = {
+    "CAPITAL": "São Paulo (Capital)",
     "0000": "Tribunal de Justiça",
     "0001": "Foro Regional I - Santana",
     "0002": "Foro Regional II - Santo Amaro",
@@ -588,3 +589,25 @@ def formatar_numero_cnj(numero):
     if len(numero_limpo) == 20:
         return f"{numero_limpo[0:7]}-{numero_limpo[7:9]}.{numero_limpo[9:13]}.{numero_limpo[13]}.{numero_limpo[14:16]}.{numero_limpo[16:20]}"
     return numero
+
+# Mapeamento especial: "São Paulo" = todos os foros da capital
+FOROS_SAO_PAULO_CAPITAL = [
+    "0000", "0001", "0002", "0003", "0004", "0005", "0006", "0007", 
+    "0008", "0009", "0010", "0011", "0020", "0084", "0704", "0014", 
+    "0015", "0016", "0021", "0050", "0052", "0053", "0090", "0100", 
+    "0258", "0260"
+]
+
+def expandir_sao_paulo(comarcas):
+    """Se 'São Paulo' estiver na lista, expande para todos os foros da capital"""
+    resultado = []
+    for comarca in comarcas:
+        if comarca.lower() in ["são paulo", "sao paulo", "sp capital"]:
+            # Adicionar todos os foros
+            for codigo in FOROS_SAO_PAULO_CAPITAL:
+                nome = COMARCAS_TJSP.get(codigo)
+                if nome:
+                    resultado.append(nome)
+        else:
+            resultado.append(comarca)
+    return resultado
