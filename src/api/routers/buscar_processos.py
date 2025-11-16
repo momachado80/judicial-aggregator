@@ -110,7 +110,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                         "comarca": nome_comarca,
                         "valor_causa": valor_causa,
                         "data_ajuizamento": source.get("dataAjuizamento"),
-                        "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo={numero_formatado}" if tribunal == "TJSP" else None
+                        "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/open.do?processoNumero={numero_formatado}" if tribunal == "TJSP" else None
                     }
                     
                     todos_processos.append(processo)
