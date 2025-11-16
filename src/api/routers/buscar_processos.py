@@ -49,11 +49,22 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "query": {
                         "bool": {
                             "must": [
-                                {"term": {"classe.codigo": tipo_cod}}
+                                {"term": {"classe.codigo": tipo_cod}},
+                                {"term": {"tribunal": tribunal}}
+                            ],
+                            "must_not": [
+                                {"terms": {"movimento.nome.keyword": [
+                                    "Arquivado Definitivamente", 
+                                    "Processo Extinto", 
+                                    "Remetido ao Arquivo", 
+                                    "Baixado Definitivamente",
+                                    "Baixado",
+                                    "Arquivado"
+                                ]}}
                             ]
                         }
                     },
-                    "size": 1000,
+                    "size": min(request.quantidade, 1000),
                     "sort": [{"dataAjuizamento": {"order": "desc"}}]
                 }
                 
