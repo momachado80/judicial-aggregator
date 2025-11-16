@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import requests
-from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj, get_comarca_codigo, get_comarca_codigo
 
 router = APIRouter()
 
@@ -45,13 +45,26 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "Authorization": f"APIKey {DATAJUD_API_KEY}"
                 }
                 
+                # Preparar filtro de comarca
+                comarca_filters = []
+                if request.comarcas and len(request.comarcas) > 0:
+                    for comarca_nome in request.comarcas:
+                        codigo = get_comarca_codigo(comarca_nome, tribunal)
+                        if codigo:
+                            comarca_filters.append({"wildcard": {"numeroProcesso": f"*{codigo}"}})
+                
+                # Montar query com filtros
+                must_filters = [
+                    {"term": {"classe.codigo": tipo_cod}},
+                    {"term": {"tribunal": tribunal}}
+                ]
+                if comarca_filters:
+                    must_filters.extend(comarca_filters)
+                
                 query = {
                     "query": {
                         "bool": {
-                            "must": [
-                                {"term": {"classe.codigo": tipo_cod}},
-                                {"term": {"tribunal": tribunal}}
-                            ],
+                            "must": must_filters,
                             "must_not": [
                                 {"terms": {"movimento.nome.keyword": [
                                     "Arquivado Definitivamente", 
