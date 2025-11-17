@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import requests
-from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj, get_comarca_codigo, get_comarca_codigo
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj
 
 router = APIRouter()
 
@@ -16,9 +16,9 @@ class BuscarProcessosRequest(BaseModel):
     quantidade: int = 50
 
 TIPOS_PROCESSO_MAPPING = {
-    "Inventário": 39,
-    "Divórcio Litigioso": 12541, 
-    "Divórcio Consensual": 12372
+    "Inventário": "289",
+    "Divórcio Litigioso": "1107", 
+    "Divórcio Consensual": "1108"
 }
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
@@ -45,18 +45,15 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     "Authorization": f"APIKey {DATAJUD_API_KEY}"
                 }
                 
-                must_filters = [
-                    {"term": {"classe.codigo": tipo_cod}},
-                    {"term": {"tribunal": tribunal}}
-                ]
-                
                 query = {
                     "query": {
                         "bool": {
-                            "must": must_filters
+                            "must": [
+                                {"term": {"classe.codigo": tipo_cod}}
+                            ]
                         }
                     },
-                    "size": min(request.quantidade, 1000),
+                    "size": 1000,
                     "sort": [{"dataAjuizamento": {"order": "desc"}}]
                 }
                 
