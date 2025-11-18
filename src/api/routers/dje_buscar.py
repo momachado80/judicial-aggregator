@@ -293,11 +293,11 @@ async def status_dje():
 async def processar_pdfs_cache(
     tipos_processo: List[str] = ["Inventário", "Divórcio"],
     comarcas: Optional[List[str]] = None,
-    apenas_imoveis: bool = True,
+    apenas_imoveis: bool = False,
     apenas_ativos: bool = True,
     valor_min: Optional[float] = None,
     valor_max: Optional[float] = None,
-    limite_pdfs: int = 3
+    limite_pdfs: int = 1
 ):
     """
     Processa PDFs que já estão em cache (data/dje_pdfs/)
