@@ -1,12 +1,94 @@
 import pdfplumber
 import re
-from typing import List, Dict
+from typing import List, Dict, Optional
+from datetime import datetime
 
-def extrair_processos_dje(pdf_path: str, tipos: List[str] = ["Inventário", "Divórcio"]) -> List[Dict]:
-    """Extrai processos do DJE"""
+# Palavras-chave que indicam presença de IMÓVEIS
+PALAVRAS_IMOVEIS = [
+    "imóvel", "imovel", "terreno", "casa", "apartamento", "apto",
+    "propriedade", "lote", "chácara", "chacara", "sítio", "sitio",
+    "fazenda", "condomínio", "condominio", "edifício", "edificio",
+    "residência", "residencia", "comercial", "sala comercial",
+    "galpão", "galpao", "armazém", "armazem", "loja",
+    "registro de imóveis", "registro de imoveis", "matricula", "matrícula",
+    "escritura", "metragem", "m²", "m2", "área construída", "area construida",
+    "unidade autônoma", "unidade autonoma", "área privativa", "area privativa",
+    "endereço", "endereco", "rua ", "avenida", "av.", "praça", "praca"
+]
+
+# Palavras que indicam processo ativo/urgente
+PALAVRAS_URGENCIA = [
+    "penhora", "leilão", "leilao", "hasta pública", "hasta publica",
+    "adjudicação", "adjudicacao", "alienação judicial", "alienacao judicial",
+    "partilha", "avaliação", "avaliacao", "inventariante", "arrolamento"
+]
+
+# Palavras que indicam processo EXTINTO/ARQUIVADO
+PALAVRAS_EXTINTO = [
+    "extinto", "arquivado", "baixado", "sentença de extinção",
+    "sentenca de extincao", "processo extinto", "arquivamento",
+    "cancelado", "suspenso", "sobrestado"
+]
+
+def tem_imovel(texto: str) -> bool:
+    """Verifica se o texto menciona imóveis"""
+    texto_lower = texto.lower()
+    return any(palavra.lower() in texto_lower for palavra in PALAVRAS_IMOVEIS)
+
+def esta_ativo(texto: str) -> bool:
+    """Verifica se processo está ativo (não extinto/arquivado)"""
+    texto_lower = texto.lower()
+    # Se menciona palavras de extinção, retorna False
+    if any(palavra.lower() in texto_lower for palavra in PALAVRAS_EXTINTO):
+        return False
+    return True
+
+def calcular_relevancia_imovel(texto: str) -> tuple:
+    """Calcula score de relevância baseado em imóveis e urgência"""
+    texto_lower = texto.lower()
+
+    tem_imovel_flag = tem_imovel(texto)
+    tem_urgencia = any(palavra.lower() in texto_lower for palavra in PALAVRAS_URGENCIA)
+
+    if tem_imovel_flag and tem_urgencia:
+        return ("Altíssima", 1.0)
+    elif tem_imovel_flag:
+        return ("Alta", 0.8)
+    elif tem_urgencia:
+        return ("Média", 0.5)
+    else:
+        return ("Baixa", 0.2)
+
+def extrair_processos_dje(
+    pdf_path: str,
+    tipos: List[str] = ["Inventário", "Divórcio"],
+    filtrar_imoveis: bool = True,
+    filtrar_ativos: bool = True,
+    comarcas_filtro: Optional[List[str]] = None,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None
+) -> List[Dict]:
+    """
+    Extrai processos do DJE com filtros avançados
+
+    Args:
+        pdf_path: Caminho do PDF
+        tipos: Tipos de processo a buscar
+        filtrar_imoveis: Se True, retorna apenas processos com imóveis
+        filtrar_ativos: Se True, exclui processos extintos/arquivados
+        comarcas_filtro: Lista de comarcas para filtrar (None = todas)
+        valor_min: Valor mínimo da causa
+        valor_max: Valor máximo da causa
+    """
     print(f"📄 Parseando: {pdf_path}")
+    print(f"   🏠 Filtrar imóveis: {filtrar_imoveis}")
+    print(f"   ✅ Filtrar ativos: {filtrar_ativos}")
+    if comarcas_filtro:
+        print(f"   📍 Comarcas: {', '.join(comarcas_filtro)}")
+
     processos = []
     processos_unicos = set()  # Para evitar duplicatas
+    processos_rejeitados = {"sem_imovel": 0, "extinto": 0, "comarca": 0, "valor": 0}
     
     with pdfplumber.open(pdf_path) as pdf:
         total_paginas = len(pdf.pages)
@@ -25,26 +107,36 @@ def extrair_processos_dje(pdf_path: str, tipos: List[str] = ["Inventário", "Div
             
             for match in re.finditer(pattern, text):
                 numero = match.group(1)
-                
+
                 # Evitar duplicatas
                 if numero in processos_unicos:
                     continue
-                
+
                 # Contexto amplo
-                start = max(0, match.start() - 1500)
-                end = min(len(text), match.end() + 1500)
+                start = max(0, match.start() - 2000)  # Aumentei contexto
+                end = min(len(text), match.end() + 2000)
                 contexto = text[start:end]
-                
+
                 # Verificar se menciona os tipos procurados
                 tipo_encontrado = None
                 for tipo in tipos:
                     if tipo.lower() in contexto.lower():
                         tipo_encontrado = tipo
                         break
-                
+
                 if not tipo_encontrado:
                     continue
-                
+
+                # FILTRO 1: Verificar se tem imóveis (se filtro ativado)
+                if filtrar_imoveis and not tem_imovel(contexto):
+                    processos_rejeitados["sem_imovel"] += 1
+                    continue
+
+                # FILTRO 2: Verificar se está ativo (se filtro ativado)
+                if filtrar_ativos and not esta_ativo(contexto):
+                    processos_rejeitados["extinto"] += 1
+                    continue
+
                 processos_unicos.add(numero)
                 
                 # Extrair informações
@@ -57,12 +149,22 @@ def extrair_processos_dje(pdf_path: str, tipos: List[str] = ["Inventário", "Div
                 # Extrair comarca (nome)
                 comarca_match = re.search(r'Comarca de ([A-Z][a-zá-úÀ-Ú\s]+)', contexto, re.IGNORECASE)
                 comarca = comarca_match.group(1).strip() if comarca_match else None
-                
+
                 # Se não achou comarca no texto, buscar antes do número
                 if not comarca:
                     linha_processo = contexto[max(0, match.start() - 200):match.end() + 50]
                     comarca_match = re.search(r'-\s*([A-Z][a-zá-úÀ-Ú\s]+)\s*-', linha_processo)
                     comarca = comarca_match.group(1).strip() if comarca_match else f"Código {codigo_comarca}"
+
+                # FILTRO 3: Filtrar por comarca (se especificado)
+                if comarcas_filtro and comarca:
+                    comarca_aceita = any(
+                        c.lower() in comarca.lower() or comarca.lower() in c.lower()
+                        for c in comarcas_filtro
+                    )
+                    if not comarca_aceita:
+                        processos_rejeitados["comarca"] += 1
+                        continue
                 
                 # Extrair partes (Apelante/Apelado ou Requerente/Requerido)
                 partes = []
@@ -82,10 +184,31 @@ def extrair_processos_dje(pdf_path: str, tipos: List[str] = ["Inventário", "Div
                     if nome_match:
                         advogados.append(f"{nome_match.group(1).strip()} ({adv_match.group(1)})")
                 
-                # Extrair valor
+                # Extrair valor da causa
+                valor_causa_float = None
                 valor_match = re.search(r'R\$\s*([\d.,]+)', contexto)
-                valor = valor_match.group(1) if valor_match else None
-                
+                if valor_match:
+                    valor_str = valor_match.group(1)
+                    # Converter para float
+                    try:
+                        valor_causa_float = float(valor_str.replace('.', '').replace(',', '.'))
+                    except:
+                        valor_causa_float = None
+
+                # FILTRO 4: Filtrar por valor da causa (se especificado)
+                if valor_min is not None and valor_causa_float is not None:
+                    if valor_causa_float < valor_min:
+                        processos_rejeitados["valor"] += 1
+                        continue
+
+                if valor_max is not None and valor_causa_float is not None:
+                    if valor_causa_float > valor_max:
+                        processos_rejeitados["valor"] += 1
+                        continue
+
+                # Calcular relevância baseada em imóveis
+                relevancia, score = calcular_relevancia_imovel(contexto)
+
                 processos.append({
                     'numero': numero,
                     'tipo': tipo_encontrado,
@@ -94,34 +217,98 @@ def extrair_processos_dje(pdf_path: str, tipos: List[str] = ["Inventário", "Div
                     'codigo_comarca': codigo_comarca,
                     'partes': partes,
                     'advogados': advogados,
-                    'valor_causa': valor,
-                    'pagina_dje': i
+                    'valor_causa': valor_causa_float,
+                    'pagina_dje': i,
+                    'tem_imovel': tem_imovel(contexto),
+                    'esta_ativo': esta_ativo(contexto),
+                    'relevancia': relevancia,
+                    'score_relevancia': score
                 })
     
-    print(f"✅ {len(processos)} processos encontrados")
+    # Relatório de filtros
+    total_rejeitados = sum(processos_rejeitados.values())
+    print(f"\n✅ {len(processos)} processos APROVADOS nos filtros")
+
+    if total_rejeitados > 0:
+        print(f"❌ {total_rejeitados} processos REJEITADOS:")
+        if processos_rejeitados["sem_imovel"] > 0:
+            print(f"   🏠 {processos_rejeitados['sem_imovel']} sem menção a imóveis")
+        if processos_rejeitados["extinto"] > 0:
+            print(f"   ⚰️  {processos_rejeitados['extinto']} extintos/arquivados")
+        if processos_rejeitados["comarca"] > 0:
+            print(f"   📍 {processos_rejeitados['comarca']} fora das comarcas selecionadas")
+        if processos_rejeitados["valor"] > 0:
+            print(f"   💰 {processos_rejeitados['valor']} fora do range de valor")
+
     return processos
 
 if __name__ == "__main__":
+    from datetime import date
+
     pdf_path = "data/dje_pdfs/dje_15-11-2025_cad11.pdf"
-    processos = extrair_processos_dje(pdf_path)
-    
-    print(f"\n📋 RESUMO: {len(processos)} processos")
-    
-    from collections import Counter
-    tipos_count = Counter(p['tipo'] for p in processos)
-    for tipo, count in tipos_count.items():
-        print(f"   {tipo}: {count}")
-    
-    print(f"\n🔍 DETALHES:")
-    for p in processos:
-        print(f"\n{'='*80}")
-        print(f"Processo: {p['numero']}")
-        print(f"Tipo: {p['tipo']}")
-        print(f"Classe: {p['classe']}")
-        print(f"Comarca: {p['comarca']} ({p['codigo_comarca']})")
-        if p['partes']:
-            print(f"Partes: {', '.join(p['partes'])}")
-        if p['advogados']:
-            print(f"Advogados: {', '.join(p['advogados'])}")
-        if p['valor_causa']:
-            print(f"Valor: R$ {p['valor_causa']}")
+
+    print("="*80)
+    print("🧪 TESTE - Parser DJE com Filtros Avançados")
+    print("="*80)
+
+    # Teste 1: Apenas processos com imóveis
+    print("\n📋 TESTE 1: Apenas processos com IMÓVEIS")
+    processos = extrair_processos_dje(
+        pdf_path,
+        tipos=["Inventário", "Divórcio"],
+        filtrar_imoveis=True,
+        filtrar_ativos=True
+    )
+
+    if processos:
+        print(f"\n✅ {len(processos)} processos encontrados com imóveis")
+
+        from collections import Counter
+        tipos_count = Counter(p['tipo'] for p in processos)
+        relevancia_count = Counter(p['relevancia'] for p in processos)
+
+        print(f"\n📊 Por tipo:")
+        for tipo, count in tipos_count.items():
+            print(f"   {tipo}: {count}")
+
+        print(f"\n🎯 Por relevância:")
+        for rel, count in relevancia_count.items():
+            print(f"   {rel}: {count}")
+
+        print(f"\n🔍 PRIMEIROS 5 PROCESSOS:")
+        for p in processos[:5]:
+            print(f"\n{'='*80}")
+            print(f"Processo: {p['numero']}")
+            print(f"Tipo: {p['tipo']} | Relevância: {p['relevancia']} ({p['score_relevancia']})")
+            print(f"Comarca: {p['comarca']}")
+            print(f"Tem imóvel: {'✅' if p['tem_imovel'] else '❌'}")
+            print(f"Ativo: {'✅' if p['esta_ativo'] else '❌'}")
+            if p['valor_causa']:
+                print(f"Valor: R$ {p['valor_causa']:,.2f}")
+            if p['partes']:
+                print(f"Partes: {', '.join(p['partes'][:2])}")
+
+    # Teste 2: Filtrar por comarca
+    print("\n" + "="*80)
+    print("📋 TESTE 2: Apenas PIRACICABA com imóveis")
+    processos_piracicaba = extrair_processos_dje(
+        pdf_path,
+        tipos=["Inventário", "Divórcio"],
+        filtrar_imoveis=True,
+        filtrar_ativos=True,
+        comarcas_filtro=["Piracicaba"]
+    )
+    print(f"✅ {len(processos_piracicaba)} processos em Piracicaba com imóveis")
+
+    # Teste 3: Filtrar por valor
+    print("\n" + "="*80)
+    print("📋 TESTE 3: Valor entre R$ 100k e R$ 1M com imóveis")
+    processos_valor = extrair_processos_dje(
+        pdf_path,
+        tipos=["Inventário", "Divórcio"],
+        filtrar_imoveis=True,
+        filtrar_ativos=True,
+        valor_min=100000,
+        valor_max=1000000
+    )
+    print(f"✅ {len(processos_valor)} processos no range de valor")
