@@ -296,12 +296,17 @@ async def processar_pdfs_cache(
     apenas_imoveis: bool = True,
     apenas_ativos: bool = True,
     valor_min: Optional[float] = None,
-    valor_max: Optional[float] = None
+    valor_max: Optional[float] = None,
+    limite_pdfs: int = 3
 ):
     """
     Processa PDFs que já estão em cache (data/dje_pdfs/)
 
     IDEAL PARA PRODUÇÃO NO RAILWAY - não precisa de Playwright!
+
+    Args:
+        limite_pdfs: Quantos PDFs processar (padrão: 3, máximo recomendado: 5)
+                    Cada PDF tem ~1200 páginas e leva ~30-60 segundos
 
     Este endpoint processa PDFs que foram:
     - Baixados localmente e commitados no repo
@@ -318,13 +323,13 @@ async def processar_pdfs_cache(
             )
 
         # Listar PDFs disponíveis
-        pdfs_disponiveis = [
+        todos_pdfs = [
             os.path.join(pdfs_dir, f)
             for f in os.listdir(pdfs_dir)
-            if f.endswith('.pdf')
+            if f.endswith('.pdf') and not f.startswith('teste')
         ]
 
-        if not pdfs_disponiveis:
+        if not todos_pdfs:
             return {
                 "total_processos": 0,
                 "processos": [],
@@ -332,7 +337,11 @@ async def processar_pdfs_cache(
                 "mensagem": "Nenhum PDF encontrado no cache"
             }
 
-        print(f"\n📁 Processando {len(pdfs_disponiveis)} PDFs do cache...")
+        # Ordenar por data (mais recente primeiro) e aplicar limite
+        todos_pdfs.sort(reverse=True)
+        pdfs_disponiveis = todos_pdfs[:limite_pdfs]
+
+        print(f"\n📁 Processando {len(pdfs_disponiveis)} de {len(todos_pdfs)} PDFs disponíveis...")
 
         # Processar cada PDF
         todos_processos = []
@@ -371,14 +380,16 @@ async def processar_pdfs_cache(
         return {
             "total_processos": len(todos_processos),
             "processos": todos_processos,
-            "pdfs_total": len(pdfs_disponiveis),
+            "pdfs_disponiveis_total": len(todos_pdfs),
+            "pdfs_processados": len(pdfs_disponiveis),
             "pdfs_processados_sucesso": pdfs_processados_sucesso,
             "pdfs_com_erro": len(pdfs_com_erro),
             "erros": pdfs_com_erro if pdfs_com_erro else None,
             "estatisticas": {
                 "por_tipo": dict(tipos_count),
                 "por_relevancia": dict(relevancia_count)
-            }
+            },
+            "mensagem": f"Processados {len(pdfs_disponiveis)} PDFs mais recentes de {len(todos_pdfs)} disponíveis"
         }
 
     except Exception as e:
