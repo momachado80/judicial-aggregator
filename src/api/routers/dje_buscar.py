@@ -336,20 +336,32 @@ async def processar_pdfs_cache(
 
         # Processar cada PDF
         todos_processos = []
+        pdfs_com_erro = []
+        pdfs_processados_sucesso = 0
+
         for pdf_path in pdfs_disponiveis:
-            print(f"\n📄 {os.path.basename(pdf_path)}")
+            pdf_nome = os.path.basename(pdf_path)
+            print(f"\n📄 {pdf_nome}")
 
-            processos = extrair_processos_dje(
-                pdf_path=pdf_path,
-                tipos=tipos_processo,
-                filtrar_imoveis=apenas_imoveis,
-                filtrar_ativos=apenas_ativos,
-                comarcas_filtro=comarcas,
-                valor_min=valor_min,
-                valor_max=valor_max
-            )
+            try:
+                processos = extrair_processos_dje(
+                    pdf_path=pdf_path,
+                    tipos=tipos_processo,
+                    filtrar_imoveis=apenas_imoveis,
+                    filtrar_ativos=apenas_ativos,
+                    comarcas_filtro=comarcas,
+                    valor_min=valor_min,
+                    valor_max=valor_max
+                )
+                todos_processos.extend(processos)
+                pdfs_processados_sucesso += 1
+                print(f"  ✅ {len(processos)} processos encontrados")
 
-            todos_processos.extend(processos)
+            except Exception as e:
+                erro_msg = f"{pdf_nome}: {str(e)}"
+                pdfs_com_erro.append(erro_msg)
+                print(f"  ⚠️ ERRO ao processar: {str(e)}")
+                continue
 
         # Estatísticas
         from collections import Counter
@@ -359,7 +371,10 @@ async def processar_pdfs_cache(
         return {
             "total_processos": len(todos_processos),
             "processos": todos_processos,
-            "pdfs_processados": len(pdfs_disponiveis),
+            "pdfs_total": len(pdfs_disponiveis),
+            "pdfs_processados_sucesso": pdfs_processados_sucesso,
+            "pdfs_com_erro": len(pdfs_com_erro),
+            "erros": pdfs_com_erro if pdfs_com_erro else None,
             "estatisticas": {
                 "por_tipo": dict(tipos_count),
                 "por_relevancia": dict(relevancia_count)
