@@ -236,6 +236,58 @@ async def listar_comarcas_disponiveis():
     }
 
 
+@router.get("/teste-simples")
+async def teste_simples():
+    """
+    Teste simples: processa 1 PDF sem filtros para verificar se está funcionando
+    """
+    import os
+    from src.scrapers.dje_parser import extrair_processos_dje
+
+    pdfs_dir = "data/dje_pdfs"
+
+    if not os.path.exists(pdfs_dir):
+        return {"erro": "Diretório de PDFs não encontrado"}
+
+    # Pegar primeiro PDF disponível (caderno 11 - menor)
+    pdfs = sorted([
+        os.path.join(pdfs_dir, f)
+        for f in os.listdir(pdfs_dir)
+        if f.endswith('cad11.pdf')
+    ])
+
+    if not pdfs:
+        return {"erro": "Nenhum PDF encontrado"}
+
+    pdf_teste = pdfs[0]
+    pdf_nome = os.path.basename(pdf_teste)
+
+    try:
+        # Processar SEM FILTROS
+        processos = extrair_processos_dje(
+            pdf_path=pdf_teste,
+            tipos=["Inventário", "Divórcio"],
+            filtrar_imoveis=False,
+            filtrar_ativos=False,
+            comarcas_filtro=None
+        )
+
+        return {
+            "sucesso": True,
+            "pdf_testado": pdf_nome,
+            "total_processos": len(processos),
+            "processos": processos[:5],  # Primeiros 5
+            "mensagem": f"Teste OK! Encontrados {len(processos)} processos de Inventário/Divórcio"
+        }
+
+    except Exception as e:
+        return {
+            "sucesso": False,
+            "erro": str(e),
+            "pdf_testado": pdf_nome
+        }
+
+
 @router.get("/status")
 async def status_dje():
     """Status do sistema DJE com diagnóstico detalhado"""
