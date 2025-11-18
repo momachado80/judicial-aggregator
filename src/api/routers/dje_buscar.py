@@ -245,9 +245,97 @@ async def status_dje():
     if os.path.exists(pdfs_dir):
         pdfs_existentes = [f for f in os.listdir(pdfs_dir) if f.endswith('.pdf')]
 
+    # Verificar se está em modo Railway (sem Playwright)
+    railway_mode = os.getenv("RAILWAY_DEPLOY", "false") == "true"
+
     return {
         "status": "online",
+        "modo": "railway" if railway_mode else "local",
+        "download_disponivel": not railway_mode,
         "pdfs_cache": len(pdfs_existentes),
         "diretorio": pdfs_dir,
         "ultimos_pdfs": sorted(pdfs_existentes, reverse=True)[:10] if pdfs_existentes else []
     }
+
+
+@router.post("/processar-pdfs-cache")
+async def processar_pdfs_cache(
+    tipos_processo: List[str] = ["Inventário", "Divórcio"],
+    comarcas: Optional[List[str]] = None,
+    apenas_imoveis: bool = True,
+    apenas_ativos: bool = True,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None
+):
+    """
+    Processa PDFs que já estão em cache (data/dje_pdfs/)
+
+    IDEAL PARA PRODUÇÃO NO RAILWAY - não precisa de Playwright!
+
+    Este endpoint processa PDFs que foram:
+    - Baixados localmente e commitados no repo
+    - Previamente baixados e salvos no servidor
+    - Enviados via upload (futuro)
+    """
+    try:
+        pdfs_dir = "data/dje_pdfs"
+
+        if not os.path.exists(pdfs_dir):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Diretório de PDFs não encontrado: {pdfs_dir}"
+            )
+
+        # Listar PDFs disponíveis
+        pdfs_disponiveis = [
+            os.path.join(pdfs_dir, f)
+            for f in os.listdir(pdfs_dir)
+            if f.endswith('.pdf')
+        ]
+
+        if not pdfs_disponiveis:
+            return {
+                "total_processos": 0,
+                "processos": [],
+                "pdfs_processados": 0,
+                "mensagem": "Nenhum PDF encontrado no cache"
+            }
+
+        print(f"\n📁 Processando {len(pdfs_disponiveis)} PDFs do cache...")
+
+        # Processar cada PDF
+        todos_processos = []
+        for pdf_path in pdfs_disponiveis:
+            print(f"\n📄 {os.path.basename(pdf_path)}")
+
+            processos = extrair_processos_dje(
+                pdf_path=pdf_path,
+                tipos=tipos_processo,
+                filtrar_imoveis=apenas_imoveis,
+                filtrar_ativos=apenas_ativos,
+                comarcas_filtro=comarcas,
+                valor_min=valor_min,
+                valor_max=valor_max
+            )
+
+            todos_processos.extend(processos)
+
+        # Estatísticas
+        from collections import Counter
+        tipos_count = Counter(p.get("tipo") for p in todos_processos)
+        relevancia_count = Counter(p.get("relevancia") for p in todos_processos)
+
+        return {
+            "total_processos": len(todos_processos),
+            "processos": todos_processos,
+            "pdfs_processados": len(pdfs_disponiveis),
+            "estatisticas": {
+                "por_tipo": dict(tipos_count),
+                "por_relevancia": dict(relevancia_count)
+            }
+        }
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
