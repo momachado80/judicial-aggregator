@@ -238,15 +238,45 @@ async def listar_comarcas_disponiveis():
 
 @router.get("/status")
 async def status_dje():
-    """Status do sistema DJE"""
+    """Status do sistema DJE com diagnóstico detalhado"""
+    import os
+    from pathlib import Path
+
     pdfs_dir = "data/dje_pdfs"
     pdfs_existentes = []
-
-    if os.path.exists(pdfs_dir):
-        pdfs_existentes = [f for f in os.listdir(pdfs_dir) if f.endswith('.pdf')]
+    diagnostico = {}
 
     # Verificar se está em modo Railway (sem Playwright)
     railway_mode = os.getenv("RAILWAY_DEPLOY", "false") == "true"
+
+    # Diagnóstico detalhado do filesystem
+    try:
+        cwd = os.getcwd()
+        diagnostico["current_working_directory"] = cwd
+        diagnostico["data_dir_exists"] = os.path.exists("data")
+        diagnostico["data_dir_absolute_path"] = os.path.abspath("data")
+        diagnostico["pdfs_dir_exists"] = os.path.exists(pdfs_dir)
+        diagnostico["pdfs_dir_absolute_path"] = os.path.abspath(pdfs_dir)
+
+        # Listar conteúdo do diretório data se existir
+        if os.path.exists("data"):
+            diagnostico["data_dir_contents"] = os.listdir("data")
+        else:
+            diagnostico["data_dir_contents"] = []
+
+        # Listar PDFs se o diretório existir
+        if os.path.exists(pdfs_dir):
+            all_files = os.listdir(pdfs_dir)
+            pdfs_existentes = [f for f in all_files if f.endswith('.pdf')]
+            diagnostico["all_files_in_pdfs_dir"] = all_files[:20]  # Primeiros 20
+
+            # Verificar tamanho dos arquivos
+            if pdfs_existentes:
+                sample_pdf = os.path.join(pdfs_dir, pdfs_existentes[0])
+                diagnostico["sample_pdf_size_bytes"] = os.path.getsize(sample_pdf)
+
+    except Exception as e:
+        diagnostico["error"] = str(e)
 
     return {
         "status": "online",
@@ -254,7 +284,8 @@ async def status_dje():
         "download_disponivel": not railway_mode,
         "pdfs_cache": len(pdfs_existentes),
         "diretorio": pdfs_dir,
-        "ultimos_pdfs": sorted(pdfs_existentes, reverse=True)[:10] if pdfs_existentes else []
+        "ultimos_pdfs": sorted(pdfs_existentes, reverse=True)[:10] if pdfs_existentes else [],
+        "diagnostico": diagnostico
     }
 
 
