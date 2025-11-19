@@ -22,6 +22,12 @@ export default function DJESearch() {
   const [comarcasCarregando, setComarcasCarregando] = useState(true);
   const [ordenarPor, setOrdenarPor] = useState('relevancia_desc');
 
+  // Paginação - 10 processos por página
+  const [paginaBusca, setPaginaBusca] = useState(1);
+  const [paginaInteresse, setPaginaInteresse] = useState(1);
+  const [paginaDescartados, setPaginaDescartados] = useState(1);
+  const PROCESSOS_POR_PAGINA = 10;
+
   // Carregar comarcas do backend
   useEffect(() => {
     const carregarComarcas = async () => {
@@ -64,6 +70,10 @@ export default function DJESearch() {
 
   const buscarProcessosDJE = async () => {
     setLoading(true);
+    // Reset pagination on new search
+    setPaginaBusca(1);
+    setPaginaInteresse(1);
+    setPaginaDescartados(1);
     try {
       const body: any = {
         tipos_processo: tiposSelecionados,
@@ -145,6 +155,24 @@ export default function DJESearch() {
   const processosInteresse = processos.filter(p => interesseIds.has(p.numero));
   const processosDescartados = processos.filter(p => descartadosIds.has(p.numero));
 
+  // Paginação - calcular quais processos mostrar
+  const getTotalPaginas = (total: number) => Math.ceil(total / PROCESSOS_POR_PAGINA);
+
+  const processosBuscaPaginados = processosBusca.slice(
+    (paginaBusca - 1) * PROCESSOS_POR_PAGINA,
+    paginaBusca * PROCESSOS_POR_PAGINA
+  );
+
+  const processosInteressePaginados = processosInteresse.slice(
+    (paginaInteresse - 1) * PROCESSOS_POR_PAGINA,
+    paginaInteresse * PROCESSOS_POR_PAGINA
+  );
+
+  const processosDescartadosPaginados = processosDescartados.slice(
+    (paginaDescartados - 1) * PROCESSOS_POR_PAGINA,
+    paginaDescartados * PROCESSOS_POR_PAGINA
+  );
+
   const formatarValor = (valor: number | null) => {
     if (!valor) return 'Não informado';
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
@@ -159,6 +187,77 @@ export default function DJESearch() {
     // O TJSP não permite links diretos para processos específicos
     // Retorna a página de busca geral
     return `https://esaj.tjsp.jus.br/cpopg/open.do`;
+  };
+
+  // Componente de paginação
+  const Paginacao = ({ paginaAtual, totalPaginas, onChange }: { paginaAtual: number, totalPaginas: number, onChange: (pagina: number) => void }) => {
+    if (totalPaginas <= 1) return null;
+
+    const paginas = [];
+    for (let i = 1; i <= totalPaginas; i++) {
+      paginas.push(i);
+    }
+
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '8px',
+        marginTop: '24px',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          onClick={() => onChange(paginaAtual - 1)}
+          disabled={paginaAtual === 1}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '6px',
+            border: '1px solid #d1d5db',
+            backgroundColor: paginaAtual === 1 ? '#f3f4f6' : 'white',
+            cursor: paginaAtual === 1 ? 'not-allowed' : 'pointer',
+            fontWeight: '600',
+            color: paginaAtual === 1 ? '#9ca3af' : '#374151'
+          }}
+        >
+          ← Anterior
+        </button>
+
+        {paginas.map(num => (
+          <button
+            key={num}
+            onClick={() => onChange(num)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '6px',
+              border: paginaAtual === num ? '2px solid #3b82f6' : '1px solid #d1d5db',
+              backgroundColor: paginaAtual === num ? '#3b82f6' : 'white',
+              cursor: 'pointer',
+              fontWeight: '600',
+              color: paginaAtual === num ? 'white' : '#374151',
+              minWidth: '40px'
+            }}
+          >
+            {num}
+          </button>
+        ))}
+
+        <button
+          onClick={() => onChange(paginaAtual + 1)}
+          disabled={paginaAtual === totalPaginas}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '6px',
+            border: '1px solid #d1d5db',
+            backgroundColor: paginaAtual === totalPaginas ? '#f3f4f6' : 'white',
+            cursor: paginaAtual === totalPaginas ? 'not-allowed' : 'pointer',
+            fontWeight: '600',
+            color: paginaAtual === totalPaginas ? '#9ca3af' : '#374151'
+          }}
+        >
+          Próxima →
+        </button>
+      </div>
+    );
   };
 
   const ProcessoDJECard = ({ processo }: { processo: any }) => (
@@ -786,16 +885,56 @@ export default function DJESearch() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
             gap: '24px'
           }}>
-            {abaAtiva === 'busca' && processosBusca.map((p, idx) => (
+            {abaAtiva === 'busca' && processosBuscaPaginados.map((p, idx) => (
               <ProcessoDJECard key={idx} processo={p} />
             ))}
-            {abaAtiva === 'interesse' && processosInteresse.map((p, idx) => (
+            {abaAtiva === 'interesse' && processosInteressePaginados.map((p, idx) => (
               <ProcessoDJECard key={idx} processo={p} />
             ))}
-            {abaAtiva === 'descartados' && processosDescartados.map((p, idx) => (
+            {abaAtiva === 'descartados' && processosDescartadosPaginados.map((p, idx) => (
               <ProcessoDJECard key={idx} processo={p} />
             ))}
           </div>
+
+          {/* Paginação */}
+          {abaAtiva === 'busca' && processosBusca.length > 0 && (
+            <div>
+              <p style={{ textAlign: 'center', color: '#6b7280', marginTop: '16px', fontSize: '14px' }}>
+                Mostrando {((paginaBusca - 1) * PROCESSOS_POR_PAGINA) + 1} - {Math.min(paginaBusca * PROCESSOS_POR_PAGINA, processosBusca.length)} de {processosBusca.length} processos
+              </p>
+              <Paginacao
+                paginaAtual={paginaBusca}
+                totalPaginas={getTotalPaginas(processosBusca.length)}
+                onChange={setPaginaBusca}
+              />
+            </div>
+          )}
+
+          {abaAtiva === 'interesse' && processosInteresse.length > 0 && (
+            <div>
+              <p style={{ textAlign: 'center', color: '#6b7280', marginTop: '16px', fontSize: '14px' }}>
+                Mostrando {((paginaInteresse - 1) * PROCESSOS_POR_PAGINA) + 1} - {Math.min(paginaInteresse * PROCESSOS_POR_PAGINA, processosInteresse.length)} de {processosInteresse.length} processos
+              </p>
+              <Paginacao
+                paginaAtual={paginaInteresse}
+                totalPaginas={getTotalPaginas(processosInteresse.length)}
+                onChange={setPaginaInteresse}
+              />
+            </div>
+          )}
+
+          {abaAtiva === 'descartados' && processosDescartados.length > 0 && (
+            <div>
+              <p style={{ textAlign: 'center', color: '#6b7280', marginTop: '16px', fontSize: '14px' }}>
+                Mostrando {((paginaDescartados - 1) * PROCESSOS_POR_PAGINA) + 1} - {Math.min(paginaDescartados * PROCESSOS_POR_PAGINA, processosDescartados.length)} de {processosDescartados.length} processos
+              </p>
+              <Paginacao
+                paginaAtual={paginaDescartados}
+                totalPaginas={getTotalPaginas(processosDescartados.length)}
+                onChange={setPaginaDescartados}
+              />
+            </div>
+          )}
 
           {abaAtiva === 'busca' && processosBusca.length === 0 && (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>
