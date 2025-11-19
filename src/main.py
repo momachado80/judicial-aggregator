@@ -36,6 +36,18 @@ async def health():
     return {"status":"healthy"}
 
 
+@app.get("/test-railway-deploy")
+async def test_railway_deploy():
+    """Endpoint de teste para verificar se o código mais recente está deployado"""
+    import os
+    return {
+        "status": "success",
+        "message": "Railway está com o código MAIS RECENTE - commit 8938a55",
+        "pdfs_directory_exists": os.path.exists("data/dje_pdfs"),
+        "endpoint_teste_simples_exists": True
+    }
+
+
 @app.on_event("startup")
 async def startup_event():
     try:
