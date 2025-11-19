@@ -9,6 +9,7 @@ from datetime import datetime
 import os
 from src.scrapers.dje_downloader import baixar_dje_intervalo, obter_cadernos_por_comarca
 from src.scrapers.dje_parser import extrair_processos_dje
+from src.utils.indexador_dje import indexar_todos_pdfs, ler_cache, filtrar_processos_cache
 from src.database import SessionLocal
 from src.models.processo import Processo
 from sqlalchemy.exc import IntegrityError
@@ -411,6 +412,109 @@ async def status_dje():
     }
 
 
+@router.post("/buscar-cache-instantaneo")
+async def buscar_cache_instantaneo(
+    tipos_processo: List[str] = ["Inventário", "Divórcio"],
+    comarcas: Optional[List[str]] = None,
+    apenas_imoveis: bool = False,
+    apenas_ativos: bool = True,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None
+):
+    """
+    🚀 BUSCA INSTANTÂNEA - Usa cache JSON pré-processado
+
+    VELOCIDADE: < 100ms (ao invés de 2+ minutos)
+
+    Este endpoint lê um arquivo JSON que contém TODOS os processos
+    já extraídos dos PDFs. A busca é EXTREMAMENTE RÁPIDA porque
+    apenas filtra dados já processados.
+
+    IMPORTANTE: O cache precisa ser gerado primeiro com /reindexar
+    """
+    try:
+        cache_path = "data/dje_cache.json"
+
+        # Verificar se cache existe
+        if not os.path.exists(cache_path):
+            raise HTTPException(
+                status_code=404,
+                detail="Cache não encontrado. Execute /api/dje/reindexar primeiro para gerar o índice."
+            )
+
+        # Ler cache
+        cache = ler_cache(cache_path)
+
+        # Filtrar processos (INSTANTÂNEO!)
+        processos_filtrados = filtrar_processos_cache(
+            cache=cache,
+            tipos=tipos_processo,
+            comarcas=comarcas,
+            apenas_imoveis=apenas_imoveis,
+            apenas_ativos=apenas_ativos,
+            valor_min=valor_min,
+            valor_max=valor_max
+        )
+
+        # Estatísticas
+        from collections import Counter
+        tipos_count = Counter(p.get("tipo") for p in processos_filtrados)
+        relevancia_count = Counter(p.get("relevancia") for p in processos_filtrados)
+
+        return {
+            "total_processos": len(processos_filtrados),
+            "processos": processos_filtrados,
+            "pdfs_disponiveis_total": cache["total_pdfs"],
+            "pdfs_processados_sucesso": cache["total_pdfs"],
+            "data_indexacao": cache["data_indexacao"],
+            "estatisticas": {
+                "por_tipo": dict(tipos_count),
+                "por_relevancia": dict(relevancia_count)
+            },
+            "mensagem": f"Busca instantânea concluída! {len(processos_filtrados)} processos encontrados.",
+            "cache_info": {
+                "total_processos_indexados": cache["total_processos"],
+                "total_pdfs_indexados": cache["total_pdfs"]
+            }
+        }
+
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/reindexar")
+async def reindexar_pdfs(background_tasks: BackgroundTasks):
+    """
+    Reindexar TODOS os PDFs e gerar cache JSON
+
+    ATENÇÃO: Este processo leva 10-20 minutos mas só precisa ser
+    executado UMA VEZ ou quando novos PDFs forem adicionados.
+
+    Após a indexação, todas as buscas serão INSTANTÂNEAS!
+    """
+    def indexar_background():
+        try:
+            print("\n🚀 Iniciando indexação em background...")
+            cache = indexar_todos_pdfs()
+            print(f"✅ Indexação concluída! {cache['total_processos']} processos indexados.")
+        except Exception as e:
+            print(f"❌ Erro na indexação: {e}")
+            import traceback
+            traceback.print_exc()
+
+    background_tasks.add_task(indexar_background)
+
+    return {
+        "status": "iniciado",
+        "mensagem": "Indexação iniciada em background. Isso levará 10-20 minutos.",
+        "info": "Acompanhe o progresso nos logs do servidor. Após concluir, use /buscar-cache-instantaneo para buscas rápidas."
+    }
+
+
 @router.post("/processar-pdfs-cache")
 async def processar_pdfs_cache(
     tipos_processo: List[str] = ["Inventário", "Divórcio"],
@@ -422,18 +526,9 @@ async def processar_pdfs_cache(
     limite_pdfs: int = 1
 ):
     """
-    Processa PDFs que já estão em cache (data/dje_pdfs/)
+    ⚠️ DEPRECATED: Use /buscar-cache-instantaneo para buscas rápidas
 
-    IDEAL PARA PRODUÇÃO NO RAILWAY - não precisa de Playwright!
-
-    Args:
-        limite_pdfs: Quantos PDFs processar (padrão: 3, máximo recomendado: 5)
-                    Cada PDF tem ~1200 páginas e leva ~30-60 segundos
-
-    Este endpoint processa PDFs que foram:
-    - Baixados localmente e commitados no repo
-    - Previamente baixados e salvos no servidor
-    - Enviados via upload (futuro)
+    Este endpoint processa PDFs em tempo real (LENTO - 30s por PDF)
     """
     try:
         pdfs_dir = "data/dje_pdfs"
