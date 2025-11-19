@@ -236,6 +236,76 @@ async def listar_comarcas_disponiveis():
     }
 
 
+@router.post("/baixar-pdfs-automatico")
+async def baixar_pdfs_automatico(
+    background_tasks: BackgroundTasks,
+    dias: int = 30,
+    todas_comarcas: bool = True
+):
+    """
+    Baixa PDFs dos últimos N dias de TODOS os cadernos do TJSP
+
+    IMPORTANTE: Este endpoint inicia o download em BACKGROUND e retorna imediatamente.
+    O download acontece no servidor e pode levar vários minutos.
+
+    Args:
+        dias: Quantos dias para trás baixar (padrão: 30)
+        todas_comarcas: Se True, baixa de todos os cadernos (11,12,13,14)
+
+    Returns:
+        Status indicando que o download foi iniciado
+    """
+    from datetime import datetime, timedelta
+
+    # Calcular datas
+    data_fim = datetime.now()
+    data_inicio = data_fim - timedelta(days=dias)
+
+    data_inicio_str = data_inicio.strftime("%d/%m/%Y")
+    data_fim_str = data_fim.strftime("%d/%m/%Y")
+
+    comarcas = ["São Paulo", "Piracicaba", "Campinas", "Santos", "Guarulhos"] if todas_comarcas else ["São Paulo"]
+
+    def baixar_em_background():
+        """Função que roda em background"""
+        try:
+            print(f"\n{'='*80}")
+            print(f"🚀 INICIANDO DOWNLOAD AUTOMÁTICO DE PDFs")
+            print(f"📅 Período: {data_inicio_str} a {data_fim_str} ({dias} dias)")
+            print(f"📍 Comarcas: {', '.join(comarcas)}")
+            print(f"{'='*80}\n")
+
+            pdfs_baixados = baixar_dje_intervalo(
+                data_inicio=data_inicio_str,
+                data_fim=data_fim_str,
+                comarcas=comarcas,
+                headless=True
+            )
+
+            print(f"\n{'='*80}")
+            print(f"✅ DOWNLOAD CONCLUÍDO!")
+            print(f"📦 Total de PDFs baixados: {len(pdfs_baixados)}")
+            print(f"{'='*80}\n")
+
+        except Exception as e:
+            print(f"\n❌ ERRO no download em background: {e}\n")
+
+    # Adicionar tarefa em background
+    background_tasks.add_task(baixar_em_background)
+
+    return {
+        "status": "iniciado",
+        "mensagem": f"Download de PDFs dos últimos {dias} dias foi iniciado em background",
+        "periodo": {
+            "inicio": data_inicio_str,
+            "fim": data_fim_str,
+            "dias": dias
+        },
+        "comarcas": comarcas,
+        "info": "O download está acontecendo no servidor. Aguarde alguns minutos e verifique os PDFs disponíveis em /api/dje/status"
+    }
+
+
 @router.get("/teste-simples")
 async def teste_simples():
     """
