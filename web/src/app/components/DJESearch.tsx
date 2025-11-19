@@ -133,8 +133,11 @@ export default function DJESearch() {
   const gerarUrlTJSP = (numeroProcesso: string) => {
     // Remover formatação (hífens e pontos) do número CNJ
     const numeroLimpo = numeroProcesso.replace(/[.-]/g, '');
+    // Extrair código do foro (últimos 4 dígitos do número CNJ)
+    const codigoForo = numeroLimpo.slice(-4);
     // URL correta do TJSP para consulta por número unificado
-    return `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=${numeroLimpo}`;
+    // Formato: processo.foro={foro}&processo.numero={numero}
+    return `https://esaj.tjsp.jus.br/cpopg/show.do?processo.foro=${codigoForo}&processo.numero=${numeroLimpo}`;
   };
 
   const ProcessoDJECard = ({ processo }: { processo: any }) => (

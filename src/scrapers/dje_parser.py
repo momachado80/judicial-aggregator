@@ -155,7 +155,12 @@ def extrair_processos_dje(
                 if not comarca:
                     linha_processo = contexto[max(0, match.start() - 200):match.end() + 50]
                     comarca_match = re.search(r'-\s*([A-Z][a-zá-úÀ-Ú\s]+)\s*-', linha_processo)
-                    comarca = comarca_match.group(1).strip() if comarca_match else f"Código {codigo_comarca}"
+                    if comarca_match:
+                        comarca = comarca_match.group(1).strip()
+                    else:
+                        # Buscar nome da comarca pelo código
+                        from src.utils.comarcas import get_comarca_nome
+                        comarca = get_comarca_nome(codigo_comarca, tribunal="TJSP")
 
                 # FILTRO 3: Filtrar por comarca (se especificado)
                 if comarcas_filtro:
