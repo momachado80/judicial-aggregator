@@ -9,7 +9,7 @@ on:
 jobs:
   update-dje:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # 2 horas max
+    timeout-minutes: 240  # 4 horas max (múltiplas comarcas)
 
     steps:
       - name: Checkout código

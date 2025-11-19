@@ -21,18 +21,29 @@ def main():
     data_inicio = tres_dias_atras.strftime("%d/%m/%Y")
     data_fim = hoje.strftime("%d/%m/%Y")
 
-    print(f"\n📅 Período: {data_inicio} até {data_fim}")
-    print(f"📍 Comarcas: São Paulo (Capital)")
-    print(f"📚 Cadernos: 12, 13 (Capital - onde estão Inventários/Divórcios)\n")
+    # Comarcas principais (Capital + Interior)
+    comarcas = [
+        "São Paulo",      # Capital
+        "Guarulhos",      # Grande SP
+        "Campinas",       # Interior
+        "Santos",         # Litoral
+        "Ribeirão Preto", # Interior
+        "Sorocaba",       # Interior
+        "Piracicaba"      # Interior
+    ]
 
-    # PASSO 1: Baixar PDFs dos últimos 3 dias (apenas cadernos da Capital)
+    print(f"\n📅 Período: {data_inicio} até {data_fim}")
+    print(f"📍 Comarcas: {', '.join(comarcas)}")
+    print(f"📚 Cadernos: 11, 12, 13, 14 (Capital + Interior)\n")
+
+    # PASSO 1: Baixar PDFs dos últimos 3 dias (Capital + Interior)
     print("📥 PASSO 1: Baixando PDFs...\n")
 
     try:
         pdfs = baixar_dje_intervalo(
             data_inicio=data_inicio,
             data_fim=data_fim,
-            comarcas=["São Paulo"],  # Apenas capital
+            comarcas=comarcas,  # Capital + Interior
             headless=True
         )
         print(f"\n✅ {len(pdfs)} PDFs baixados")
