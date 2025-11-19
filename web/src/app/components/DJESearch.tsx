@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function DJESearch() {
   const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio']);
@@ -18,20 +18,37 @@ export default function DJESearch() {
   const [interesseIds, setInteresseIds] = useState(new Set<string>());
   const [descartadosIds, setDescartadosIds] = useState(new Set<string>());
   const [abaAtiva, setAbaAtiva] = useState<'busca' | 'interesse' | 'descartados'>('busca');
+  const [comarcasDisponiveis, setComarcasDisponiveis] = useState<string[]>([]);
+  const [comarcasCarregando, setComarcasCarregando] = useState(true);
+  const [ordenarPor, setOrdenarPor] = useState('relevancia_desc');
 
-  const comarcasDisponiveis = [
-    'São Paulo',
-    'Piracicaba',
-    'Campinas',
-    'Santos',
-    'Guarulhos',
-    'Santo André',
-    'São Bernardo',
-    'Osasco',
-    'Limeira',
-    'Rio Claro',
-    'Americana'
-  ];
+  // Carregar comarcas do backend
+  useEffect(() => {
+    const carregarComarcas = async () => {
+      try {
+        const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/dje/comarcas-disponiveis');
+        const data = await response.json();
+        setComarcasDisponiveis(data.comarcas || []);
+      } catch (error) {
+        console.error('Erro ao carregar comarcas:', error);
+        // Fallback para lista básica
+        setComarcasDisponiveis([
+          'São Paulo',
+          'Piracicaba',
+          'Campinas',
+          'Santos',
+          'Guarulhos',
+          'Santo André',
+          'São Bernardo do Campo',
+          'Osasco'
+        ]);
+      } finally {
+        setComarcasCarregando(false);
+      }
+    };
+
+    carregarComarcas();
+  }, []);
 
   const adicionarComarca = (comarca: string) => {
     const comarcaTrimmed = comarca.trim();
@@ -73,6 +90,9 @@ export default function DJESearch() {
       if (dataFim) {
         body.data_fim = dataFim;
       }
+
+      // Adicionar ordenação
+      body.ordenar_por = ordenarPor;
 
       const response = await fetch(
         `https://judicial-aggregator-production.up.railway.app/api/dje/buscar-cache-instantaneo`,
@@ -130,14 +150,15 @@ export default function DJESearch() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   };
 
+  const copiarNumeroProcesso = (numeroProcesso: string) => {
+    navigator.clipboard.writeText(numeroProcesso);
+    alert(`Número ${numeroProcesso} copiado! Cole no site do TJSP: https://esaj.tjsp.jus.br/cpopg/open.do`);
+  };
+
   const gerarUrlTJSP = (numeroProcesso: string) => {
-    // Remover formatação (hífens e pontos) do número CNJ
-    const numeroLimpo = numeroProcesso.replace(/[.-]/g, '');
-    // Extrair código do foro (últimos 4 dígitos do número CNJ)
-    const codigoForo = numeroLimpo.slice(-4);
-    // URL correta do TJSP para consulta por número unificado
-    // Formato: processo.foro={foro}&processo.numero={numero}
-    return `https://esaj.tjsp.jus.br/cpopg/show.do?processo.foro=${codigoForo}&processo.numero=${numeroLimpo}`;
+    // O TJSP não permite links diretos para processos específicos
+    // Retorna a página de busca geral
+    return `https://esaj.tjsp.jus.br/cpopg/open.do`;
   };
 
   const ProcessoDJECard = ({ processo }: { processo: any }) => (
@@ -150,24 +171,51 @@ export default function DJESearch() {
     }}>
       <div style={{ marginBottom: '16px' }}>
         <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
-        <a
-          href={gerarUrlTJSP(processo.numero)}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            color: '#2563eb',
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span style={{
             fontFamily: 'monospace',
             fontSize: '14px',
             fontWeight: '600',
-            textDecoration: 'none',
-            cursor: 'pointer',
-            display: 'inline-block'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-          onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-        >
-          {processo.numero} 🔗
-        </a>
+            color: '#374151'
+          }}>
+            {processo.numero}
+          </span>
+          <button
+            onClick={() => copiarNumeroProcesso(processo.numero)}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 12px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+            title="Copiar número e abrir TJSP"
+          >
+            📋 Copiar
+          </button>
+          <a
+            href={gerarUrlTJSP(processo.numero)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 12px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              fontWeight: '500',
+              textDecoration: 'none'
+            }}
+            title="Abrir site do TJSP"
+          >
+            🔗 TJSP
+          </a>
+        </div>
       </div>
 
       <div style={{ marginBottom: '12px' }}>
@@ -367,9 +415,16 @@ export default function DJESearch() {
           </div>
 
           <div>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>
               Comarcas (opcional)
             </label>
+            <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+              {comarcasCarregando ? (
+                'Carregando comarcas...'
+              ) : (
+                `${comarcasDisponiveis.length} comarcas disponíveis (TJSP)`
+              )}
+            </p>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 type="text"
@@ -384,6 +439,7 @@ export default function DJESearch() {
                   borderRadius: '8px'
                 }}
                 list="comarcas-dje-list"
+                disabled={comarcasCarregando}
               />
               <button
                 onClick={() => adicionarComarca(inputComarca)}
@@ -557,6 +613,31 @@ export default function DJESearch() {
                 </p>
               </div>
             </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+              Ordenar resultados por:
+            </label>
+            <select
+              value={ordenarPor}
+              onChange={(e) => setOrdenarPor(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: 'white'
+              }}
+            >
+              <option value="relevancia_desc">🔥 Alta relevância primeiro</option>
+              <option value="relevancia_asc">📉 Baixa relevância primeiro</option>
+              <option value="data_desc">📅 Mais recentes primeiro</option>
+              <option value="data_asc">📅 Mais antigos primeiro</option>
+              <option value="valor_desc">💰 Maior valor primeiro</option>
+              <option value="valor_asc">💰 Menor valor primeiro</option>
+            </select>
           </div>
 
           <button
