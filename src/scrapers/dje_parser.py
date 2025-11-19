@@ -122,38 +122,47 @@ def extrair_processos_dje(
                 codigo_comarca = numero.split('.')[-1]
 
                 # Extrair CLASSE REAL do processo
-                # DJE TJSP tem 2 formatos:
-                # 1) Distribuição: "CLASSE :DIVÓRCIO CONSENSUAL"
+                # DJE TJSP tem 3 formatos:
+                # 1a) Distribuição com dois pontos: "CLASSE :DIVÓRCIO CONSENSUAL"
+                # 1b) Distribuição sem dois pontos: "Classe\nTutela Antecipada Antecedente"
                 # 2) Movimentações: "número - texto - Classe - Comarca"
 
-                # Tentar Formato 1 primeiro (CLASSE :)
+                classe = None
+
+                # Tentar Formato 1a (CLASSE :)
                 classe_match = re.search(
-                    r'CLASSE\s*:([\s\n]*)([^\n]+)',
+                    r'CLASSE\s*:\s*([^\n]+)',
                     contexto,
                     re.IGNORECASE
                 )
+                if classe_match:
+                    classe = classe_match.group(1).strip()
 
-                if not classe_match:
-                    # Tentar Formato 2 (" - Classe - ")
+                # Tentar Formato 1b (Classe\n sem dois pontos)
+                if not classe:
+                    classe_match = re.search(
+                        r'Classe[\s\n]+([^\n]+)',
+                        contexto,
+                        re.IGNORECASE
+                    )
+                    if classe_match:
+                        classe = classe_match.group(1).strip()
+
+                # Tentar Formato 2 (" - Classe - ")
+                if not classe:
                     classe_match = re.search(
                         r'-\s+(Inventário|Arrolamento|Divórcio\s+(?:Consensual|Litigioso)|'
                         r'Separação\s+(?:Consensual|Litigiosa)|Alvará\s+Judicial)\s+-',
                         contexto,
                         re.IGNORECASE
                     )
+                    if classe_match:
+                        classe = classe_match.group(1).strip()
 
-                if not classe_match:
+                if not classe:
                     # Se não encontrou classe em nenhum formato, rejeitar
                     processos_rejeitados["classe_nao_identificada"] = processos_rejeitados.get("classe_nao_identificada", 0) + 1
                     continue
-
-                # Extrair classe dependendo do formato
-                if classe_match.lastindex and classe_match.lastindex >= 2:
-                    # Formato 1: group(2) contém a classe
-                    classe = classe_match.group(2).strip()
-                else:
-                    # Formato 2: group(1) contém a classe
-                    classe = classe_match.group(1).strip()
 
                 # FILTRO CRÍTICO: Verificar se a CLASSE corresponde aos tipos procurados
                 tipo_encontrado = None
