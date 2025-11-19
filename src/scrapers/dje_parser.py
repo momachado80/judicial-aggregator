@@ -121,22 +121,39 @@ def extrair_processos_dje(
                 # Extrair informações primeiro
                 codigo_comarca = numero.split('.')[-1]
 
-                # Extrair CLASSE REAL do processo (aparece logo após o número)
-                # Padrão: o número é seguido por espaço/quebra e depois a classe
+                # Extrair CLASSE REAL do processo
+                # DJE TJSP tem 2 formatos:
+                # 1) Distribuição: "CLASSE :DIVÓRCIO CONSENSUAL"
+                # 2) Movimentações: "número - texto - Classe - Comarca"
+
+                # Tentar Formato 1 primeiro (CLASSE :)
                 classe_match = re.search(
-                    r'Classe:\s*([^\n]+)|'  # Formato: "Classe: Inventário"
-                    r'(?:Inventário|Arrolamento|Divórcio\s+(?:Consensual|Litigioso)|'
-                    r'Separação\s+(?:Consensual|Litigiosa)|Alvará\s+Judicial)',
+                    r'CLASSE\s*:([\s\n]*)([^\n]+)',
                     contexto,
                     re.IGNORECASE
                 )
 
                 if not classe_match:
-                    # Se não encontrou classe, rejeitar
+                    # Tentar Formato 2 (" - Classe - ")
+                    classe_match = re.search(
+                        r'-\s+(Inventário|Arrolamento|Divórcio\s+(?:Consensual|Litigioso)|'
+                        r'Separação\s+(?:Consensual|Litigiosa)|Alvará\s+Judicial)\s+-',
+                        contexto,
+                        re.IGNORECASE
+                    )
+
+                if not classe_match:
+                    # Se não encontrou classe em nenhum formato, rejeitar
                     processos_rejeitados["classe_nao_identificada"] = processos_rejeitados.get("classe_nao_identificada", 0) + 1
                     continue
 
-                classe = classe_match.group(1).strip() if classe_match.group(1) else classe_match.group(0).strip()
+                # Extrair classe dependendo do formato
+                if classe_match.lastindex and classe_match.lastindex >= 2:
+                    # Formato 1: group(2) contém a classe
+                    classe = classe_match.group(2).strip()
+                else:
+                    # Formato 2: group(1) contém a classe
+                    classe = classe_match.group(1).strip()
 
                 # FILTRO CRÍTICO: Verificar se a CLASSE corresponde aos tipos procurados
                 tipo_encontrado = None
