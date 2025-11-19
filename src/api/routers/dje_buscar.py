@@ -237,6 +237,96 @@ async def listar_comarcas_disponiveis():
     }
 
 
+@router.post("/baixar-pdfs-periodo")
+async def baixar_pdfs_periodo(
+    background_tasks: BackgroundTasks,
+    data_inicio: str,
+    data_fim: str,
+    comarcas: List[str] = ["São Paulo", "Piracicaba", "Campinas", "Santos"]
+):
+    """
+    📥 Baixa PDFs de um período específico (ex: 01/01/2024 a 31/01/2024)
+
+    IMPORTANTE: Executa em BACKGROUND. Pode levar HORAS dependendo do período!
+
+    Args:
+        data_inicio: Data início (DD/MM/YYYY ou YYYY-MM-DD)
+        data_fim: Data fim (DD/MM/YYYY ou YYYY-MM-DD)
+        comarcas: Lista de comarcas para baixar
+
+    Exemplo:
+        POST /api/dje/baixar-pdfs-periodo
+        {
+            "data_inicio": "01/01/2024",
+            "data_fim": "31/01/2024",
+            "comarcas": ["São Paulo", "Piracicaba"]
+        }
+    """
+    from datetime import datetime
+
+    # Converter formato se vier YYYY-MM-DD
+    if "-" in data_inicio:
+        data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").strftime("%d/%m/%Y")
+    if "-" in data_fim:
+        data_fim = datetime.strptime(data_fim, "%Y-%m-%d").strftime("%d/%m/%Y")
+
+    def baixar_em_background():
+        """Função que roda em background"""
+        try:
+            print(f"\n{'='*80}")
+            print(f"📥 DOWNLOAD DE PDFs POR PERÍODO")
+            print(f"📅 Período: {data_inicio} a {data_fim}")
+            print(f"📍 Comarcas: {', '.join(comarcas)}")
+            print(f"{'='*80}\n")
+
+            pdfs_baixados = baixar_dje_intervalo(
+                data_inicio=data_inicio,
+                data_fim=data_fim,
+                comarcas=comarcas,
+                headless=True
+            )
+
+            print(f"\n{'='*80}")
+            print(f"✅ DOWNLOAD CONCLUÍDO!")
+            print(f"📦 Total de PDFs baixados: {len(pdfs_baixados)}")
+            print(f"{'='*80}\n")
+
+            # Reindexar automaticamente após baixar
+            print("🔄 Reindexando cache...")
+            from src.utils.indexador_dje import indexar_todos_pdfs
+            cache = indexar_todos_pdfs()
+            print(f"✅ Cache atualizado! {cache['total_processos']} processos indexados.")
+
+        except Exception as e:
+            print(f"\n❌ ERRO no download: {e}\n")
+            import traceback
+            traceback.print_exc()
+
+    # Adicionar tarefa em background
+    background_tasks.add_task(baixar_em_background)
+
+    # Calcular número aproximado de dias
+    try:
+        d1 = datetime.strptime(data_inicio, "%d/%m/%Y")
+        d2 = datetime.strptime(data_fim, "%d/%m/%Y")
+        dias = (d2 - d1).days
+    except:
+        dias = "?"
+
+    return {
+        "status": "iniciado",
+        "mensagem": f"Download de PDFs do período {data_inicio} a {data_fim} iniciado em background",
+        "periodo": {
+            "inicio": data_inicio,
+            "fim": data_fim,
+            "dias_aproximados": dias
+        },
+        "comarcas": comarcas,
+        "aviso": f"Este processo pode levar várias horas! (~{len(comarcas) * (dias if isinstance(dias, int) else 30)} PDFs)",
+        "info": "Após o download, o cache será reindexado automaticamente. Acompanhe o progresso nos logs."
+    }
+
+
 @router.post("/baixar-pdfs-automatico")
 async def baixar_pdfs_automatico(
     background_tasks: BackgroundTasks,
@@ -244,17 +334,9 @@ async def baixar_pdfs_automatico(
     todas_comarcas: bool = True
 ):
     """
+    ⚠️ DEPRECATED: Use /baixar-pdfs-periodo para maior controle
+
     Baixa PDFs dos últimos N dias de TODOS os cadernos do TJSP
-
-    IMPORTANTE: Este endpoint inicia o download em BACKGROUND e retorna imediatamente.
-    O download acontece no servidor e pode levar vários minutos.
-
-    Args:
-        dias: Quantos dias para trás baixar (padrão: 30)
-        todas_comarcas: Se True, baixa de todos os cadernos (11,12,13,14)
-
-    Returns:
-        Status indicando que o download foi iniciado
     """
     from datetime import datetime, timedelta
 
@@ -419,7 +501,9 @@ async def buscar_cache_instantaneo(
     apenas_imoveis: bool = False,
     apenas_ativos: bool = True,
     valor_min: Optional[float] = None,
-    valor_max: Optional[float] = None
+    valor_max: Optional[float] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None
 ):
     """
     🚀 BUSCA INSTANTÂNEA - Usa cache JSON pré-processado
@@ -453,7 +537,9 @@ async def buscar_cache_instantaneo(
             apenas_imoveis=apenas_imoveis,
             apenas_ativos=apenas_ativos,
             valor_min=valor_min,
-            valor_max=valor_max
+            valor_max=valor_max,
+            data_inicio=data_inicio,
+            data_fim=data_fim
         )
 
         # Estatísticas

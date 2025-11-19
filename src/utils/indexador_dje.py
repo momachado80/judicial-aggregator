@@ -111,14 +111,51 @@ def filtrar_processos_cache(
     apenas_imoveis: bool = True,
     apenas_ativos: bool = True,
     valor_min: float = None,
-    valor_max: float = None
+    valor_max: float = None,
+    data_inicio: str = None,
+    data_fim: str = None
 ) -> List[Dict]:
     """
     Filtra processos do cache (INSTANTÂNEO)
 
     Esta função é EXTREMAMENTE RÁPIDA porque apenas filtra dados já processados
+
+    Args:
+        data_inicio: Data no formato YYYY-MM-DD (ex: 2024-01-01)
+        data_fim: Data no formato YYYY-MM-DD (ex: 2024-02-01)
     """
     processos = cache["processos"]
+
+    # Filtrar por data do DJE (se especificado)
+    if data_inicio or data_fim:
+        from datetime import datetime
+
+        processos_filtrados = []
+        for p in processos:
+            data_pdf = p.get("data_pdf")  # Formato: DD-MM-YYYY
+            if not data_pdf:
+                continue
+
+            try:
+                # Converter DD-MM-YYYY para datetime
+                data_processo = datetime.strptime(data_pdf, "%d-%m-%Y")
+
+                # Comparar com range
+                if data_inicio:
+                    data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d")
+                    if data_processo < data_inicio_dt:
+                        continue
+
+                if data_fim:
+                    data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d")
+                    if data_processo > data_fim_dt:
+                        continue
+
+                processos_filtrados.append(p)
+            except:
+                continue
+
+        processos = processos_filtrados
 
     # Aplicar filtros
     if tipos:

@@ -10,6 +10,8 @@ export default function DJESearch() {
   const [limitePdfs, setLimitePdfs] = useState(50);
   const [valorMin, setValorMin] = useState('');
   const [valorMax, setValorMax] = useState('');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
   const [processos, setProcessos] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,14 @@ export default function DJESearch() {
 
       if (valorMax) {
         body.valor_max = Number(valorMax);
+      }
+
+      if (dataInicio) {
+        body.data_inicio = dataInicio;
+      }
+
+      if (dataFim) {
+        body.data_fim = dataFim;
       }
 
       const response = await fetch(
@@ -415,6 +425,46 @@ export default function DJESearch() {
                   }}>×</button>
                 </span>
               ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                📅 Data Início (DJE)
+              </label>
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                min="2021-01-01"
+                max={new Date().toISOString().split('T')[0]}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                📅 Data Fim (DJE)
+              </label>
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+                min="2021-01-01"
+                max={new Date().toISOString().split('T')[0]}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}
+              />
             </div>
           </div>
 
