@@ -222,52 +222,44 @@ def salvar_processos_dje(processos: List[dict]) -> tuple:
 @router.get("/comarcas-disponiveis")
 async def listar_comarcas_disponiveis():
     """
-    Lista TODAS as comarcas do TJSP disponíveis para busca
+    Lista comarcas do TJSP disponíveis para busca
 
-    Retorna lista completa de 600+ comarcas organizadas por tipo:
-    - Capital: Foros da cidade de São Paulo
-    - Interior: Todas as comarcas do interior do estado
+    Retorna:
+    - "São Paulo" representa TODOS os foros da capital (26 foros)
+    - Comarcas do interior (ex: Piracicaba, Campinas, Santos)
+
+    Total: ~350 comarcas
     """
     from src.utils.comarcas import COMARCAS_TJSP, FOROS_SAO_PAULO_CAPITAL
 
-    # Separar comarcas da capital e do interior
-    comarcas_capital = []
+    # Coletar apenas comarcas do interior (excluir foros da capital)
     comarcas_interior = []
 
     for codigo, nome in COMARCAS_TJSP.items():
+        # Pular foros da capital (serão representados por "São Paulo")
         if codigo in FOROS_SAO_PAULO_CAPITAL:
-            comarcas_capital.append({
-                "codigo": codigo,
-                "nome": nome,
-                "tipo": "capital"
-            })
-        else:
-            comarcas_interior.append({
-                "codigo": codigo,
-                "nome": nome,
-                "tipo": "interior"
-            })
+            continue
 
-    # Ordenar alfabeticamente pelo nome
-    comarcas_capital.sort(key=lambda x: x["nome"])
+        comarcas_interior.append({
+            "codigo": codigo,
+            "nome": nome,
+            "tipo": "interior"
+        })
+
+    # Ordenar alfabeticamente
     comarcas_interior.sort(key=lambda x: x["nome"])
 
-    # Lista simplificada de nomes (para compatibilidade)
-    nomes_comarcas = [c["nome"] for c in comarcas_capital + comarcas_interior]
+    # Adicionar "São Paulo" no início (representa todos os foros)
+    comarcas_lista = ["São Paulo"] + [c["nome"] for c in comarcas_interior]
 
     return {
-        "comarcas": nomes_comarcas,
-        "comarcas_detalhadas": {
-            "capital": comarcas_capital,
-            "interior": comarcas_interior
-        },
-        "total": len(nomes_comarcas),
-        "total_capital": len(comarcas_capital),
-        "total_interior": len(comarcas_interior),
+        "comarcas": comarcas_lista,
+        "total": len(comarcas_lista),
+        "info": "São Paulo representa todos os 26 foros da capital",
         "exemplos": {
-            "capital": ["São Paulo (Capital)", "Foro Central Cível", "Foro Regional I - Santana"],
-            "interior": ["Piracicaba", "Campinas", "Santos", "Guarulhos"],
-            "grande_sp": ["Guarulhos", "Santo André", "São Bernardo do Campo", "Osasco", "Mogi das Cruzes"]
+            "capital": ["São Paulo"],
+            "grande_sp": ["Guarulhos", "Santo André", "São Bernardo do Campo", "Osasco", "Mogi das Cruzes"],
+            "interior": ["Piracicaba", "Campinas", "Santos", "Ribeirão Preto", "Sorocaba"]
         }
     }
 
