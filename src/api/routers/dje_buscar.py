@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 from src.scrapers.dje_downloader import baixar_dje_intervalo, obter_cadernos_por_comarca
 from src.scrapers.dje_parser import extrair_processos_dje
-from src.utils.indexador_dje import indexar_todos_pdfs, ler_cache, filtrar_processos_cache
+from src.utils.indexador_dje import indexar_todos_pdfs, ler_cache, filtrar_processos_cache, ordenar_processos
 from src.database import SessionLocal
 from src.models.processo import Processo
 from sqlalchemy.exc import IntegrityError
@@ -221,18 +221,53 @@ def salvar_processos_dje(processos: List[dict]) -> tuple:
 
 @router.get("/comarcas-disponiveis")
 async def listar_comarcas_disponiveis():
-    """Lista comarcas disponíveis no sistema DJE"""
-    from src.scrapers.dje_downloader import COMARCAS_POR_CADERNO
+    """
+    Lista TODAS as comarcas do TJSP disponíveis para busca
 
-    comarcas = list(COMARCAS_POR_CADERNO.keys())
+    Retorna lista completa de 600+ comarcas organizadas por tipo:
+    - Capital: Foros da cidade de São Paulo
+    - Interior: Todas as comarcas do interior do estado
+    """
+    from src.utils.comarcas import COMARCAS_TJSP, FOROS_SAO_PAULO_CAPITAL
+
+    # Separar comarcas da capital e do interior
+    comarcas_capital = []
+    comarcas_interior = []
+
+    for codigo, nome in COMARCAS_TJSP.items():
+        if codigo in FOROS_SAO_PAULO_CAPITAL:
+            comarcas_capital.append({
+                "codigo": codigo,
+                "nome": nome,
+                "tipo": "capital"
+            })
+        else:
+            comarcas_interior.append({
+                "codigo": codigo,
+                "nome": nome,
+                "tipo": "interior"
+            })
+
+    # Ordenar alfabeticamente pelo nome
+    comarcas_capital.sort(key=lambda x: x["nome"])
+    comarcas_interior.sort(key=lambda x: x["nome"])
+
+    # Lista simplificada de nomes (para compatibilidade)
+    nomes_comarcas = [c["nome"] for c in comarcas_capital + comarcas_interior]
+
     return {
-        "comarcas": comarcas,
-        "total": len(comarcas),
-        "exemplo": {
-            "capital": ["São Paulo"],
-            "interior": ["Piracicaba", "Campinas", "Santos"],
-            "raio_50km_sp": ["Guarulhos", "Santo André", "São Bernardo", "Osasco"],
-            "raio_50km_piracicaba": ["Limeira", "Rio Claro", "Americana"]
+        "comarcas": nomes_comarcas,
+        "comarcas_detalhadas": {
+            "capital": comarcas_capital,
+            "interior": comarcas_interior
+        },
+        "total": len(nomes_comarcas),
+        "total_capital": len(comarcas_capital),
+        "total_interior": len(comarcas_interior),
+        "exemplos": {
+            "capital": ["São Paulo (Capital)", "Foro Central Cível", "Foro Regional I - Santana"],
+            "interior": ["Piracicaba", "Campinas", "Santos", "Guarulhos"],
+            "grande_sp": ["Guarulhos", "Santo André", "São Bernardo do Campo", "Osasco", "Mogi das Cruzes"]
         }
     }
 
@@ -503,7 +538,8 @@ async def buscar_cache_instantaneo(
     valor_min: Optional[float] = None,
     valor_max: Optional[float] = None,
     data_inicio: Optional[str] = None,
-    data_fim: Optional[str] = None
+    data_fim: Optional[str] = None,
+    ordenar_por: str = "relevancia_desc"
 ):
     """
     🚀 BUSCA INSTANTÂNEA - Usa cache JSON pré-processado
@@ -515,6 +551,15 @@ async def buscar_cache_instantaneo(
     apenas filtra dados já processados.
 
     IMPORTANTE: O cache precisa ser gerado primeiro com /reindexar
+
+    Args:
+        ordenar_por: Critério de ordenação dos resultados
+            - "relevancia_desc": Alta relevância primeiro (padrão)
+            - "relevancia_asc": Baixa relevância primeiro
+            - "data_desc": Mais recente primeiro
+            - "data_asc": Mais antigo primeiro
+            - "valor_desc": Maior valor primeiro
+            - "valor_asc": Menor valor primeiro
     """
     try:
         cache_path = "data/dje_cache.json"
@@ -542,10 +587,26 @@ async def buscar_cache_instantaneo(
             data_fim=data_fim
         )
 
+        # Ordenar processos (INSTANTÂNEO!)
+        processos_filtrados = ordenar_processos(
+            processos=processos_filtrados,
+            ordenar_por=ordenar_por
+        )
+
         # Estatísticas
         from collections import Counter
         tipos_count = Counter(p.get("tipo") for p in processos_filtrados)
         relevancia_count = Counter(p.get("relevancia") for p in processos_filtrados)
+
+        # Descrição da ordenação
+        ordenacao_desc = {
+            "relevancia_desc": "Alta relevância primeiro",
+            "relevancia_asc": "Baixa relevância primeiro",
+            "data_desc": "Mais recentes primeiro",
+            "data_asc": "Mais antigos primeiro",
+            "valor_desc": "Maior valor primeiro",
+            "valor_asc": "Menor valor primeiro"
+        }
 
         return {
             "total_processos": len(processos_filtrados),
@@ -553,6 +614,10 @@ async def buscar_cache_instantaneo(
             "pdfs_disponiveis_total": cache["total_pdfs"],
             "pdfs_processados_sucesso": cache["total_pdfs"],
             "data_indexacao": cache["data_indexacao"],
+            "ordenacao": {
+                "criterio": ordenar_por,
+                "descricao": ordenacao_desc.get(ordenar_por, "Sem ordenação")
+            },
             "estatisticas": {
                 "por_tipo": dict(tipos_count),
                 "por_relevancia": dict(relevancia_count)

@@ -201,6 +201,79 @@ def filtrar_processos_cache(
     return processos
 
 
+def ordenar_processos(
+    processos: List[Dict],
+    ordenar_por: str = "relevancia_desc"
+) -> List[Dict]:
+    """
+    Ordena processos segundo critério especificado
+
+    Args:
+        processos: Lista de processos para ordenar
+        ordenar_por: Critério de ordenação
+            - "relevancia_desc": Alta relevância primeiro (padrão)
+            - "relevancia_asc": Baixa relevância primeiro
+            - "data_desc": Mais recente primeiro (por data do DJE)
+            - "data_asc": Mais antigo primeiro (por data do DJE)
+            - "valor_desc": Maior valor de causa primeiro
+            - "valor_asc": Menor valor de causa primeiro
+
+    Returns:
+        Lista ordenada de processos
+    """
+    from datetime import datetime
+
+    if ordenar_por == "relevancia_desc":
+        # Alta -> Baixa (0.8 -> 0.2)
+        return sorted(processos, key=lambda p: p.get("score_relevancia", 0), reverse=True)
+
+    elif ordenar_por == "relevancia_asc":
+        # Baixa -> Alta (0.2 -> 0.8)
+        return sorted(processos, key=lambda p: p.get("score_relevancia", 0), reverse=False)
+
+    elif ordenar_por == "data_desc":
+        # Mais recente primeiro
+        def get_data(p):
+            data_pdf = p.get("data_pdf", "01-01-2000")
+            try:
+                return datetime.strptime(data_pdf, "%d-%m-%Y")
+            except:
+                return datetime(2000, 1, 1)
+
+        return sorted(processos, key=get_data, reverse=True)
+
+    elif ordenar_por == "data_asc":
+        # Mais antigo primeiro
+        def get_data(p):
+            data_pdf = p.get("data_pdf", "01-01-2000")
+            try:
+                return datetime.strptime(data_pdf, "%d-%m-%Y")
+            except:
+                return datetime(2000, 1, 1)
+
+        return sorted(processos, key=get_data, reverse=False)
+
+    elif ordenar_por == "valor_desc":
+        # Maior valor primeiro
+        return sorted(
+            processos,
+            key=lambda p: p.get("valor_causa") if p.get("valor_causa") is not None else -1,
+            reverse=True
+        )
+
+    elif ordenar_por == "valor_asc":
+        # Menor valor primeiro
+        return sorted(
+            processos,
+            key=lambda p: p.get("valor_causa") if p.get("valor_causa") is not None else float('inf'),
+            reverse=False
+        )
+
+    else:
+        # Se ordenação inválida, retornar sem ordenar
+        return processos
+
+
 if __name__ == "__main__":
     # Executar indexação
     cache = indexar_todos_pdfs()
