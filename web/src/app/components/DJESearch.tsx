@@ -426,30 +426,43 @@ export default function DJESearch() {
               )}
             </p>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <select
-                value=""
-                onChange={(e) => {
-                  if (e.target.value) {
-                    adicionarComarca(e.target.value);
-                  }
-                }}
+              <input
+                type="text"
+                value={inputComarca}
+                onChange={(e) => setInputComarca(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(inputComarca)}
+                placeholder="Digite: São Paulo, Piracicaba, Campinas..."
                 style={{
                   flex: 1,
                   padding: '12px',
                   border: '1px solid #d1d5db',
                   borderRadius: '8px',
-                  fontSize: '14px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
+                  fontSize: '14px'
+                }}
+                list="comarcas-dje-list"
+                disabled={comarcasCarregando}
+              />
+              <button
+                onClick={() => adicionarComarca(inputComarca)}
+                style={{
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  padding: '0 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '600'
                 }}
                 disabled={comarcasCarregando}
               >
-                <option value="">Selecione uma comarca...</option>
-                {comarcasDisponiveis.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                + Adicionar
+              </button>
             </div>
+            <datalist id="comarcas-dje-list">
+              {comarcasDisponiveis.map(c => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
               {comarcasSelecionadas.map(c => (
