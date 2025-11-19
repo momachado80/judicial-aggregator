@@ -7,7 +7,7 @@ export default function DJESearch() {
   const [inputComarca, setInputComarca] = useState('');
   const [apenasImoveis, setApenasImoveis] = useState(true);
   const [apenasAtivos, setApenasAtivos] = useState(true);
-  const [limitePdfs, setLimitePdfs] = useState(3);
+  const [limitePdfs, setLimitePdfs] = useState(50);
   const [valorMin, setValorMin] = useState('');
   const [valorMax, setValorMax] = useState('');
   const [processos, setProcessos] = useState<any[]>([]);
@@ -470,10 +470,12 @@ export default function DJESearch() {
                   borderRadius: '8px'
                 }}
               >
-                <option value={1}>1 PDF (~30s)</option>
-                <option value={3}>3 PDFs (~90s)</option>
                 <option value={5}>5 PDFs (~2min)</option>
                 <option value={10}>10 PDFs (~4min)</option>
+                <option value={20}>20 PDFs (~8min)</option>
+                <option value={30}>30 PDFs (~12min)</option>
+                <option value={50}>50 PDFs (~20min) - RECOMENDADO</option>
+                <option value={100}>TODOS os PDFs (~40min)</option>
               </select>
             </div>
           </div>

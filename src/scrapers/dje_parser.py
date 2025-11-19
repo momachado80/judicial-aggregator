@@ -2,6 +2,7 @@ import pdfplumber
 import re
 from typing import List, Dict, Optional
 from datetime import datetime
+from src.utils.comarcas import FOROS_SAO_PAULO_CAPITAL, get_comarca_nome
 
 # Palavras-chave que indicam presença de IMÓVEIS
 PALAVRAS_IMOVEIS = [
@@ -157,11 +158,26 @@ def extrair_processos_dje(
                     comarca = comarca_match.group(1).strip() if comarca_match else f"Código {codigo_comarca}"
 
                 # FILTRO 3: Filtrar por comarca (se especificado)
-                if comarcas_filtro and comarca:
-                    comarca_aceita = any(
-                        c.lower() in comarca.lower() or comarca.lower() in c.lower()
+                if comarcas_filtro:
+                    comarca_aceita = False
+
+                    # Verificar se São Paulo está nos filtros
+                    busca_sao_paulo = any(
+                        c.lower() in ["são paulo", "sao paulo", "sp capital", "são paulo (capital)", "sao paulo (capital)"]
                         for c in comarcas_filtro
                     )
+
+                    # Se buscar São Paulo, verificar pelo CÓDIGO da comarca
+                    if busca_sao_paulo and codigo_comarca in FOROS_SAO_PAULO_CAPITAL:
+                        comarca_aceita = True
+
+                    # Verificação normal por nome de comarca
+                    if not comarca_aceita and comarca:
+                        comarca_aceita = any(
+                            c.lower() in comarca.lower() or comarca.lower() in c.lower()
+                            for c in comarcas_filtro
+                        )
+
                     if not comarca_aceita:
                         processos_rejeitados["comarca"] += 1
                         continue
