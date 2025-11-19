@@ -585,6 +585,38 @@ async def buscar_cache_instantaneo(
             ordenar_por=ordenar_por
         )
 
+        # LIMITE DE 100 PROCESSOS PARA BUSCAS ABERTAS
+        # "Em comarcas maiores como São Paulo Capital, numa pesquisa aberta,
+        # puxe os 100 processos mais recentes"
+        total_antes_limite = len(processos_filtrados)
+        limite_aplicado = False
+
+        if data_inicio is None and data_fim is None:
+            # Busca aberta (sem filtro de data): limitar a 100 mais recentes
+            # Primeiro, ordenar por data para garantir que pegamos os mais recentes
+            from datetime import datetime
+
+            def get_data_processo(p):
+                data_pdf = p.get("data_pdf", "01-01-2000")
+                try:
+                    return datetime.strptime(data_pdf, "%d-%m-%Y")
+                except:
+                    return datetime(2000, 1, 1)
+
+            # Ordenar por data (mais recente primeiro) temporariamente
+            processos_ordenados_data = sorted(processos_filtrados, key=get_data_processo, reverse=True)
+
+            # Pegar os 100 mais recentes
+            processos_filtrados = processos_ordenados_data[:100]
+
+            # Agora reaplicar a ordenação original escolhida pelo usuário
+            processos_filtrados = ordenar_processos(
+                processos=processos_filtrados,
+                ordenar_por=ordenar_por
+            )
+
+            limite_aplicado = True
+
         # Estatísticas
         from collections import Counter
         tipos_count = Counter(p.get("tipo") for p in processos_filtrados)
@@ -600,8 +632,16 @@ async def buscar_cache_instantaneo(
             "valor_asc": "Menor valor primeiro"
         }
 
+        # Mensagem de resultado
+        if limite_aplicado:
+            mensagem = f"Busca aberta: retornando os 100 processos mais recentes de {total_antes_limite} encontrados."
+        else:
+            mensagem = f"Busca com filtro de data: {len(processos_filtrados)} processos encontrados."
+
         return {
             "total_processos": len(processos_filtrados),
+            "total_processos_antes_limite": total_antes_limite if limite_aplicado else len(processos_filtrados),
+            "limite_aplicado": limite_aplicado,
             "processos": processos_filtrados,
             "pdfs_disponiveis_total": cache["total_pdfs"],
             "pdfs_processados_sucesso": cache["total_pdfs"],
@@ -614,7 +654,7 @@ async def buscar_cache_instantaneo(
                 "por_tipo": dict(tipos_count),
                 "por_relevancia": dict(relevancia_count)
             },
-            "mensagem": f"Busca instantânea concluída! {len(processos_filtrados)} processos encontrados.",
+            "mensagem": mensagem,
             "cache_info": {
                 "total_processos_indexados": cache["total_processos"],
                 "total_pdfs_indexados": cache["total_pdfs"]
