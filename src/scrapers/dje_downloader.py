@@ -49,8 +49,16 @@ def baixar_dje_tjsp(data: str, caderno: str = "12", headless: bool = True):
             
             # Preencher data usando o name correto
             print(f"📝 Preenchendo data: {data}")
-            page.evaluate(f'document.querySelector("input[type=\'text\']").value = "{data}"')
-            
+            page.fill('input[type="text"]', data)
+
+            # Trigger change event para o JavaScript do site processar
+            page.evaluate('document.querySelector("input[type=\'text\']").dispatchEvent(new Event("change", { bubbles: true }))')
+
+            # Aguardar campo de caderno ser habilitado (não mais disabled)
+            print(f"⏳ Aguardando campo de caderno ser habilitado...")
+            page.wait_for_function('document.querySelector("select[name=\\"cadernosCad\\"]").disabled === false', timeout=10000)
+            time.sleep(1)
+
             # Selecionar caderno usando name="cadernosCad"
             print(f"📚 Selecionando caderno {caderno}...")
             page.select_option('select[name="cadernosCad"]', caderno)
