@@ -13,6 +13,9 @@ export default function DJESearch() {
   const [processos, setProcessos] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [interesseIds, setInteresseIds] = useState(new Set<string>());
+  const [descartadosIds, setDescartadosIds] = useState(new Set<string>());
+  const [abaAtiva, setAbaAtiva] = useState<'busca' | 'interesse' | 'descartados'>('busca');
 
   const comarcasDisponiveis = [
     'São Paulo',
@@ -94,9 +97,35 @@ export default function DJESearch() {
     setLoading(false);
   };
 
+  const marcarInteresse = (numero: string) => {
+    const novos = new Set(interesseIds);
+    novos.add(numero);
+    setInteresseIds(novos);
+    const desc = new Set(descartadosIds);
+    desc.delete(numero);
+    setDescartadosIds(desc);
+  };
+
+  const marcarDescartado = (numero: string) => {
+    const novos = new Set(descartadosIds);
+    novos.add(numero);
+    setDescartadosIds(novos);
+    const inter = new Set(interesseIds);
+    inter.delete(numero);
+    setInteresseIds(inter);
+  };
+
+  const processosBusca = processos.filter(p => !interesseIds.has(p.numero) && !descartadosIds.has(p.numero));
+  const processosInteresse = processos.filter(p => interesseIds.has(p.numero));
+  const processosDescartados = processos.filter(p => descartadosIds.has(p.numero));
+
   const formatarValor = (valor: number | null) => {
     if (!valor) return 'Não informado';
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+  };
+
+  const gerarUrlTJSP = (numeroProcesso: string) => {
+    return `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.valorConsultaNuUnificado=${numeroProcesso}&dadosConsulta.valorConsulta=${numeroProcesso}`;
   };
 
   const ProcessoDJECard = ({ processo }: { processo: any }) => (
@@ -109,15 +138,24 @@ export default function DJESearch() {
     }}>
       <div style={{ marginBottom: '16px' }}>
         <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
-        <p style={{
-          color: '#2563eb',
-          fontFamily: 'monospace',
-          fontSize: '14px',
-          fontWeight: '600',
-          margin: 0
-        }}>
-          {processo.numero}
-        </p>
+        <a
+          href={gerarUrlTJSP(processo.numero)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: '#2563eb',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            fontWeight: '600',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            display: 'inline-block'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+        >
+          {processo.numero} 🔗
+        </a>
       </div>
 
       <div style={{ marginBottom: '12px' }}>
@@ -205,6 +243,39 @@ export default function DJESearch() {
 
       <div style={{ marginTop: '12px', fontSize: '11px', color: '#9ca3af' }}>
         Página DJE: {processo.pagina_dje}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+        <button
+          onClick={() => marcarInteresse(processo.numero)}
+          style={{
+            backgroundColor: '#10b981',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600',
+            fontSize: '14px'
+          }}
+        >
+          ⭐ Interesse
+        </button>
+        <button
+          onClick={() => marcarDescartado(processo.numero)}
+          style={{
+            backgroundColor: '#ef4444',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: '600',
+            fontSize: '14px'
+          }}
+        >
+          🗑️ Descartar
+        </button>
       </div>
     </div>
   );
@@ -545,26 +616,86 @@ export default function DJESearch() {
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           padding: '32px'
         }}>
-          <h3 style={{
-            fontSize: '20px',
-            fontWeight: 'bold',
-            marginBottom: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            📋 Processos Encontrados ({processos.length})
-          </h3>
+          {/* Abas de Navegação */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+            <button
+              onClick={() => setAbaAtiva('busca')}
+              style={{
+                backgroundColor: abaAtiva === 'busca' ? '#3b82f6' : 'white',
+                color: abaAtiva === 'busca' ? 'white' : '#6b7280',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                border: abaAtiva === 'busca' ? 'none' : '2px solid #e5e7eb',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              📋 Busca ({processosBusca.length})
+            </button>
+            <button
+              onClick={() => setAbaAtiva('interesse')}
+              style={{
+                backgroundColor: abaAtiva === 'interesse' ? '#eab308' : 'white',
+                color: abaAtiva === 'interesse' ? 'white' : '#6b7280',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                border: abaAtiva === 'interesse' ? 'none' : '2px solid #e5e7eb',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              ⭐ Interesse ({processosInteresse.length})
+            </button>
+            <button
+              onClick={() => setAbaAtiva('descartados')}
+              style={{
+                backgroundColor: abaAtiva === 'descartados' ? '#6b7280' : 'white',
+                color: abaAtiva === 'descartados' ? 'white' : '#6b7280',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                border: abaAtiva === 'descartados' ? 'none' : '2px solid #e5e7eb',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              🗑️ Descartados ({processosDescartados.length})
+            </button>
+          </div>
 
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
             gap: '24px'
           }}>
-            {processos.map((p, idx) => (
+            {abaAtiva === 'busca' && processosBusca.map((p, idx) => (
+              <ProcessoDJECard key={idx} processo={p} />
+            ))}
+            {abaAtiva === 'interesse' && processosInteresse.map((p, idx) => (
+              <ProcessoDJECard key={idx} processo={p} />
+            ))}
+            {abaAtiva === 'descartados' && processosDescartados.map((p, idx) => (
               <ProcessoDJECard key={idx} processo={p} />
             ))}
           </div>
+
+          {abaAtiva === 'busca' && processosBusca.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>
+              <p style={{ fontSize: '18px', margin: 0 }}>Nenhum processo nesta aba</p>
+            </div>
+          )}
+          {abaAtiva === 'interesse' && processosInteresse.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>
+              <p style={{ fontSize: '18px', margin: 0 }}>Nenhum processo marcado como interesse</p>
+            </div>
+          )}
+          {abaAtiva === 'descartados' && processosDescartados.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>
+              <p style={{ fontSize: '18px', margin: 0 }}>Nenhum processo descartado</p>
+            </div>
+          )}
         </div>
       )}
     </div>
