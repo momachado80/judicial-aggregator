@@ -10,6 +10,8 @@ export default function DJESearch() {
   const [limitePdfs, setLimitePdfs] = useState(50);
   const [valorMin, setValorMin] = useState('');
   const [valorMax, setValorMax] = useState('');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
   const [processos, setProcessos] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +50,8 @@ export default function DJESearch() {
     try {
       const body: any = {
         tipos_processo: tiposSelecionados,
+        apenas_imoveis: apenasImoveis,
+        apenas_ativos: apenasAtivos
       };
 
       if (comarcasSelecionadas.length > 0) {
@@ -62,14 +66,16 @@ export default function DJESearch() {
         body.valor_max = Number(valorMax);
       }
 
-      const params = new URLSearchParams({
-        apenas_imoveis: String(apenasImoveis),
-        apenas_ativos: String(apenasAtivos),
-        limite_pdfs: String(limitePdfs)
-      });
+      if (dataInicio) {
+        body.data_inicio = dataInicio;
+      }
+
+      if (dataFim) {
+        body.data_fim = dataFim;
+      }
 
       const response = await fetch(
-        `https://judicial-aggregator-production.up.railway.app/api/dje/processar-pdfs-cache?${params}`,
+        `https://judicial-aggregator-production.up.railway.app/api/dje/buscar-cache-instantaneo`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,7 +131,10 @@ export default function DJESearch() {
   };
 
   const gerarUrlTJSP = (numeroProcesso: string) => {
-    return `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.valorConsultaNuUnificado=${numeroProcesso}&dadosConsulta.valorConsulta=${numeroProcesso}`;
+    // Remover formatação (hífens e pontos) do número CNJ
+    const numeroLimpo = numeroProcesso.replace(/[.-]/g, '');
+    // URL correta do TJSP para consulta por número unificado
+    return `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=${numeroLimpo}`;
   };
 
   const ProcessoDJECard = ({ processo }: { processo: any }) => (
@@ -419,7 +428,47 @@ export default function DJESearch() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                📅 Data Início (DJE)
+              </label>
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                min="2021-01-01"
+                max={new Date().toISOString().split('T')[0]}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                📅 Data Fim (DJE)
+              </label>
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+                min="2021-01-01"
+                max={new Date().toISOString().split('T')[0]}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
                 Valor Mínimo (R$)
@@ -454,29 +503,6 @@ export default function DJESearch() {
                   borderRadius: '8px'
                 }}
               />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
-                PDFs a Processar
-              </label>
-              <select
-                value={limitePdfs}
-                onChange={(e) => setLimitePdfs(Number(e.target.value))}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px'
-                }}
-              >
-                <option value={5}>5 PDFs (~2min)</option>
-                <option value={10}>10 PDFs (~4min)</option>
-                <option value={20}>20 PDFs (~8min)</option>
-                <option value={30}>30 PDFs (~12min)</option>
-                <option value={50}>50 PDFs (~20min) - RECOMENDADO</option>
-                <option value={100}>TODOS os PDFs (~40min)</option>
-              </select>
             </div>
           </div>
 
