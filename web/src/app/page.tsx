@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
+import DJESearch from './components/DJESearch';
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<'api' | 'dje'>('dje');
   const [tribunaisSelecionados, setTribunaisSelecionados] = useState(['TJSP']);
   const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário']);
   const [comarcasSelecionadas, setComarcasSelecionadas] = useState([]);
@@ -237,6 +239,87 @@ export default function Home() {
       </nav>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
+        {/* Tabs de Navegação */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          padding: '8px',
+          marginBottom: '24px',
+          display: 'flex',
+          gap: '8px'
+        }}>
+          <button
+            onClick={() => setActiveTab('dje')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              borderRadius: '12px',
+              border: 'none',
+              fontWeight: '600',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'dje' ? 'linear-gradient(to right, #10b981, #059669)' : 'transparent',
+              background: activeTab === 'dje' ? 'linear-gradient(to right, #10b981, #059669)' : 'transparent',
+              color: activeTab === 'dje' ? 'white' : '#6b7280',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <span>📄</span>
+            Busca DJE (Diário Oficial)
+            {activeTab === 'dje' && (
+              <span style={{
+                backgroundColor: 'rgba(255,255,255,0.3)',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '11px'
+              }}>
+                PRECISO
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('api')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              borderRadius: '12px',
+              border: 'none',
+              fontWeight: '600',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'api' ? '#4f46e5' : 'transparent',
+              color: activeTab === 'api' ? 'white' : '#6b7280',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <span>🔍</span>
+            Busca API DataJud
+            {activeTab === 'api' && (
+              <span style={{
+                backgroundColor: 'rgba(255,255,255,0.3)',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '11px'
+              }}>
+                VOLUME
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Conteúdo DJE */}
+        {activeTab === 'dje' && <DJESearch />}
+
+        {/* Conteúdo API DataJud */}
+        {activeTab === 'api' && (
+          <>
         <div style={{
           backgroundColor: 'white',
           borderRadius: '16px',
@@ -546,6 +629,8 @@ export default function Home() {
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
     </div>
   );
