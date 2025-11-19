@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 import requests
 from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj
 from src.utils.cache_datajud import ler_cache, salvar_cache, filtrar_processos, status_cache
