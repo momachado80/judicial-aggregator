@@ -9,6 +9,7 @@ from datetime import datetime
 import os
 from src.scrapers.dje_downloader import baixar_dje_intervalo, obter_cadernos_por_comarca
 from src.scrapers.dje_parser import extrair_processos_dje
+from src.utils.indexador_dje import indexar_todos_pdfs, ler_cache, filtrar_processos_cache
 from src.database import SessionLocal
 from src.models.processo import Processo
 from sqlalchemy.exc import IntegrityError
@@ -236,6 +237,96 @@ async def listar_comarcas_disponiveis():
     }
 
 
+@router.post("/baixar-pdfs-periodo")
+async def baixar_pdfs_periodo(
+    background_tasks: BackgroundTasks,
+    data_inicio: str,
+    data_fim: str,
+    comarcas: List[str] = ["São Paulo", "Piracicaba", "Campinas", "Santos"]
+):
+    """
+    📥 Baixa PDFs de um período específico (ex: 01/01/2024 a 31/01/2024)
+
+    IMPORTANTE: Executa em BACKGROUND. Pode levar HORAS dependendo do período!
+
+    Args:
+        data_inicio: Data início (DD/MM/YYYY ou YYYY-MM-DD)
+        data_fim: Data fim (DD/MM/YYYY ou YYYY-MM-DD)
+        comarcas: Lista de comarcas para baixar
+
+    Exemplo:
+        POST /api/dje/baixar-pdfs-periodo
+        {
+            "data_inicio": "01/01/2024",
+            "data_fim": "31/01/2024",
+            "comarcas": ["São Paulo", "Piracicaba"]
+        }
+    """
+    from datetime import datetime
+
+    # Converter formato se vier YYYY-MM-DD
+    if "-" in data_inicio:
+        data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").strftime("%d/%m/%Y")
+    if "-" in data_fim:
+        data_fim = datetime.strptime(data_fim, "%Y-%m-%d").strftime("%d/%m/%Y")
+
+    def baixar_em_background():
+        """Função que roda em background"""
+        try:
+            print(f"\n{'='*80}")
+            print(f"📥 DOWNLOAD DE PDFs POR PERÍODO")
+            print(f"📅 Período: {data_inicio} a {data_fim}")
+            print(f"📍 Comarcas: {', '.join(comarcas)}")
+            print(f"{'='*80}\n")
+
+            pdfs_baixados = baixar_dje_intervalo(
+                data_inicio=data_inicio,
+                data_fim=data_fim,
+                comarcas=comarcas,
+                headless=True
+            )
+
+            print(f"\n{'='*80}")
+            print(f"✅ DOWNLOAD CONCLUÍDO!")
+            print(f"📦 Total de PDFs baixados: {len(pdfs_baixados)}")
+            print(f"{'='*80}\n")
+
+            # Reindexar automaticamente após baixar
+            print("🔄 Reindexando cache...")
+            from src.utils.indexador_dje import indexar_todos_pdfs
+            cache = indexar_todos_pdfs()
+            print(f"✅ Cache atualizado! {cache['total_processos']} processos indexados.")
+
+        except Exception as e:
+            print(f"\n❌ ERRO no download: {e}\n")
+            import traceback
+            traceback.print_exc()
+
+    # Adicionar tarefa em background
+    background_tasks.add_task(baixar_em_background)
+
+    # Calcular número aproximado de dias
+    try:
+        d1 = datetime.strptime(data_inicio, "%d/%m/%Y")
+        d2 = datetime.strptime(data_fim, "%d/%m/%Y")
+        dias = (d2 - d1).days
+    except:
+        dias = "?"
+
+    return {
+        "status": "iniciado",
+        "mensagem": f"Download de PDFs do período {data_inicio} a {data_fim} iniciado em background",
+        "periodo": {
+            "inicio": data_inicio,
+            "fim": data_fim,
+            "dias_aproximados": dias
+        },
+        "comarcas": comarcas,
+        "aviso": f"Este processo pode levar várias horas! (~{len(comarcas) * (dias if isinstance(dias, int) else 30)} PDFs)",
+        "info": "Após o download, o cache será reindexado automaticamente. Acompanhe o progresso nos logs."
+    }
+
+
 @router.post("/baixar-pdfs-automatico")
 async def baixar_pdfs_automatico(
     background_tasks: BackgroundTasks,
@@ -243,17 +334,9 @@ async def baixar_pdfs_automatico(
     todas_comarcas: bool = True
 ):
     """
+    ⚠️ DEPRECATED: Use /baixar-pdfs-periodo para maior controle
+
     Baixa PDFs dos últimos N dias de TODOS os cadernos do TJSP
-
-    IMPORTANTE: Este endpoint inicia o download em BACKGROUND e retorna imediatamente.
-    O download acontece no servidor e pode levar vários minutos.
-
-    Args:
-        dias: Quantos dias para trás baixar (padrão: 30)
-        todas_comarcas: Se True, baixa de todos os cadernos (11,12,13,14)
-
-    Returns:
-        Status indicando que o download foi iniciado
     """
     from datetime import datetime, timedelta
 
@@ -411,6 +494,113 @@ async def status_dje():
     }
 
 
+@router.post("/buscar-cache-instantaneo")
+async def buscar_cache_instantaneo(
+    tipos_processo: List[str] = ["Inventário", "Divórcio"],
+    comarcas: Optional[List[str]] = None,
+    apenas_imoveis: bool = False,
+    apenas_ativos: bool = True,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None,
+    data_inicio: Optional[str] = None,
+    data_fim: Optional[str] = None
+):
+    """
+    🚀 BUSCA INSTANTÂNEA - Usa cache JSON pré-processado
+
+    VELOCIDADE: < 100ms (ao invés de 2+ minutos)
+
+    Este endpoint lê um arquivo JSON que contém TODOS os processos
+    já extraídos dos PDFs. A busca é EXTREMAMENTE RÁPIDA porque
+    apenas filtra dados já processados.
+
+    IMPORTANTE: O cache precisa ser gerado primeiro com /reindexar
+    """
+    try:
+        cache_path = "data/dje_cache.json"
+
+        # Verificar se cache existe
+        if not os.path.exists(cache_path):
+            raise HTTPException(
+                status_code=404,
+                detail="Cache não encontrado. Execute /api/dje/reindexar primeiro para gerar o índice."
+            )
+
+        # Ler cache
+        cache = ler_cache(cache_path)
+
+        # Filtrar processos (INSTANTÂNEO!)
+        processos_filtrados = filtrar_processos_cache(
+            cache=cache,
+            tipos=tipos_processo,
+            comarcas=comarcas,
+            apenas_imoveis=apenas_imoveis,
+            apenas_ativos=apenas_ativos,
+            valor_min=valor_min,
+            valor_max=valor_max,
+            data_inicio=data_inicio,
+            data_fim=data_fim
+        )
+
+        # Estatísticas
+        from collections import Counter
+        tipos_count = Counter(p.get("tipo") for p in processos_filtrados)
+        relevancia_count = Counter(p.get("relevancia") for p in processos_filtrados)
+
+        return {
+            "total_processos": len(processos_filtrados),
+            "processos": processos_filtrados,
+            "pdfs_disponiveis_total": cache["total_pdfs"],
+            "pdfs_processados_sucesso": cache["total_pdfs"],
+            "data_indexacao": cache["data_indexacao"],
+            "estatisticas": {
+                "por_tipo": dict(tipos_count),
+                "por_relevancia": dict(relevancia_count)
+            },
+            "mensagem": f"Busca instantânea concluída! {len(processos_filtrados)} processos encontrados.",
+            "cache_info": {
+                "total_processos_indexados": cache["total_processos"],
+                "total_pdfs_indexados": cache["total_pdfs"]
+            }
+        }
+
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/reindexar")
+async def reindexar_pdfs(background_tasks: BackgroundTasks):
+    """
+    Reindexar TODOS os PDFs e gerar cache JSON
+
+    ATENÇÃO: Este processo leva 10-20 minutos mas só precisa ser
+    executado UMA VEZ ou quando novos PDFs forem adicionados.
+
+    Após a indexação, todas as buscas serão INSTANTÂNEAS!
+    """
+    def indexar_background():
+        try:
+            print("\n🚀 Iniciando indexação em background...")
+            cache = indexar_todos_pdfs()
+            print(f"✅ Indexação concluída! {cache['total_processos']} processos indexados.")
+        except Exception as e:
+            print(f"❌ Erro na indexação: {e}")
+            import traceback
+            traceback.print_exc()
+
+    background_tasks.add_task(indexar_background)
+
+    return {
+        "status": "iniciado",
+        "mensagem": "Indexação iniciada em background. Isso levará 10-20 minutos.",
+        "info": "Acompanhe o progresso nos logs do servidor. Após concluir, use /buscar-cache-instantaneo para buscas rápidas."
+    }
+
+
 @router.post("/processar-pdfs-cache")
 async def processar_pdfs_cache(
     tipos_processo: List[str] = ["Inventário", "Divórcio"],
@@ -422,18 +612,9 @@ async def processar_pdfs_cache(
     limite_pdfs: int = 1
 ):
     """
-    Processa PDFs que já estão em cache (data/dje_pdfs/)
+    ⚠️ DEPRECATED: Use /buscar-cache-instantaneo para buscas rápidas
 
-    IDEAL PARA PRODUÇÃO NO RAILWAY - não precisa de Playwright!
-
-    Args:
-        limite_pdfs: Quantos PDFs processar (padrão: 3, máximo recomendado: 5)
-                    Cada PDF tem ~1200 páginas e leva ~30-60 segundos
-
-    Este endpoint processa PDFs que foram:
-    - Baixados localmente e commitados no repo
-    - Previamente baixados e salvos no servidor
-    - Enviados via upload (futuro)
+    Este endpoint processa PDFs em tempo real (LENTO - 30s por PDF)
     """
     try:
         pdfs_dir = "data/dje_pdfs"
