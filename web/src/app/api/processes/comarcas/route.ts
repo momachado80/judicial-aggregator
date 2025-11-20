@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://judicial-aggregator-production.up.railway.app';
-    const response = await fetch(`${apiUrl}/processes/comarcas`, {
+    const response = await fetch(`${apiUrl}/api/processes/comarcas`, {
       headers: {
         'Content-Type': 'application/json',
       },
