@@ -2,16 +2,27 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/processes/comarcas`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://judicial-aggregator-production.up.railway.app';
+    const response = await fetch(`${apiUrl}/processes/comarcas`, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Erro ao buscar comarcas:', error);
-    return NextResponse.json({ comarcas: [] }, { status: 500 });
+    // Retornar formato correto mesmo em caso de erro
+    return NextResponse.json({
+      TJSP: [],
+      TJBA: [],
+      total: 0,
+      error: 'Falha ao carregar comarcas'
+    }, { status: 500 });
   }
 }
