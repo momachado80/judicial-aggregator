@@ -23,7 +23,7 @@ export default function Home() {
 
   // Buscar comarcas da API ao carregar
   useEffect(() => {
-    fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
+    fetch('/api/processes/comarcas')
       .then(res => res.json())
       .then(data => {
         setTjspComarcas(data.TJSP || []);
