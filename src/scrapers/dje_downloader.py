@@ -49,8 +49,7 @@ def baixar_dje_tjsp(data: str, caderno: str = "12", headless: bool = True):
             
             # Preencher data via JavaScript (campo pode estar readonly)
             print(f"📝 Preenchendo data: {data}")
-<<<<<<< HEAD
-<<<<<<< HEAD
+
             page.evaluate(f'''
                 var input = document.querySelector("input[name='dtDiario']");
                 if (input) {{
@@ -60,17 +59,12 @@ def baixar_dje_tjsp(data: str, caderno: str = "12", headless: bool = True):
                     input.dispatchEvent(new Event("blur", {{ bubbles: true }}));
                 }}
             ''')
-=======
-=======
->>>>>>> origin/main
+
             page.fill('input[type="text"]', data)
 
             # Trigger change event para o JavaScript do site processar
             page.evaluate('document.querySelector("input[type=\'text\']").dispatchEvent(new Event("change", { bubbles: true }))')
-<<<<<<< HEAD
->>>>>>> 004e8a5 (fix: Wait for caderno field to be enabled before selecting)
-=======
->>>>>>> origin/main
+
 
             # Aguardar campo de caderno ser habilitado (não mais disabled)
             print(f"⏳ Aguardando campo de caderno ser habilitado...")
