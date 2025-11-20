@@ -32,9 +32,10 @@ export default function DJESearch() {
   useEffect(() => {
     const carregarComarcas = async () => {
       try {
-        const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/dje/comarcas-disponiveis');
+        const response = await fetch('/api/processes/comarcas');
         const data = await response.json();
-        setComarcasDisponiveis(data.comarcas || []);
+        // Pegar apenas comarcas TJSP (DJE é só TJSP)
+        setComarcasDisponiveis(data.TJSP || []);
       } catch (error) {
         console.error('Erro ao carregar comarcas:', error);
         // Fallback para lista básica
