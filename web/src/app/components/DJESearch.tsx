@@ -30,25 +30,29 @@ export default function DJESearch() {
 
   // Carregar comarcas do backend
   useEffect(() => {
+    const fallbackComarcas = [
+      'São Paulo', 'Guarulhos', 'Campinas', 'Santos', 'São Bernardo do Campo',
+      'Santo André', 'Osasco', 'Ribeirão Preto', 'Sorocaba', 'Mogi das Cruzes',
+      'Piracicaba', 'Bauru', 'São José dos Campos', 'Jundiaí', 'Franca',
+      'Presidente Prudente', 'Araraquara', 'Americana', 'Araçatuba', 'Suzano',
+      'Limeira', 'Diadema', 'Taboão da Serra', 'Mauá', 'Carapicuíba',
+      'Itaquaquecetuba', 'Barueri', 'Embu das Artes', 'Jacareí', 'Praia Grande',
+      'Indaiatuba', 'Cotia', 'São Carlos', 'Marília', 'Taubaté'
+    ];
+
     const carregarComarcas = async () => {
       try {
         const response = await fetch('/api/processes/comarcas');
         const data = await response.json();
         // Pegar apenas comarcas TJSP (DJE é só TJSP)
-        setComarcasDisponiveis(data.TJSP || []);
+        if (data.TJSP && data.TJSP.length > 0) {
+          setComarcasDisponiveis(data.TJSP);
+        } else {
+          setComarcasDisponiveis(fallbackComarcas);
+        }
       } catch (error) {
         console.error('Erro ao carregar comarcas:', error);
-        // Fallback para lista básica
-        setComarcasDisponiveis([
-          'São Paulo',
-          'Piracicaba',
-          'Campinas',
-          'Santos',
-          'Guarulhos',
-          'Santo André',
-          'São Bernardo do Campo',
-          'Osasco'
-        ]);
+        setComarcasDisponiveis(fallbackComarcas);
       } finally {
         setComarcasCarregando(false);
       }
