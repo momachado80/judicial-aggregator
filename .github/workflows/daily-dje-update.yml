@@ -1,0 +1,43 @@
+name: Atualização Diária DJE
+
+on:
+  schedule:
+    # Roda todos os dias às 9h UTC (6h BRT - após publicação do DJE)
+    - cron: '0 9 * * *'
+  workflow_dispatch:  # Permite executar manualmente
+
+jobs:
+  update-dje:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240  # 4 horas max (múltiplas comarcas)
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Baixar PDFs dos últimos 3 dias
+        run: |
+          python3 scripts/daily_update.py
+        continue-on-error: true
+
+      - name: Commit e push se houver mudanças
+        run: |
+          git config --global user.name 'DJE Bot'
+          git config --global user.email 'bot@judicial-aggregator.com'
+          git add data/dje_pdfs/*.pdf data/dje_cache.json
+          git diff --staged --quiet || git commit -m "chore: Daily DJE update - $(date +%Y-%m-%d)"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

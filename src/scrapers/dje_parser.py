@@ -118,14 +118,62 @@ def extrair_processos_dje(
                 end = min(len(text), match.end() + 2000)
                 contexto = text[start:end]
 
-                # Verificar se menciona os tipos procurados
+                # Extrair informações primeiro
+                codigo_comarca = numero.split('.')[-1]
+
+                # Extrair CLASSE REAL do processo
+                # DJE TJSP tem 3 formatos:
+                # 1a) Distribuição com dois pontos: "CLASSE :DIVÓRCIO CONSENSUAL"
+                # 1b) Distribuição sem dois pontos: "Classe\nTutela Antecipada Antecedente"
+                # 2) Movimentações: "número - texto - Classe - Comarca"
+
+                classe = None
+
+                # Tentar Formato 1a (CLASSE :)
+                classe_match = re.search(
+                    r'CLASSE\s*:\s*([^\n]+)',
+                    contexto,
+                    re.IGNORECASE
+                )
+                if classe_match:
+                    classe = classe_match.group(1).strip()
+
+                # Tentar Formato 1b (Classe\n sem dois pontos)
+                if not classe:
+                    classe_match = re.search(
+                        r'Classe[\s\n]+([^\n]+)',
+                        contexto,
+                        re.IGNORECASE
+                    )
+                    if classe_match:
+                        classe = classe_match.group(1).strip()
+
+                # Tentar Formato 2 (" - Classe - ")
+                if not classe:
+                    classe_match = re.search(
+                        r'-\s+(Inventário|Arrolamento|Divórcio\s+(?:Consensual|Litigioso)|'
+                        r'Separação\s+(?:Consensual|Litigiosa)|Alvará\s+Judicial)\s+-',
+                        contexto,
+                        re.IGNORECASE
+                    )
+                    if classe_match:
+                        classe = classe_match.group(1).strip()
+
+                if not classe:
+                    # Se não encontrou classe em nenhum formato, rejeitar
+                    processos_rejeitados["classe_nao_identificada"] = processos_rejeitados.get("classe_nao_identificada", 0) + 1
+                    continue
+
+                # FILTRO CRÍTICO: Verificar se a CLASSE corresponde aos tipos procurados
                 tipo_encontrado = None
                 for tipo in tipos:
-                    if tipo.lower() in contexto.lower():
+                    if tipo.lower() in classe.lower():
                         tipo_encontrado = tipo
                         break
 
                 if not tipo_encontrado:
+                    # Classe não corresponde aos tipos procurados (ex: Apelação Cível quando busca Inventário)
+                    processos_rejeitados["classe_incompativel"] = processos_rejeitados.get("classe_incompativel", 0) + 1
                     continue
 
                 # FILTRO 1: Verificar se tem imóveis (se filtro ativado)
@@ -139,13 +187,6 @@ def extrair_processos_dje(
                     continue
 
                 processos_unicos.add(numero)
-                
-                # Extrair informações
-                codigo_comarca = numero.split('.')[-1]
-                
-                # Extrair classe do processo
-                classe_match = re.search(r'(Apelação Cível|Inventário|Divórcio[^\n]*|Arrolamento)', contexto, re.IGNORECASE)
-                classe = classe_match.group(1) if classe_match else tipo_encontrado
                 
                 # Extrair comarca (nome)
                 comarca_match = re.search(r'Comarca de ([A-Z][a-zá-úÀ-Ú\s]+)', contexto, re.IGNORECASE)
