@@ -14,7 +14,7 @@ from src.database import SessionLocal
 from src.models.processo import Processo
 from sqlalchemy.exc import IntegrityError
 
-router = APIRouter(prefix="/dje", tags=["DJE"])
+router = APIRouter(tags=["DJE"])
 
 class BuscarDJERequest(BaseModel):
     """
