@@ -113,9 +113,10 @@ def extrair_processos_dje(
                 if numero in processos_unicos:
                     continue
 
-                # Contexto amplo
-                start = max(0, match.start() - 2000)  # Aumentei contexto
-                end = min(len(text), match.end() + 2000)
+                # Contexto REDUZIDO para evitar capturar citações de outros processos
+                # 600 caracteres é suficiente para capturar o processo e suas informações
+                start = max(0, match.start() - 600)
+                end = min(len(text), match.end() + 600)
                 contexto = text[start:end]
 
                 # Extrair informações primeiro
@@ -164,15 +165,25 @@ def extrair_processos_dje(
                     processos_rejeitados["classe_nao_identificada"] = processos_rejeitados.get("classe_nao_identificada", 0) + 1
                     continue
 
-                # FILTRO CRÍTICO: Verificar se a CLASSE corresponde aos tipos procurados
+                # FILTRO CRÍTICO: Verificar se a CLASSE corresponde EXATAMENTE aos tipos procurados
+                # Agora verifica se a classe COMEÇA com o tipo, não apenas se CONTÉM
                 tipo_encontrado = None
+                classe_lower = classe.lower()
+
                 for tipo in tipos:
-                    if tipo.lower() in classe.lower():
+                    tipo_lower = tipo.lower()
+                    # Aceitar se:
+                    # 1. Classe é exatamente o tipo (ex: "Inventário" == "Inventário")
+                    # 2. Classe começa com o tipo + espaço (ex: "Inventário Negativo" começa com "Inventário ")
+                    # 3. Classe começa com o tipo + hífen (ex: "Divórcio-Consensual" começa com "Divórcio")
+                    if (classe_lower == tipo_lower or
+                        classe_lower.startswith(tipo_lower + " ") or
+                        classe_lower.startswith(tipo_lower + "-")):
                         tipo_encontrado = tipo
                         break
 
                 if not tipo_encontrado:
-                    # Classe não corresponde aos tipos procurados (ex: Apelação Cível quando busca Inventário)
+                    # Classe não corresponde aos tipos procurados (ex: "Procedimento Comum Cível" quando busca "Inventário")
                     processos_rejeitados["classe_incompativel"] = processos_rejeitados.get("classe_incompativel", 0) + 1
                     continue
 
