@@ -18,9 +18,9 @@ app.add_middleware(
 from src.api.routers import processes, buscar_processos, dje_buscar
 
 # Adicionar prefix /api para todos os routers
-app.include_router(processes.router, prefix="/api", tags=["processes"])
-app.include_router(buscar_processos.router, prefix="/api", tags=["buscar"])
-app.include_router(dje_buscar.router, prefix="/api", tags=["dje"])
+app.include_router(processes.router, prefix="/api/processes", tags=["processes"])
+app.include_router(buscar_processos.router, prefix="/api/buscar", tags=["buscar"])
+app.include_router(dje_buscar.router, prefix="/api/dje", tags=["dje"])
 
 
 @app.get("/")
