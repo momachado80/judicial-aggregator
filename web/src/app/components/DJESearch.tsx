@@ -188,7 +188,7 @@ export default function DJESearch() {
 
   const copiarNumeroProcesso = (numeroProcesso: string) => {
     navigator.clipboard.writeText(numeroProcesso);
-    alert(`Número ${numeroProcesso} copiado! Cole no site do TJSP: https://esaj.tjsp.jus.br/cpopg/open.do`);
+    // Copia silenciosamente, sem popup
   };
 
   const gerarUrlTJSP = (numeroProcesso: string) => {
