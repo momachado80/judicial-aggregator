@@ -120,6 +120,9 @@ export default function DJESearch() {
 
       const data = await response.json();
 
+      // DEBUG: Ver primeiros 2 processos
+      console.log('🔍 PRIMEIROS 2 PROCESSOS:', JSON.stringify(data.processos?.slice(0, 2), null, 2));
+
       if (data.processos) {
         setProcessos(data.processos);
         setStats({
