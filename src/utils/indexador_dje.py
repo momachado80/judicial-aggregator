@@ -8,9 +8,14 @@ from typing import List, Dict
 from src.scrapers.dje_parser import extrair_processos_dje
 
 
-def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/dje_cache.json") -> Dict:
+def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/dje_cache.json", limite_pdfs: int = None) -> Dict:
     """
-    Processa TODOS os PDFs e salva em cache JSON
+    Processa TODOS os PDFs (ou limite especificado) e salva em cache JSON
+
+    Args:
+        pdfs_dir: Diretório com PDFs
+        cache_path: Caminho do arquivo de cache
+        limite_pdfs: Limite de PDFs a processar (None = todos). Use 10-15 para evitar OOM no Railway.
 
     Returns:
         {
@@ -27,12 +32,17 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
     if not os.path.exists(pdfs_dir):
         raise FileNotFoundError(f"Diretório de PDFs não encontrado: {pdfs_dir}")
 
-    # Listar todos os PDFs
+    # Listar todos os PDFs (ordenados do mais recente para o mais antigo)
     todos_pdfs = sorted([
         os.path.join(pdfs_dir, f)
         for f in os.listdir(pdfs_dir)
         if f.endswith('.pdf') and not f.startswith('teste')
-    ])
+    ], reverse=True)  # Mais recentes primeiro
+
+    # Aplicar limite se especificado
+    if limite_pdfs:
+        todos_pdfs = todos_pdfs[:limite_pdfs]
+        print(f"⚠️  MODO LIMITADO: Processando apenas os {limite_pdfs} PDFs mais recentes (de {len(todos_pdfs)} disponíveis)")
 
     print(f"\n📦 {len(todos_pdfs)} PDFs encontrados")
     print("⏳ Processando... (isso pode levar 10-20 minutos, mas só precisa ser feito UMA VEZ)\n")

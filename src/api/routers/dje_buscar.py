@@ -670,19 +670,23 @@ async def buscar_cache_instantaneo(
 
 
 @router.post("/reindexar")
-async def reindexar_pdfs(background_tasks: BackgroundTasks):
+async def reindexar_pdfs(background_tasks: BackgroundTasks, limite_pdfs: Optional[int] = None):
     """
-    Reindexar TODOS os PDFs e gerar cache JSON
+    Reindexar PDFs e gerar cache JSON
 
-    ATENÇÃO: Este processo leva 10-20 minutos mas só precisa ser
-    executado UMA VEZ ou quando novos PDFs forem adicionados.
+    Args:
+        limite_pdfs: Quantidade máxima de PDFs a processar (mais recentes primeiro).
+                     None = processar todos.
+                     Use 10-15 para evitar problemas de memória no Railway.
+
+    ATENÇÃO: Este processo leva 5-20 minutos dependendo do limite.
 
     Após a indexação, todas as buscas serão INSTANTÂNEAS!
     """
     def indexar_background():
         try:
             print("\n🚀 Iniciando indexação em background...")
-            cache = indexar_todos_pdfs()
+            cache = indexar_todos_pdfs(limite_pdfs=limite_pdfs)
             print(f"✅ Indexação concluída! {cache['total_processos']} processos indexados.")
         except Exception as e:
             print(f"❌ Erro na indexação: {e}")
@@ -691,11 +695,21 @@ async def reindexar_pdfs(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(indexar_background)
 
-    return {
-        "status": "iniciado",
-        "mensagem": "Indexação iniciada em background. Isso levará 10-20 minutos.",
-        "info": "Acompanhe o progresso nos logs do servidor. Após concluir, use /buscar-cache-instantaneo para buscas rápidas."
-    }
+    if limite_pdfs:
+        return {
+            "status": "iniciado",
+            "mensagem": f"Indexação iniciada (limitada a {limite_pdfs} PDFs mais recentes). Isso levará 5-10 minutos.",
+            "info": "Acompanhe o progresso nos logs do servidor. Após concluir, use /buscar-cache-instantaneo para buscas rápidas.",
+            "modo": "limitado",
+            "limite": limite_pdfs
+        }
+    else:
+        return {
+            "status": "iniciado",
+            "mensagem": "Indexação iniciada em background (TODOS os PDFs). Isso levará 10-20 minutos.",
+            "info": "Acompanhe o progresso nos logs do servidor. Após concluir, use /buscar-cache-instantaneo para buscas rápidas.",
+            "modo": "completo"
+        }
 
 
 @router.post("/processar-pdfs-cache")
