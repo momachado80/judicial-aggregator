@@ -5,7 +5,7 @@ import re
 pdf_path = "data/dje_pdfs/dje_19-11-2025_cad12.pdf"
 target_numero = "1100500-77.2025.8.26.0100"
 
-print(f"🔍 Debugging parser for process: {target_numero}")
+print(f"🔍 Debugging NEW parser logic for process: {target_numero}")
 print(f"📄 PDF: {pdf_path}\n")
 
 with pdfplumber.open(pdf_path) as pdf:
@@ -19,15 +19,15 @@ with pdfplumber.open(pdf_path) as pdf:
         numero = match.group(1)
 
         if numero == target_numero:
-            print(f"✅ Found process at position {match.start()}\n")
+            print(f"✅ Found process at position {match.start()}-{match.end()}\n")
 
-            # Show context with 600 chars (current setting)
-            start = max(0, match.start() - 600)
-            end = min(len(text), match.end() + 600)
-            contexto = text[start:end]
+            # NEW LOGIC: Context ONLY AFTER the process number
+            start_contexto = match.end()  # Starts AFTER the number
+            end_contexto = min(len(text), match.end() + 300)  # Only 300 chars after
+            contexto = text[start_contexto:end_contexto]
 
             print("="*80)
-            print("CONTEXT (600 chars before/after):")
+            print("NEW CONTEXT (300 chars AFTER process number ONLY):")
             print("="*80)
             print(contexto)
             print("="*80)
@@ -44,5 +44,23 @@ with pdfplumber.open(pdf_path) as pdf:
             classe_match2 = re.search(r'Classe[\s\n]+([^\n]+)', contexto, re.IGNORECASE)
             if classe_match2:
                 print(f"\n✅ CLASSE FOUND (format 2): '{classe_match2.group(1).strip()}'")
+
+            # Check if it matches Inventário/Divórcio
+            if classe_match:
+                classe = classe_match.group(1).strip()
+                classe_lower = classe.lower()
+
+                print(f"\n🔍 Checking if '{classe}' starts with 'inventário' or 'divórcio':")
+
+                for tipo in ["Inventário", "Divórcio"]:
+                    tipo_lower = tipo.lower()
+                    if (classe_lower == tipo_lower or
+                        classe_lower.startswith(tipo_lower + " ") or
+                        classe_lower.startswith(tipo_lower + "-")):
+                        print(f"   ✅ MATCH: Class starts with '{tipo}'")
+                        break
+                else:
+                    print(f"   ❌ REJECT: Class does NOT start with 'Inventário' or 'Divórcio'")
+                    print(f"   This process will be REJECTED by the filter!")
 
             break
