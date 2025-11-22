@@ -78,12 +78,25 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
             print(f"  ❌ ERRO: {e}\n")
             continue
 
+    # DEDUPLICAÇÃO: Remover processos duplicados (mesmo número em PDFs diferentes)
+    # Manter apenas a ocorrência mais recente (primeiro PDF processado, pois estão ordenados por data desc)
+    processos_unicos = {}
+    for p in todos_processos:
+        numero = p["numero"]
+        if numero not in processos_unicos:
+            processos_unicos[numero] = p
+
+    processos_finais = list(processos_unicos.values())
+
+    print(f"\n🔍 Deduplicação: {len(todos_processos)} processos → {len(processos_finais)} únicos")
+    print(f"   Removidos: {len(todos_processos) - len(processos_finais)} duplicados\n")
+
     # Criar estrutura do cache
     cache = {
-        "total_processos": len(todos_processos),
+        "total_processos": len(processos_finais),
         "total_pdfs": pdfs_processados,
         "data_indexacao": datetime.now().isoformat(),
-        "processos": todos_processos
+        "processos": processos_finais
     }
 
     # Salvar cache
