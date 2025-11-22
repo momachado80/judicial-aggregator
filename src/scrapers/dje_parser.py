@@ -113,16 +113,24 @@ def extrair_processos_dje(
                 if numero in processos_unicos:
                     continue
 
-                # Contexto REDUZIDO para evitar capturar citações de outros processos
-                # 600 caracteres é suficiente para capturar o processo e suas informações
-                start = max(0, match.start() - 600)
-                end = min(len(text), match.end() + 600)
-                contexto = text[start:end]
+                # Contexto pequeno APENAS DEPOIS do número do processo
+                # Isso evita capturar a CLASSE de processos anteriores
+                start_contexto = match.end()  # Começa DEPOIS do número
+                end_contexto = min(len(text), match.end() + 300)  # Apenas 300 chars depois
+                contexto = text[start_contexto:end_contexto]
+
+                # Também capturar contexto ANTES (menor) para comarca e outras infos
+                start_antes = max(0, match.start() - 200)
+                contexto_antes = text[start_antes:match.start()]
+
+                # Contexto completo para verificações de imóvel/ativo
+                contexto_completo = text[max(0, match.start() - 400):min(len(text), match.end() + 400)]
 
                 # Extrair informações primeiro
                 codigo_comarca = numero.split('.')[-1]
 
                 # Extrair CLASSE REAL do processo
+                # CRÍTICO: Só buscar DEPOIS do número do processo para evitar pegar classe de processo anterior
                 # DJE TJSP tem 3 formatos:
                 # 1a) Distribuição com dois pontos: "CLASSE :DIVÓRCIO CONSENSUAL"
                 # 1b) Distribuição sem dois pontos: "Classe\nTutela Antecipada Antecedente"
@@ -130,10 +138,10 @@ def extrair_processos_dje(
 
                 classe = None
 
-                # Tentar Formato 1a (CLASSE :)
+                # Tentar Formato 1a (CLASSE :) - BUSCAR APENAS DEPOIS DO NÚMERO
                 classe_match = re.search(
                     r'CLASSE\s*:\s*([^\n]+)',
-                    contexto,
+                    contexto,  # Usa contexto DEPOIS do número
                     re.IGNORECASE
                 )
                 if classe_match:
@@ -143,7 +151,7 @@ def extrair_processos_dje(
                 if not classe:
                     classe_match = re.search(
                         r'Classe[\s\n]+([^\n]+)',
-                        contexto,
+                        contexto,  # Usa contexto DEPOIS do número
                         re.IGNORECASE
                     )
                     if classe_match:
@@ -154,7 +162,7 @@ def extrair_processos_dje(
                     classe_match = re.search(
                         r'-\s+(Inventário|Arrolamento|Divórcio\s+(?:Consensual|Litigioso)|'
                         r'Separação\s+(?:Consensual|Litigiosa)|Alvará\s+Judicial)\s+-',
-                        contexto,
+                        contexto,  # Usa contexto DEPOIS do número
                         re.IGNORECASE
                     )
                     if classe_match:
@@ -188,25 +196,24 @@ def extrair_processos_dje(
                     continue
 
                 # FILTRO 1: Verificar se tem imóveis (se filtro ativado)
-                if filtrar_imoveis and not tem_imovel(contexto):
+                if filtrar_imoveis and not tem_imovel(contexto_completo):
                     processos_rejeitados["sem_imovel"] += 1
                     continue
 
                 # FILTRO 2: Verificar se está ativo (se filtro ativado)
-                if filtrar_ativos and not esta_ativo(contexto):
+                if filtrar_ativos and not esta_ativo(contexto_completo):
                     processos_rejeitados["extinto"] += 1
                     continue
 
                 processos_unicos.add(numero)
-                
-                # Extrair comarca (nome)
-                comarca_match = re.search(r'Comarca de ([A-Z][a-zá-úÀ-Ú\s]+)', contexto, re.IGNORECASE)
+
+                # Extrair comarca (nome) - usar contexto completo
+                comarca_match = re.search(r'Comarca de ([A-Z][a-zá-úÀ-Ú\s]+)', contexto_completo, re.IGNORECASE)
                 comarca = comarca_match.group(1).strip() if comarca_match else None
 
                 # Se não achou comarca no texto, buscar antes do número
                 if not comarca:
-                    linha_processo = contexto[max(0, match.start() - 200):match.end() + 50]
-                    comarca_match = re.search(r'-\s*([A-Z][a-zá-úÀ-Ú\s]+)\s*-', linha_processo)
+                    comarca_match = re.search(r'-\s*([A-Z][a-zá-úÀ-Ú\s]+)\s*-', contexto_antes)
                     if comarca_match:
                         comarca = comarca_match.group(1).strip()
                     else:
@@ -239,27 +246,27 @@ def extrair_processos_dje(
                         processos_rejeitados["comarca"] += 1
                         continue
                 
-                # Extrair partes (Apelante/Apelado ou Requerente/Requerido)
+                # Extrair partes (Apelante/Apelado ou Requerente/Requerido) - usar contexto completo
                 partes = []
                 for parte_tipo in ['Apelante', 'Apelado', 'Requerente', 'Requerido', 'Autor', 'Réu']:
-                    parte_match = re.search(f'{parte_tipo}:\s*([A-ZÀ-Ú][^-\n]+?)(?:\s*-|\n)', contexto)
+                    parte_match = re.search(f'{parte_tipo}:\s*([A-ZÀ-Ú][^-\n]+?)(?:\s*-|\n)', contexto_completo)
                     if parte_match:
                         partes.append(f"{parte_tipo}: {parte_match.group(1).strip()}")
-                
-                # Extrair advogados
+
+                # Extrair advogados - usar contexto completo
                 advogados = []
-                adv_matches = re.finditer(r'(OAB:\s*\d+/[A-Z]{2})', contexto)
+                adv_matches = re.finditer(r'(OAB:\s*\d+/[A-Z]{2})', contexto_completo)
                 for adv_match in adv_matches:
                     # Pegar nome antes do OAB
-                    pos = contexto.index(adv_match.group(1))
-                    trecho = contexto[max(0, pos-100):pos]
+                    pos = contexto_completo.index(adv_match.group(1))
+                    trecho = contexto_completo[max(0, pos-100):pos]
                     nome_match = re.search(r'([A-Z][a-zá-úÀ-Ú\s]+(?:\s+[A-Z][a-zá-úÀ-Ú\s]+)*)\s*\(', trecho)
                     if nome_match:
                         advogados.append(f"{nome_match.group(1).strip()} ({adv_match.group(1)})")
-                
-                # Extrair valor da causa
+
+                # Extrair valor da causa - usar contexto completo
                 valor_causa_float = None
-                valor_match = re.search(r'R\$\s*([\d.,]+)', contexto)
+                valor_match = re.search(r'R\$\s*([\d.,]+)', contexto_completo)
                 if valor_match:
                     valor_str = valor_match.group(1)
                     # Converter para float
@@ -279,8 +286,8 @@ def extrair_processos_dje(
                         processos_rejeitados["valor"] += 1
                         continue
 
-                # Calcular relevância baseada em imóveis
-                relevancia, score = calcular_relevancia_imovel(contexto)
+                # Calcular relevância baseada em imóveis - usar contexto completo
+                relevancia, score = calcular_relevancia_imovel(contexto_completo)
 
                 processos.append({
                     'numero': numero,
@@ -292,8 +299,8 @@ def extrair_processos_dje(
                     'advogados': advogados,
                     'valor_causa': valor_causa_float,
                     'pagina_dje': i,
-                    'tem_imovel': tem_imovel(contexto),
-                    'esta_ativo': esta_ativo(contexto),
+                    'tem_imovel': tem_imovel(contexto_completo),
+                    'esta_ativo': esta_ativo(contexto_completo),
                     'relevancia': relevancia,
                     'score_relevancia': score
                 })
