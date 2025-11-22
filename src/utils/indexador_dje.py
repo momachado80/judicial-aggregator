@@ -32,12 +32,14 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
     if not os.path.exists(pdfs_dir):
         raise FileNotFoundError(f"Diretório de PDFs não encontrado: {pdfs_dir}")
 
-    # Listar todos os PDFs de CADERNO 12 (Distribuições - melhor fonte para Inventário/Divórcio)
+    # Listar todos os PDFs de CADERNOS 11, 12, 13, 14 (Capital + Interior - todas comarcas SP)
+    # Caderno 11: Interior Parte I | Caderno 12: Capital Parte I
+    # Caderno 13: Capital Parte II | Caderno 14: Interior Parte II
     # Ordenados do mais recente para o mais antigo
     todos_pdfs = sorted([
         os.path.join(pdfs_dir, f)
         for f in os.listdir(pdfs_dir)
-        if f.endswith('.pdf') and not f.startswith('teste') and 'cad12' in f
+        if f.endswith('.pdf') and not f.startswith('teste') and any(f'cad{c}' in f for c in ['11', '12', '13', '14'])
     ], reverse=True)  # Mais recentes primeiro
 
     # Aplicar limite se especificado
