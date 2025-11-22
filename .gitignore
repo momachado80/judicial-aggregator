@@ -23,3 +23,7 @@ out/
 *.swp
 *.swo
 backups/
+
+# DJE PDFs - muito grandes, não commitar (apenas cache JSON)
+data/dje_pdfs/*.pdf
+!data/dje_pdfs/.gitkeep
