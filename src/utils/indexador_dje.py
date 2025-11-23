@@ -32,12 +32,12 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
     if not os.path.exists(pdfs_dir):
         raise FileNotFoundError(f"Diretório de PDFs não encontrado: {pdfs_dir}")
 
-    # Listar todos os PDFs de CADERNO 12 (Distribuições - melhor fonte para Inventário/Divórcio)
+    # Listar todos os PDFs de CADERNOS 11, 12, 13, 14 (Capital + Interior)
     # Ordenados do mais recente para o mais antigo
     todos_pdfs = sorted([
         os.path.join(pdfs_dir, f)
         for f in os.listdir(pdfs_dir)
-        if f.endswith('.pdf') and not f.startswith('teste') and 'cad12' in f
+        if f.endswith('.pdf') and not f.startswith('teste') and any(f'cad{c}' in f for c in ['11', '12', '13', '14'])
     ], reverse=True)  # Mais recentes primeiro
 
     # Aplicar limite se especificado
@@ -78,12 +78,30 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
             print(f"  ❌ ERRO: {e}\n")
             continue
 
+    # Deduplicação: manter apenas a ocorrência mais recente de cada processo
+    print(f"\n🔍 Aplicando deduplicação...")
+    print(f"   Total ANTES da deduplicação: {len(todos_processos)} processos")
+
+    processos_unicos = {}
+    for p in todos_processos:
+        numero = p["numero"]
+        # Como PDFs estão ordenados do mais recente para o mais antigo,
+        # a primeira ocorrência é sempre a mais recente
+        if numero not in processos_unicos:
+            processos_unicos[numero] = p
+
+    processos_deduplicated = list(processos_unicos.values())
+    processos_removidos = len(todos_processos) - len(processos_deduplicated)
+
+    print(f"   Total DEPOIS da deduplicação: {len(processos_deduplicated)} processos")
+    print(f"   🗑️  Removidos {processos_removidos} duplicados")
+
     # Criar estrutura do cache
     cache = {
-        "total_processos": len(todos_processos),
+        "total_processos": len(processos_deduplicated),
         "total_pdfs": pdfs_processados,
         "data_indexacao": datetime.now().isoformat(),
-        "processos": todos_processos
+        "processos": processos_deduplicated
     }
 
     # Salvar cache
@@ -94,8 +112,9 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
     print("\n" + "="*80)
     print("✅ INDEXAÇÃO CONCLUÍDA!")
     print("="*80)
-    print(f"📊 Total de processos indexados: {len(todos_processos)}")
+    print(f"📊 Total de processos únicos: {len(processos_deduplicated)}")
     print(f"📄 PDFs processados: {pdfs_processados}/{len(todos_pdfs)}")
+    print(f"🗑️  Duplicados removidos: {processos_removidos}")
     print(f"💾 Cache salvo em: {cache_path}")
     print(f"📦 Tamanho do arquivo: {os.path.getsize(cache_path) / 1024 / 1024:.2f} MB")
     print("="*80)
