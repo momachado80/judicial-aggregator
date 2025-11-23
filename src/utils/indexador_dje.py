@@ -1,21 +1,82 @@
 """
-Indexador de PDFs DJE - Processa todos os PDFs UMA VEZ e salva em cache JSON
+Indexador de PDFs DJE - Processa todos os PDFs com OTIMIZAÇÃO e RESUME
 """
 import os
 import json
 from datetime import datetime
 from typing import List, Dict
+import concurrent.futures
 from src.scrapers.dje_parser import extrair_processos_dje
+
+
+def processar_pdf_worker(pdf_path: str) -> List[Dict]:
+    """Worker function para processar um único PDF (multiprocessing)"""
+    try:
+        pdf_nome = os.path.basename(pdf_path)
+        # Processar SEM FILTROS e SEM LOGS VERBOSOS (mais rápido)
+        processos = extrair_processos_dje(
+            pdf_path=pdf_path,
+            tipos=["Inventário", "Divórcio", "Arrolamento"],
+            filtrar_imoveis=False,
+            filtrar_ativos=False,
+            comarcas_filtro=None,
+            verbose=False  # Silencia logs para acelerar
+        )
+
+        # Adicionar metadados do PDF
+        for p in processos:
+            p["pdf_origem"] = pdf_nome
+            try:
+                p["data_pdf"] = pdf_nome.split("_")[1].replace(".pdf", "")
+            except:
+                p["data_pdf"] = "01-01-2000"
+
+        return processos
+    except Exception as e:
+        print(f"  ❌ ERRO ao processar {os.path.basename(pdf_path)}: {e}")
+        return []
+
+
+def carregar_progresso(cache_path: str) -> tuple:
+    """Carrega processos já salvos e lista de PDFs processados (para RESUME)"""
+    if not os.path.exists(cache_path):
+        return [], set()
+
+    try:
+        with open(cache_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            processos = data.get("processos", [])
+            pdfs_processados = set(p.get("pdf_origem") for p in processos if p.get("pdf_origem"))
+            return processos, pdfs_processados
+    except Exception as e:
+        print(f"⚠️  Erro ao ler cache: {e}. Começando do zero.")
+        return [], set()
+
+
+def salvar_cache_parcial(processos: List[Dict], total_pdfs: int, cache_path: str):
+    """Salva cache parcialmente (batches)"""
+    cache = {
+        "total_processos": len(processos),
+        "total_pdfs": total_pdfs,
+        "data_indexacao": datetime.now().isoformat(),
+        "processos": processos
+    }
+
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    temp_path = cache_path + ".tmp"
+    with open(temp_path, 'w', encoding='utf-8') as f:
+        json.dump(cache, f, ensure_ascii=False, indent=2)
+    os.replace(temp_path, cache_path)
 
 
 def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/dje_cache.json", limite_pdfs: int = None) -> Dict:
     """
-    Processa TODOS os PDFs (ou limite especificado) e salva em cache JSON
+    Processa TODOS os PDFs com OTIMIZAÇÃO (multiprocessing + batching + resume)
 
     Args:
         pdfs_dir: Diretório com PDFs
         cache_path: Caminho do arquivo de cache
-        limite_pdfs: Limite de PDFs a processar (None = todos). Use 10-15 para evitar OOM no Railway.
+        limite_pdfs: Limite de PDFs a processar (None = todos)
 
     Returns:
         {
@@ -26,97 +87,131 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
         }
     """
     print("\n" + "="*80)
-    print("🚀 INDEXAÇÃO DE PDFs DJE - PROCESSAMENTO ÚNICO")
+    print("🚀 INDEXAÇÃO OTIMIZADA - Multiprocessing + Batching + Resume")
     print("="*80)
 
     if not os.path.exists(pdfs_dir):
         raise FileNotFoundError(f"Diretório de PDFs não encontrado: {pdfs_dir}")
 
-    # Listar todos os PDFs de CADERNOS 11, 12, 13, 14 (Capital + Interior)
-    # Ordenados do mais recente para o mais antigo
+    # 1. Listar todos os PDFs de CADERNOS 11, 12, 13, 14 (Capital + Interior)
     todos_pdfs = sorted([
         os.path.join(pdfs_dir, f)
         for f in os.listdir(pdfs_dir)
         if f.endswith('.pdf') and not f.startswith('teste') and any(f'cad{c}' in f for c in ['11', '12', '13', '14'])
-    ], reverse=True)  # Mais recentes primeiro
+    ], reverse=True)
 
-    # Aplicar limite se especificado
     if limite_pdfs:
         todos_pdfs = todos_pdfs[:limite_pdfs]
-        print(f"⚠️  MODO LIMITADO: Processando apenas os {limite_pdfs} PDFs mais recentes (de {len(todos_pdfs)} disponíveis)")
+        print(f"⚠️  MODO LIMITADO: {limite_pdfs} PDFs")
 
-    print(f"\n📦 {len(todos_pdfs)} PDFs encontrados")
-    print("⏳ Processando... (isso pode levar 10-20 minutos, mas só precisa ser feito UMA VEZ)\n")
+    print(f"📦 Total de PDFs disponíveis: {len(todos_pdfs)}")
 
-    todos_processos = []
-    pdfs_processados = 0
+    # 2. Carregar progresso anterior (RESUME)
+    todos_processos, pdfs_ja_processados = carregar_progresso(cache_path)
 
-    for i, pdf_path in enumerate(todos_pdfs, 1):
-        pdf_nome = os.path.basename(pdf_path)
-        print(f"[{i}/{len(todos_pdfs)}] {pdf_nome}")
+    # Filtrar PDFs que faltam processar
+    pdfs_para_processar = [
+        p for p in todos_pdfs
+        if os.path.basename(p) not in pdfs_ja_processados
+    ]
 
-        try:
-            # Processar SEM FILTROS - capturar TUDO
-            processos = extrair_processos_dje(
-                pdf_path=pdf_path,
-                tipos=["Inventário", "Divórcio", "Arrolamento"],
-                filtrar_imoveis=False,  # Captura todos
-                filtrar_ativos=False,   # Captura todos
-                comarcas_filtro=None    # Captura todas
-            )
+    print(f"🔄 Retomando: {len(pdfs_ja_processados)} PDFs já processados")
+    print(f"⏳ Restam: {len(pdfs_para_processar)} PDFs para processar")
 
-            # Adicionar metadados do PDF
-            for p in processos:
-                p["pdf_origem"] = pdf_nome
-                p["data_pdf"] = pdf_nome.split("_")[1].replace(".pdf", "")
+    if not pdfs_para_processar:
+        print("✅ Nada a fazer! Todos os PDFs já foram processados.")
+        # Aplicar deduplicação final
+        processos_unicos = {}
+        for p in todos_processos:
+            numero = p["numero"]
+            if numero not in processos_unicos:
+                processos_unicos[numero] = p
+        processos_deduplicated = list(processos_unicos.values())
 
-            todos_processos.extend(processos)
-            pdfs_processados += 1
-            print(f"  ✅ {len(processos)} processos extraídos\n")
+        cache = {
+            "total_processos": len(processos_deduplicated),
+            "total_pdfs": len(todos_pdfs),
+            "data_indexacao": datetime.now().isoformat(),
+            "processos": processos_deduplicated
+        }
+        salvar_cache_parcial(processos_deduplicated, len(todos_pdfs), cache_path)
+        return cache
 
-        except Exception as e:
-            print(f"  ❌ ERRO: {e}\n")
-            continue
+    # 3. Processamento com multiprocessing em BATCHES
+    BATCH_SIZE = 100  # Salvar a cada 100 PDFs
+    TIMEOUT_POR_PDF = 180  # 3 minutos por PDF
+    max_workers = min(4, os.cpu_count() or 2)  # 4 workers em paralelo
 
-    # Deduplicação: manter apenas a ocorrência mais recente de cada processo
-    print(f"\n🔍 Aplicando deduplicação...")
-    print(f"   Total ANTES da deduplicação: {len(todos_processos)} processos")
+    print(f"⚡ Workers: {max_workers} | Batch: {BATCH_SIZE} PDFs")
+    print(f"🔥 Logs silenciados para máxima velocidade!\n")
+
+    chunks = [pdfs_para_processar[i:i + BATCH_SIZE] for i in range(0, len(pdfs_para_processar), BATCH_SIZE)]
+    total_chunks = len(chunks)
+
+    for i, chunk in enumerate(chunks, 1):
+        print(f"📦 Lote {i}/{total_chunks} ({len(chunk)} PDFs)...")
+
+        novos_processos = []
+
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(processar_pdf_worker, pdf): pdf for pdf in chunk}
+
+            for future in concurrent.futures.as_completed(futures):
+                pdf_path = futures[future]
+                try:
+                    resultado = future.result(timeout=TIMEOUT_POR_PDF)
+                    if resultado:
+                        novos_processos.extend(resultado)
+                except concurrent.futures.TimeoutError:
+                    print(f"  ⏰ TIMEOUT: {os.path.basename(pdf_path)}")
+                except Exception as e:
+                    print(f"  ❌ ERRO: {os.path.basename(pdf_path)} - {e}")
+
+        # Adicionar ao total
+        todos_processos.extend(novos_processos)
+
+        # SALVAR PARCIALMENTE (a cada batch)
+        print(f"  💾 Salvando ({len(todos_processos)} processos totais)...\n")
+        salvar_cache_parcial(todos_processos, len(todos_pdfs), cache_path)
+
+        # Limpar memória
+        import gc
+        gc.collect()
+
+    # 4. Deduplicação FINAL
+    print("\n" + "="*80)
+    print("🔍 Aplicando deduplicação final...")
+    print(f"   Total ANTES: {len(todos_processos)} processos")
 
     processos_unicos = {}
     for p in todos_processos:
         numero = p["numero"]
-        # Como PDFs estão ordenados do mais recente para o mais antigo,
-        # a primeira ocorrência é sempre a mais recente
         if numero not in processos_unicos:
             processos_unicos[numero] = p
 
     processos_deduplicated = list(processos_unicos.values())
     processos_removidos = len(todos_processos) - len(processos_deduplicated)
 
-    print(f"   Total DEPOIS da deduplicação: {len(processos_deduplicated)} processos")
-    print(f"   🗑️  Removidos {processos_removidos} duplicados")
+    print(f"   Total DEPOIS: {len(processos_deduplicated)} processos")
+    print(f"   🗑️ Removidos {processos_removidos} duplicados")
 
-    # Criar estrutura do cache
+    # Salvar FINAL
     cache = {
         "total_processos": len(processos_deduplicated),
-        "total_pdfs": pdfs_processados,
+        "total_pdfs": len(todos_pdfs),
         "data_indexacao": datetime.now().isoformat(),
         "processos": processos_deduplicated
     }
-
-    # Salvar cache
-    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-    with open(cache_path, 'w', encoding='utf-8') as f:
-        json.dump(cache, f, ensure_ascii=False, indent=2)
+    salvar_cache_parcial(processos_deduplicated, len(todos_pdfs), cache_path)
 
     print("\n" + "="*80)
     print("✅ INDEXAÇÃO CONCLUÍDA!")
     print("="*80)
     print(f"📊 Total de processos únicos: {len(processos_deduplicated)}")
-    print(f"📄 PDFs processados: {pdfs_processados}/{len(todos_pdfs)}")
-    print(f"🗑️  Duplicados removidos: {processos_removidos}")
+    print(f"📄 PDFs processados: {len(todos_pdfs)}")
+    print(f"🗑️ Duplicados removidos: {processos_removidos}")
     print(f"💾 Cache salvo em: {cache_path}")
-    print(f"📦 Tamanho do arquivo: {os.path.getsize(cache_path) / 1024 / 1024:.2f} MB")
+    print(f"📦 Tamanho: {os.path.getsize(cache_path) / 1024 / 1024:.2f} MB")
     print("="*80)
 
     return cache

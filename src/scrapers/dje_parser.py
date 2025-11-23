@@ -67,7 +67,8 @@ def extrair_processos_dje(
     filtrar_ativos: bool = True,
     comarcas_filtro: Optional[List[str]] = None,
     valor_min: Optional[float] = None,
-    valor_max: Optional[float] = None
+    valor_max: Optional[float] = None,
+    verbose: bool = True
 ) -> List[Dict]:
     """
     Extrai processos do DJE com filtros avançados
@@ -80,12 +81,14 @@ def extrair_processos_dje(
         comarcas_filtro: Lista de comarcas para filtrar (None = todas)
         valor_min: Valor mínimo da causa
         valor_max: Valor máximo da causa
+        verbose: Se True, mostra logs detalhados
     """
-    print(f"📄 Parseando: {pdf_path}")
-    print(f"   🏠 Filtrar imóveis: {filtrar_imoveis}")
-    print(f"   ✅ Filtrar ativos: {filtrar_ativos}")
-    if comarcas_filtro:
-        print(f"   📍 Comarcas: {', '.join(comarcas_filtro)}")
+    if verbose:
+        print(f"📄 Parseando: {pdf_path}")
+        print(f"   🏠 Filtrar imóveis: {filtrar_imoveis}")
+        print(f"   ✅ Filtrar ativos: {filtrar_ativos}")
+        if comarcas_filtro:
+            print(f"   📍 Comarcas: {', '.join(comarcas_filtro)}")
 
     processos = []
     processos_unicos = set()  # Para evitar duplicatas
@@ -93,10 +96,11 @@ def extrair_processos_dje(
     
     with pdfplumber.open(pdf_path) as pdf:
         total_paginas = len(pdf.pages)
-        print(f"📊 {total_paginas} páginas")
-        
+        if verbose:
+            print(f"📊 {total_paginas} páginas")
+
         for i, page in enumerate(pdf.pages, 1):
-            if i % 10 == 0:
+            if verbose and i % 100 == 0:
                 print(f"   Página {i}/{total_paginas}...")
             
             text = page.extract_text()
@@ -306,19 +310,20 @@ def extrair_processos_dje(
                 })
     
     # Relatório de filtros
-    total_rejeitados = sum(processos_rejeitados.values())
-    print(f"\n✅ {len(processos)} processos APROVADOS nos filtros")
+    if verbose:
+        total_rejeitados = sum(processos_rejeitados.values())
+        print(f"\n✅ {len(processos)} processos APROVADOS nos filtros")
 
-    if total_rejeitados > 0:
-        print(f"❌ {total_rejeitados} processos REJEITADOS:")
-        if processos_rejeitados["sem_imovel"] > 0:
-            print(f"   🏠 {processos_rejeitados['sem_imovel']} sem menção a imóveis")
-        if processos_rejeitados["extinto"] > 0:
-            print(f"   ⚰️  {processos_rejeitados['extinto']} extintos/arquivados")
-        if processos_rejeitados["comarca"] > 0:
-            print(f"   📍 {processos_rejeitados['comarca']} fora das comarcas selecionadas")
-        if processos_rejeitados["valor"] > 0:
-            print(f"   💰 {processos_rejeitados['valor']} fora do range de valor")
+        if total_rejeitados > 0:
+            print(f"❌ {total_rejeitados} processos REJEITADOS:")
+            if processos_rejeitados["sem_imovel"] > 0:
+                print(f"   🏠 {processos_rejeitados['sem_imovel']} sem menção a imóveis")
+            if processos_rejeitados["extinto"] > 0:
+                print(f"   ⚰️  {processos_rejeitados['extinto']} extintos/arquivados")
+            if processos_rejeitados["comarca"] > 0:
+                print(f"   📍 {processos_rejeitados['comarca']} fora das comarcas selecionadas")
+            if processos_rejeitados["valor"] > 0:
+                print(f"   💰 {processos_rejeitados['valor']} fora do range de valor")
 
     return processos
 
