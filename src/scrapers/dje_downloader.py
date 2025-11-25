@@ -47,23 +47,19 @@ def baixar_dje_tjsp(data: str, caderno: str = "12", headless: bool = True):
             time.sleep(2)
             print("✅ Página carregada!")
             
-            # Preencher data via JavaScript (campo pode estar readonly)
+            # Preencher data usando JS Injection (mais confiável que teclado)
             print(f"📝 Preenchendo data: {data}")
-
-            page.evaluate(f'''
-                var input = document.querySelector("input[name='dtDiario']");
-                if (input) {{
-                    input.removeAttribute("readonly");
-                    input.value = "{data}";
-                    input.dispatchEvent(new Event("change", {{ bubbles: true }}));
-                    input.dispatchEvent(new Event("blur", {{ bubbles: true }}));
-                }}
-            ''')
-
-            page.fill('input[type="text"]', data)
-
-            # Trigger change event para o JavaScript do site processar
-            page.evaluate('document.querySelector("input[type=\'text\']").dispatchEvent(new Event("change", { bubbles: true }))')
+            
+            page.evaluate(f"""
+                document.getElementById('dtDiario').value = '{data}';
+                document.getElementById('dtDiario').dispatchEvent(new Event('change'));
+                document.getElementById('dtDiario').dispatchEvent(new Event('blur'));
+            """)
+            
+            time.sleep(2)
+            
+            # Screenshot para debug
+            page.screenshot(path=f"debug_dje_{data.replace('/', '-')}.png")
 
 
             # Aguardar campo de caderno ser habilitado (não mais disabled)
@@ -182,26 +178,16 @@ if __name__ == "__main__":
 
     # Teste 1: Download único
     print("🧪 TESTE 1: Download de um único DJE")
-    pdf = baixar_dje_tjsp("15/11/2025", caderno="12", headless=False)
+    pdf = baixar_dje_tjsp("18/11/2024", caderno="12", headless=True)
     if pdf:
         print(f"✅ Sucesso: {pdf}\n")
 
     # Teste 2: Intervalo de datas
-    print("\n🧪 TESTE 2: Intervalo de 3 dias (São Paulo)")
+    print("\n🧪 TESTE 2: Intervalo de 2 dias (São Paulo)")
     pdfs = baixar_dje_intervalo(
-        data_inicio="13/11/2025",
-        data_fim="15/11/2025",
+        data_inicio="18/11/2024",
+        data_fim="19/11/2024",
         comarcas=["São Paulo"],
-        headless=True
-    )
-    print(f"✅ {len(pdfs)} PDFs baixados")
-
-    # Teste 3: Múltiplas comarcas
-    print("\n🧪 TESTE 3: São Paulo e Piracicaba (1 dia)")
-    pdfs = baixar_dje_intervalo(
-        data_inicio="15/11/2025",
-        data_fim="15/11/2025",
-        comarcas=["São Paulo", "Piracicaba"],
         headless=True
     )
     print(f"✅ {len(pdfs)} PDFs baixados")
