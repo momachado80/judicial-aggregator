@@ -20,7 +20,7 @@ def processar_pdf_worker(pdf_path: str) -> List[Dict]:
             filtrar_imoveis=False,
             filtrar_ativos=False,
             comarcas_filtro=None,
-            verbose=False  # Silencia logs para acelerar
+            verbose=False  # Silent mode
         )
 
         # Adicionar metadados do PDF
@@ -138,12 +138,12 @@ def indexar_todos_pdfs(pdfs_dir: str = "data/dje_pdfs", cache_path: str = "data/
         return cache
 
     # 3. Processamento com multiprocessing em BATCHES
-    BATCH_SIZE = 100  # Salvar a cada 100 PDFs
+    BATCH_SIZE = 100  # Production batch size
     TIMEOUT_POR_PDF = 180  # 3 minutos por PDF
-    max_workers = min(4, os.cpu_count() or 2)  # 4 workers em paralelo
+    max_workers = 2  # 2 workers for speed
 
     print(f"⚡ Workers: {max_workers} | Batch: {BATCH_SIZE} PDFs")
-    print(f"🔥 Logs silenciados para máxima velocidade!\n")
+    print(f"🔥 Logs silenciados para velocidade!\n")
 
     chunks = [pdfs_para_processar[i:i + BATCH_SIZE] for i in range(0, len(pdfs_para_processar), BATCH_SIZE)]
     total_chunks = len(chunks)

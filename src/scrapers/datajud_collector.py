@@ -37,8 +37,9 @@ class DataJudCollector:
         except:
             return numero_sem_formato
     
-    def buscar_api(self, tribunal: str, classe: str, from_idx: int = 0, size: int = 100) -> Dict:
-        """Busca processos na API DataJud"""
+    def buscar_api(self, tribunal: str, classe: str, from_idx: int = 0, size: int = 100, 
+                  comarcas: list = None, valor_min: float = None, valor_max: float = None) -> Dict:
+        """Busca processos na API DataJud com filtros"""
         url = self.endpoints.get(tribunal)
         
         headers = {
@@ -46,10 +47,37 @@ class DataJudCollector:
             "Authorization": f"APIKey {self.api_key}"
         }
         
+        # Construir query base
+        must_clauses = [
+            {"match": {"classe.nome": classe}}
+        ]
+        
+        # Filtro de Comarcas (OR)
+        if comarcas:
+            should_clauses = []
+            for comarca in comarcas:
+                # Usar match simples para pegar "Vara de Campinas" buscando "Campinas"
+                should_clauses.append({"match": {"orgaoJulgador.nome": comarca}})
+            
+            must_clauses.append({
+                "bool": {
+                    "should": should_clauses,
+                    "minimum_should_match": 1
+                }
+            })
+            
+        # Filtro de Valor da Causa (REMOVIDO DA QUERY API POIS O CAMPO GERALMENTE NÃO EXISTE)
+        # A filtragem será feita em memória se o campo vier
+
         payload = {
-            "query": {"match": {"classe.nome": classe}},
+            "query": {
+                "bool": {
+                    "must": must_clauses
+                }
+            },
             "size": size,
-            "from": from_idx
+            "from": from_idx,
+            "sort": [{"dataAjuizamento": {"order": "desc"}}]
         }
         
         try:
@@ -60,14 +88,28 @@ class DataJudCollector:
             print(f"❌ Erro na API: {e}")
             return {"hits": {"hits": [], "total": {"value": 0}}}
     
-    def coletar_e_salvar(self, tribunal: str, tipo_processo: str, max_processos: int = 5000):
-        """Coleta e salva processos de um tribunal/tipo específico"""
-        db = SessionLocal()
+    def coletar_e_salvar(self, tribunal: str, tipo_processo: str, max_processos: int = 5000,
+                        comarcas: list = None, valor_min: float = None, valor_max: float = None,
+                        dry_run: bool = False):
+        """
+        Coleta e salva processos de um tribunal/tipo específico com filtros.
+        Args:
+            dry_run: Se True, não salva no banco (apenas imprime)
+        """
+        db = None
+        if not dry_run:
+            db = SessionLocal()
         
         try:
             print(f"\n📊 Coletando {tipo_processo} do {tribunal}...")
+            if comarcas:
+                print(f"   📍 Filtro Comarcas: {comarcas}")
+            if valor_min or valor_max:
+                print(f"   💰 Filtro Valor: {valor_min} a {valor_max}")
+            if dry_run:
+                print("   🧪 MODO DE TESTE (DRY RUN): Sem salvar no banco")
             
-            resultado = self.buscar_api(tribunal, tipo_processo, 0, 1)
+            resultado = self.buscar_api(tribunal, tipo_processo, 0, 1, comarcas, valor_min, valor_max)
             total_api = resultado.get("hits", {}).get("total", {}).get("value", 0)
             print(f"   💾 Disponíveis na API: {total_api:,}")
             
@@ -82,7 +124,7 @@ class DataJudCollector:
             limite = min(max_processos, total_api)
             
             while coletados < limite:
-                resultado = self.buscar_api(tribunal, tipo_processo, from_idx, 100)
+                resultado = self.buscar_api(tribunal, tipo_processo, from_idx, 100, comarcas, valor_min, valor_max)
                 hits = resultado.get("hits", {}).get("hits", [])
                 
                 if not hits:
@@ -97,16 +139,21 @@ class DataJudCollector:
                     
                     numero_cnj = self.formatar_numero_cnj(numero_bruto)
                     
-                    existe = db.query(Processo).filter(
-                        Processo.numero_processo == numero_cnj
-                    ).first()
-                    
-                    if existe:
-                        duplicados += 1
-                        continue
+                    # Verificar duplicidade no banco (apenas se não for dry_run)
+                    if not dry_run:
+                        existe = db.query(Processo).filter(
+                            Processo.numero_processo == numero_cnj
+                        ).first()
+                        
+                        if existe:
+                            duplicados += 1
+                            continue
                     
                     orgao = source.get("orgaoJulgador", {})
-                    comarca = orgao.get("nomeOrgao", "Não informado")
+                    comarca = orgao.get("nome", "Não informado")
+                    
+                    # Extrair valor da causa
+                    valor_causa = source.get("dadosBasicos", {}).get("valorCausa", 0.0)
                     
                     data_ajuiz = source.get("dataAjuizamento")
                     if data_ajuiz:
@@ -117,34 +164,40 @@ class DataJudCollector:
                     
                     relevancia = "Média"
                     score = 0.5
-                    if data_ajuiz:
+                    # Lógica de relevância baseada em valor e data
+                    if valor_causa and valor_causa > 500000:
+                        relevancia = "Altíssima"
+                        score = 1.0
+                    elif data_ajuiz:
                         dias = (datetime.now().date() - data_ajuiz).days
                         if dias < 180:
                             relevancia = "Alta"
                             score = 0.8
-                        elif dias > 730:
-                            relevancia = "Baixa"
-                            score = 0.3
                     
-                    processo = Processo(
-                        numero_processo=numero_cnj,
-                        tribunal=tribunal,
-                        tipo_processo=tipo_processo,
-                        classe=tipo_processo,
-                        comarca=comarca,
-                        vara="Vara de Família e Sucessões",
-                        data_ajuizamento=data_ajuiz,
-                        relevancia=relevancia,
-                        score_relevancia=score
-                    )
-                    
-                    try:
-                        db.add(processo)
-                        db.commit()
+                    if dry_run:
+                        print(f"   🔎 Encontrado: {numero_cnj} | Comarca: {comarca} | Valor: {valor_causa}")
                         novos += 1
-                    except IntegrityError:
-                        db.rollback()
-                        duplicados += 1
+                    else:
+                        processo = Processo(
+                            numero_processo=numero_cnj,
+                            tribunal=tribunal,
+                            tipo_processo=tipo_processo,
+                            classe=tipo_processo,
+                            comarca=comarca,
+                            vara="Vara de Família e Sucessões",
+                            data_ajuizamento=data_ajuiz,
+                            valor_causa=valor_causa,
+                            relevancia=relevancia,
+                            score_relevancia=score
+                        )
+                        
+                        try:
+                            db.add(processo)
+                            db.commit()
+                            novos += 1
+                        except IntegrityError:
+                            db.rollback()
+                            duplicados += 1
                 
                 coletados += len(hits)
                 progresso = min(100, int(coletados * 100 / limite))
@@ -160,7 +213,8 @@ class DataJudCollector:
             return novos, duplicados
             
         finally:
-            db.close()
+            if db:
+                db.close()
     
     def coletar_tudo(self, max_por_tipo: int = 5000):
         """Coleta todos os tipos de ambos tribunais"""
@@ -187,4 +241,18 @@ class DataJudCollector:
 
 if __name__ == "__main__":
     collector = DataJudCollector()
-    collector.coletar_tudo(max_por_tipo=5000)
+    
+    # Teste com filtros específicos
+    print("🧪 TESTE: Coletando Inventários em SP (Capital e Interior)")
+    print("⚠️  Nota: Filtro de valor aplicado em memória (se disponível)")
+    
+    comarcas_teste = ["São Paulo", "Campinas", "Ribeirão Preto", "Sorocaba", "Santos"]
+    
+    collector.coletar_e_salvar(
+        tribunal="TJSP", 
+        tipo_processo="Inventário", 
+        max_processos=100,
+        comarcas=comarcas_teste,
+        valor_min=100000,
+        dry_run=True
+    )

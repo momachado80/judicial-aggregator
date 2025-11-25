@@ -1,4 +1,4 @@
-import pdfplumber
+
 import re
 from typing import List, Dict, Optional
 from datetime import datetime
@@ -90,20 +90,26 @@ def extrair_processos_dje(
         if comarcas_filtro:
             print(f"   📍 Comarcas: {', '.join(comarcas_filtro)}")
 
+    import pypdfium2 as pdfium
+
     processos = []
     processos_unicos = set()  # Para evitar duplicatas
     processos_rejeitados = {"sem_imovel": 0, "extinto": 0, "comarca": 0, "valor": 0}
     
-    with pdfplumber.open(pdf_path) as pdf:
-        total_paginas = len(pdf.pages)
+    try:
+        pdf = pdfium.PdfDocument(pdf_path)
+        total_paginas = len(pdf)
         if verbose:
             print(f"📊 {total_paginas} páginas")
 
-        for i, page in enumerate(pdf.pages, 1):
-            if verbose and i % 100 == 0:
-                print(f"   Página {i}/{total_paginas}...")
+        for i in range(total_paginas):
+            if verbose and (i + 1) % 100 == 0:
+                print(f"   Página {i + 1}/{total_paginas}...")
             
-            text = page.extract_text()
+            page = pdf[i]
+            textpage = page.get_textpage()
+            text = textpage.get_text_range()
+            
             if not text:
                 continue
             
@@ -309,6 +315,11 @@ def extrair_processos_dje(
                     'score_relevancia': score
                 })
     
+    except Exception as e:
+        if verbose:
+            print(f"❌ Erro ao processar PDF: {e}")
+        return []
+
     # Relatório de filtros
     if verbose:
         total_rejeitados = sum(processos_rejeitados.values())
