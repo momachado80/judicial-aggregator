@@ -48,8 +48,7 @@ async def _buscar_api_cnj(tribunal: str, tipo: str, quantidade: int = 1000) -> L
         "query": {
             "bool": {
                 "must": [
-                    {"term": {"classe.codigo": tipo_cod}},
-                    {"term": {"tribunal": tribunal}}
+                    {"term": {"classe.codigo": tipo_cod}}
                 ]
             }
         },
