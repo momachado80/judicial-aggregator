@@ -110,7 +110,7 @@ export default function DJESearch() {
       body.ordenar_por = ordenarPor;
 
       const response = await fetch(
-        `https://judicial-aggregator-production.up.railway.app/api/dje/buscar-cache-instantaneo`,
+        `/api/dje/buscar-cache-instantaneo`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -383,9 +383,9 @@ export default function DJESearch() {
           <p style={{ fontSize: '12px', color: '#6b7280' }}>Relevância:</p>
           <div style={{
             backgroundColor: processo.relevancia === 'Altíssima' ? '#fee2e2' :
-                           processo.relevancia === 'Alta' ? '#fef3c7' : '#f3f4f6',
+              processo.relevancia === 'Alta' ? '#fef3c7' : '#f3f4f6',
             color: processo.relevancia === 'Altíssima' ? '#991b1b' :
-                   processo.relevancia === 'Alta' ? '#92400e' : '#374151',
+              processo.relevancia === 'Alta' ? '#92400e' : '#374151',
             padding: '8px',
             borderRadius: '6px',
             fontWeight: '600',
