@@ -64,12 +64,25 @@ async def buscar_processos_dje(request: BuscarDJERequest):
 
         # PASSO 1: Baixar PDFs
         print("\n📥 PASSO 1: Baixando PDFs do DJE...")
-        pdfs = baixar_dje_intervalo(
-            data_inicio=request.data_inicio,
-            data_fim=request.data_fim,
-            comarcas=request.comarcas,
-            headless=True
-        )
+        try:
+            pdfs = baixar_dje_intervalo(
+                data_inicio=request.data_inicio,
+                data_fim=request.data_fim,
+                comarcas=request.comarcas,
+                headless=True
+            )
+        except NotImplementedError as e:
+            # Se estiver no Railway, pular download e tentar usar PDFs existentes
+            print(f"⚠️ {e}")
+            print("⚠️ Tentando processar apenas PDFs já existentes no cache...")
+            pdfs = []
+            # Tentar listar PDFs existentes que batem com a data (lógica simplificada)
+            # Na verdade, se não baixou, não tem novos. Mas pode ter antigos.
+            # Vamos avisar o usuário que o download foi pulado.
+            raise HTTPException(
+                status_code=501,
+                detail=f"Download desabilitado neste ambiente: {str(e)}"
+            )
 
         if not pdfs:
             raise HTTPException(
@@ -306,12 +319,16 @@ async def baixar_pdfs_periodo(
             print(f"📍 Comarcas: {', '.join(comarcas)}")
             print(f"{'='*80}\n")
 
-            pdfs_baixados = baixar_dje_intervalo(
-                data_inicio=data_inicio,
-                data_fim=data_fim,
-                comarcas=comarcas,
-                headless=True
-            )
+            try:
+                pdfs_baixados = baixar_dje_intervalo(
+                    data_inicio=data_inicio,
+                    data_fim=data_fim,
+                    comarcas=comarcas,
+                    headless=True
+                )
+            except NotImplementedError as e:
+                print(f"⚠️ DOWNLOAD CANCELADO: {e}")
+                return
 
             print(f"\n{'='*80}")
             print(f"✅ DOWNLOAD CONCLUÍDO!")
@@ -385,12 +402,16 @@ async def baixar_pdfs_automatico(
             print(f"📍 Comarcas: {', '.join(comarcas)}")
             print(f"{'='*80}\n")
 
-            pdfs_baixados = baixar_dje_intervalo(
-                data_inicio=data_inicio_str,
-                data_fim=data_fim_str,
-                comarcas=comarcas,
-                headless=True
-            )
+            try:
+                pdfs_baixados = baixar_dje_intervalo(
+                    data_inicio=data_inicio_str,
+                    data_fim=data_fim_str,
+                    comarcas=comarcas,
+                    headless=True
+                )
+            except NotImplementedError as e:
+                print(f"⚠️ DOWNLOAD CANCELADO: {e}")
+                return
 
             print(f"\n{'='*80}")
             print(f"✅ DOWNLOAD CONCLUÍDO!")

@@ -28,9 +28,16 @@ def baixar_dje_tjsp(data: str, caderno: str = "12", headless: bool = True):
     Args:
         data: Data no formato DD/MM/YYYY
         caderno: Código do caderno (11, 12, 13, 14)
-        headless: Se True, roda sem abrir janela do browser
-    """
+        """
     print(f"🌐 Baixando DJE de {data}, caderno {caderno} ({CADERNOS_TJSP.get(caderno, 'Desconhecido')})")
+
+    # Verificar se está no Railway (onde não há browsers instalados)
+    if os.getenv("RAILWAY_DEPLOY", "false") == "true":
+        print("⚠️  Modo Railway detectado: Download de DJE desabilitado.")
+        raise NotImplementedError(
+            "O download de DJE não está disponível no ambiente Railway (produção). "
+            "Utilize apenas o processamento de PDFs já existentes ou faça upload manual."
+        )
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
