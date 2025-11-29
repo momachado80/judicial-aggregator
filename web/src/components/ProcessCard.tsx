@@ -18,9 +18,9 @@ interface Props {
 export function ProcessCard({ process, onSelect, onDiscard }: Props) {
   const formatCurrency = (value?: number) => {
     if (!value) return 'Não informado'
-    return new Intl.NumberFormat('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL' 
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
     }).format(value)
   }
 
@@ -40,11 +40,11 @@ export function ProcessCard({ process, onSelect, onDiscard }: Props) {
               </span>
             )}
           </div>
-          
+
           <h3 className="font-mono text-sm font-bold text-gray-800 mb-1">
             {process.numero_cnj}
           </h3>
-          
+
           <div className="text-sm text-gray-600 space-y-1">
             <p><strong>Tipo:</strong> {process.tipo_processo}</p>
             <p><strong>Tribunal:</strong> {process.tribunal}</p>
@@ -67,8 +67,9 @@ export function ProcessCard({ process, onSelect, onDiscard }: Props) {
         >
           🗑️ Descartar
         </button>
-        
-          href={`https://judicial-aggregator-production.up.railway.app/processes/${process.id}`}
+
+        <a
+          href={`/processes/${process.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-colors"

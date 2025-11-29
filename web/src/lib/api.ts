@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE || 'https://judicial-aggregator-production.up.railway.app',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE || '/api',
 });
 
 export interface Process {
@@ -53,6 +53,6 @@ export async function fetchProcesses(params: {
 }
 
 export async function fetchProcessById(id: number) {
-  const response = await api.get<ProcessDetail>(\`/processes/\${id}\`);
+  const response = await api.get<ProcessDetail>(`/processes/${id}`);
   return response.data;
 }
