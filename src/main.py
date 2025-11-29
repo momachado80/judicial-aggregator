@@ -124,3 +124,28 @@ async def listar_comarcas():
             for k, v in sorted_codigos[:50]
         ]
     }
+
+# ========================================
+# SERVIR FRONTEND (STATIC FILES)
+# ========================================
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Verificar se a pasta do build existe (produção)
+frontend_path = "web/out"
+if os.path.exists(frontend_path):
+    # Montar arquivos estáticos (JS, CSS, imagens)
+    app.mount("/_next", StaticFiles(directory=f"{frontend_path}/_next"), name="next")
+    
+    # Rota catch-all para servir o index.html (SPA)
+    # Importante: deve ser a última rota definida
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Se for arquivo estático que não está em _next (ex: favicon.ico), tentar servir
+        file_path = os.path.join(frontend_path, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        # Caso contrário, servir index.html para o React lidar com a rota
+        return FileResponse(os.path.join(frontend_path, "index.html"))

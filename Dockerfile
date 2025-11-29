@@ -1,4 +1,25 @@
-# Use Python 3.11 oficial
+# ========================================
+# ESTÁGIO 1: Build do Frontend (Node.js)
+# ========================================
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/web
+
+# Copiar arquivos de dependências
+COPY web/package.json web/package-lock.json ./
+
+# Instalar dependências
+RUN npm ci
+
+# Copiar código fonte do frontend
+COPY web/ .
+
+# Build do Next.js (gera pasta 'out' devido ao output: 'export')
+RUN npm run build
+
+# ========================================
+# ESTÁGIO 2: Backend (Python)
+# ========================================
 FROM python:3.11-slim
 
 # Instalar dependências do sistema
@@ -15,8 +36,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo o código
+# Copiar todo o código do backend
 COPY . .
+
+# Copiar o build do frontend do estágio anterior
+# O build estático do Next.js fica em /app/web/out
+COPY --from=frontend-builder /app/web/out /app/web/out
 
 # Expor porta
 EXPOSE 8080
