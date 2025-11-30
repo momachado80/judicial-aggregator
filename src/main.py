@@ -142,6 +142,10 @@ if os.path.exists(frontend_path):
     # Importante: deve ser a última rota definida
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
+        # Se for rota de API, retornar 404 em vez do frontend
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API route not found")
+
         # Se for arquivo estático que não está em _next (ex: favicon.ico), tentar servir
         file_path = os.path.join(frontend_path, full_path)
         if os.path.isfile(file_path):
