@@ -110,7 +110,7 @@ export default function DJESearch() {
       body.ordenar_por = ordenarPor;
 
       const response = await fetch(
-        `/api/dje/buscar-cache-instantaneo`,
+        `https://judicial-aggregator-production.up.railway.app/api/dje/buscar-cache-instantaneo`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

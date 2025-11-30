@@ -69,7 +69,7 @@ export function ProcessCard({ process, onSelect, onDiscard }: Props) {
         </button>
 
         <a
-          href={`/processes/${process.id}`}
+          href={`/processes?id=${process.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-colors"

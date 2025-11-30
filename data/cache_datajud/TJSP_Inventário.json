@@ -1,0 +1,508 @@
+{
+  "tribunal": "TJSP",
+  "tipo_processo": "Inventário",
+  "total_processos": 50,
+  "data_atualizacao": "2025-11-24T22:16:55.396401",
+  "processos": [
+    {
+      "numero": "10037111520258260650",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Valinhos",
+      "codigo_comarca": "0650",
+      "valor_causa": null,
+      "data_ajuizamento": "20250730160913",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10037111520258260650"
+    },
+    {
+      "numero": "10046022420258260266",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Itanhaém",
+      "codigo_comarca": "0266",
+      "valor_causa": null,
+      "data_ajuizamento": "20250725202647",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10046022420258260266"
+    },
+    {
+      "numero": "10059505520258260047",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Assis",
+      "codigo_comarca": "0047",
+      "valor_causa": null,
+      "data_ajuizamento": "20250725131431",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10059505520258260047"
+    },
+    {
+      "numero": "10059427820258260047",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Assis",
+      "codigo_comarca": "0047",
+      "valor_causa": null,
+      "data_ajuizamento": "20250725111819",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10059427820258260047"
+    },
+    {
+      "numero": "10116509320258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250724164720",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10116509320258260020"
+    },
+    {
+      "numero": "10210158320258260405",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Osasco",
+      "codigo_comarca": "0405",
+      "valor_causa": null,
+      "data_ajuizamento": "20250723140145",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10210158320258260405"
+    },
+    {
+      "numero": "10114681020258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250722183224",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10114681020258260020"
+    },
+    {
+      "numero": "10208547320258260405",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Osasco",
+      "codigo_comarca": "0405",
+      "valor_causa": null,
+      "data_ajuizamento": "20250722143923",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10208547320258260405"
+    },
+    {
+      "numero": "10049216420258260533",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Santa Bárbara d'Oeste",
+      "codigo_comarca": "0533",
+      "valor_causa": null,
+      "data_ajuizamento": "20250721105238",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10049216420258260533"
+    },
+    {
+      "numero": "10112828420258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250719181520",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10112828420258260020"
+    },
+    {
+      "numero": "10033190220258260157",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Cubatão",
+      "codigo_comarca": "0157",
+      "valor_causa": null,
+      "data_ajuizamento": "20250718155634",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10033190220258260157"
+    },
+    {
+      "numero": "10018236020258260472",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Porto Ferreira",
+      "codigo_comarca": "0472",
+      "valor_causa": null,
+      "data_ajuizamento": "20250718152525",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10018236020258260472"
+    },
+    {
+      "numero": "10026982820258260505",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Ribeirão Pires",
+      "codigo_comarca": "0505",
+      "valor_causa": null,
+      "data_ajuizamento": "20250717144730",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10026982820258260505"
+    },
+    {
+      "numero": "10019977320258260115",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Campo Limpo Paulista",
+      "codigo_comarca": "0115",
+      "valor_causa": null,
+      "data_ajuizamento": "20250717103001",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10019977320258260115"
+    },
+    {
+      "numero": "10030928320258260198",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Franco da Rocha",
+      "codigo_comarca": "0198",
+      "valor_causa": null,
+      "data_ajuizamento": "20250716213522",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10030928320258260198"
+    },
+    {
+      "numero": "10069246120258260510",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Rio Claro",
+      "codigo_comarca": "0510",
+      "valor_causa": null,
+      "data_ajuizamento": "20250716150331",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10069246120258260510"
+    },
+    {
+      "numero": "10039377820258260663",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Votorantim",
+      "codigo_comarca": "0663",
+      "valor_causa": null,
+      "data_ajuizamento": "20250715232230",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10039377820258260663"
+    },
+    {
+      "numero": "10118756020258260361",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Mogi das Cruzes",
+      "codigo_comarca": "0361",
+      "valor_causa": null,
+      "data_ajuizamento": "20250715161145",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10118756020258260361"
+    },
+    {
+      "numero": "10138434920258260451",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Piracicaba",
+      "codigo_comarca": "0451",
+      "valor_causa": null,
+      "data_ajuizamento": "20250715135827",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10138434920258260451"
+    },
+    {
+      "numero": "10056128120258260047",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Assis",
+      "codigo_comarca": "0047",
+      "valor_causa": null,
+      "data_ajuizamento": "20250715131444",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10056128120258260047"
+    },
+    {
+      "numero": "10019277920258260366",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Mongaguá",
+      "codigo_comarca": "0366",
+      "valor_causa": null,
+      "data_ajuizamento": "20250714120014",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10019277920258260366"
+    },
+    {
+      "numero": "10083907020258260161",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Diadema",
+      "codigo_comarca": "0161",
+      "valor_causa": null,
+      "data_ajuizamento": "20250713211234",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10083907020258260161"
+    },
+    {
+      "numero": "10055399520258260084",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional de Vila Mimosa",
+      "codigo_comarca": "0084",
+      "valor_causa": null,
+      "data_ajuizamento": "20250713161040",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10055399520258260084"
+    },
+    {
+      "numero": "10025834220258260655",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Várzea Paulista",
+      "codigo_comarca": "0655",
+      "valor_causa": null,
+      "data_ajuizamento": "20250710191327",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10025834220258260655"
+    },
+    {
+      "numero": "10106904020258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250710100821",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10106904020258260020"
+    },
+    {
+      "numero": "10007018920258260511",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Rio das Pedras",
+      "codigo_comarca": "0511",
+      "valor_causa": null,
+      "data_ajuizamento": "20250709222613",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10007018920258260511"
+    },
+    {
+      "numero": "10038557020258260526",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Salto",
+      "codigo_comarca": "0526",
+      "valor_causa": null,
+      "data_ajuizamento": "20250709143144",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10038557020258260526"
+    },
+    {
+      "numero": "10019443320258260070",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Batatais",
+      "codigo_comarca": "0070",
+      "valor_causa": null,
+      "data_ajuizamento": "20250709140333",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10019443320258260070"
+    },
+    {
+      "numero": "10195122720258260405",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Osasco",
+      "codigo_comarca": "0405",
+      "valor_causa": null,
+      "data_ajuizamento": "20250708220245",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10195122720258260405"
+    },
+    {
+      "numero": "10029568620258260198",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Franco da Rocha",
+      "codigo_comarca": "0198",
+      "valor_causa": null,
+      "data_ajuizamento": "20250708152926",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10029568620258260198"
+    },
+    {
+      "numero": "10048661720258260565",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "São Caetano do Sul",
+      "codigo_comarca": "0565",
+      "valor_causa": null,
+      "data_ajuizamento": "20250708141624",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10048661720258260565"
+    },
+    {
+      "numero": "10031980220258260568",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "São João da Boa Vista",
+      "codigo_comarca": "0568",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707165239",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10031980220258260568"
+    },
+    {
+      "numero": "10066327620258260510",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Rio Claro",
+      "codigo_comarca": "0510",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707161915",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10066327620258260510"
+    },
+    {
+      "numero": "10293170420258260114",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Campinas",
+      "codigo_comarca": "0114",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707161329",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10293170420258260114"
+    },
+    {
+      "numero": "10055278120258260278",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Itaquaquecetuba",
+      "codigo_comarca": "0278",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707150102",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10055278120258260278"
+    },
+    {
+      "numero": "10162353520258260071",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Bauru",
+      "codigo_comarca": "0071",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707135932",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10162353520258260071"
+    },
+    {
+      "numero": "10018541020258260366",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Mongaguá",
+      "codigo_comarca": "0366",
+      "valor_causa": null,
+      "data_ajuizamento": "20250707123346",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10018541020258260366"
+    },
+    {
+      "numero": "10132770320258260451",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Piracicaba",
+      "codigo_comarca": "0451",
+      "valor_causa": null,
+      "data_ajuizamento": "20250704173548",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10132770320258260451"
+    },
+    {
+      "numero": "10047752420258260565",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "São Caetano do Sul",
+      "codigo_comarca": "0565",
+      "valor_causa": null,
+      "data_ajuizamento": "20250703205840",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10047752420258260565"
+    },
+    {
+      "numero": "10019921820258260417",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Paraguaçu Paulista",
+      "codigo_comarca": "0417",
+      "valor_causa": null,
+      "data_ajuizamento": "20250703161526",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10019921820258260417"
+    },
+    {
+      "numero": "10189268720258260405",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Osasco",
+      "codigo_comarca": "0405",
+      "valor_causa": null,
+      "data_ajuizamento": "20250702223053",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10189268720258260405"
+    },
+    {
+      "numero": "10037212020258260663",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Votorantim",
+      "codigo_comarca": "0663",
+      "valor_causa": null,
+      "data_ajuizamento": "20250702165453",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10037212020258260663"
+    },
+    {
+      "numero": "10020569420258260201",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Garça",
+      "codigo_comarca": "0201",
+      "valor_causa": null,
+      "data_ajuizamento": "20250701192546",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10020569420258260201"
+    },
+    {
+      "numero": "10101907120258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250701120719",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10101907120258260020"
+    },
+    {
+      "numero": "10024713820258260505",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Ribeirão Pires",
+      "codigo_comarca": "0505",
+      "valor_causa": null,
+      "data_ajuizamento": "20250630182132",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10024713820258260505"
+    },
+    {
+      "numero": "10014743820258260543",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Santa Isabel",
+      "codigo_comarca": "0543",
+      "valor_causa": null,
+      "data_ajuizamento": "20250630092339",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10014743820258260543"
+    },
+    {
+      "numero": "10108909120258260361",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Mogi das Cruzes",
+      "codigo_comarca": "0361",
+      "valor_causa": null,
+      "data_ajuizamento": "20250629192628",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10108909120258260361"
+    },
+    {
+      "numero": "10100252420258260020",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Foro Regional XII - Nossa Senhora do Ó",
+      "codigo_comarca": "0020",
+      "valor_causa": null,
+      "data_ajuizamento": "20250627201828",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10100252420258260020"
+    },
+    {
+      "numero": "10028241320258260462",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Poá",
+      "codigo_comarca": "0462",
+      "valor_causa": null,
+      "data_ajuizamento": "20250627195811",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10028241320258260462"
+    },
+    {
+      "numero": "10065687520258260604",
+      "tribunal": "TJSP",
+      "tipo": "Inventário",
+      "comarca": "Sumaré",
+      "codigo_comarca": "0604",
+      "valor_causa": null,
+      "data_ajuizamento": "20250627183016",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=10065687520258260604"
+    }
+  ]
+}
