@@ -542,37 +542,30 @@ async def status_dje():
     }
 
 
-@router.post("/buscar-cache-instantaneo")
-async def buscar_cache_instantaneo(
-    tipos_processo: List[str] = ["Inventário", "Divórcio"],
-    comarcas: Optional[List[str]] = None,
-    apenas_imoveis: bool = False,
-    apenas_ativos: bool = True,
-    valor_min: Optional[float] = None,
-    valor_max: Optional[float] = None,
-    data_inicio: Optional[str] = None,
-    data_fim: Optional[str] = None,
+class BuscarCacheRequest(BaseModel):
+    """Request para busca no cache instantâneo"""
+    tipos_processo: List[str] = ["Inventário", "Divórcio"]
+    comarcas: Optional[List[str]] = None
+    apenas_imoveis: bool = False
+    apenas_ativos: bool = True
+    valor_min: Optional[float] = None
+    valor_max: Optional[float] = None
+    data_inicio: Optional[str] = None
+    data_fim: Optional[str] = None
     ordenar_por: str = "relevancia_desc"
-):
+
+@router.post("/buscar-cache-instantaneo")
+async def buscar_cache_instantaneo(request: BuscarCacheRequest):
     """
     🚀 BUSCA INSTANTÂNEA - Usa cache JSON pré-processado
-
+    
     VELOCIDADE: < 100ms (ao invés de 2+ minutos)
-
+    
     Este endpoint lê um arquivo JSON que contém TODOS os processos
     já extraídos dos PDFs. A busca é EXTREMAMENTE RÁPIDA porque
     apenas filtra dados já processados.
-
+    
     IMPORTANTE: O cache precisa ser gerado primeiro com /reindexar
-
-    Args:
-        ordenar_por: Critério de ordenação dos resultados
-            - "relevancia_desc": Alta relevância primeiro (padrão)
-            - "relevancia_asc": Baixa relevância primeiro
-            - "data_desc": Mais recente primeiro
-            - "data_asc": Mais antigo primeiro
-            - "valor_desc": Maior valor primeiro
-            - "valor_asc": Menor valor primeiro
     """
     try:
         cache_path = "data/dje_cache.json"
@@ -598,20 +591,20 @@ async def buscar_cache_instantaneo(
         # Filtrar processos (INSTANTÂNEO!)
         processos_filtrados = filtrar_processos_cache(
             cache=cache,
-            tipos=tipos_processo,
-            comarcas=comarcas,
-            apenas_imoveis=apenas_imoveis,
-            apenas_ativos=apenas_ativos,
-            valor_min=valor_min,
-            valor_max=valor_max,
-            data_inicio=data_inicio,
-            data_fim=data_fim
+            tipos=request.tipos_processo,
+            comarcas=request.comarcas,
+            apenas_imoveis=request.apenas_imoveis,
+            apenas_ativos=request.apenas_ativos,
+            valor_min=request.valor_min,
+            valor_max=request.valor_max,
+            data_inicio=request.data_inicio,
+            data_fim=request.data_fim
         )
 
         # Ordenar processos (INSTANTÂNEO!)
         processos_filtrados = ordenar_processos(
             processos=processos_filtrados,
-            ordenar_por=ordenar_por
+            ordenar_por=request.ordenar_por
         )
 
         # LIMITE DE 100 PROCESSOS PARA BUSCAS ABERTAS
@@ -620,7 +613,7 @@ async def buscar_cache_instantaneo(
         total_antes_limite = len(processos_filtrados)
         limite_aplicado = False
 
-        if data_inicio is None and data_fim is None:
+        if request.data_inicio is None and request.data_fim is None:
             # Busca aberta (sem filtro de data): limitar a 100 mais recentes
             # Primeiro, ordenar por data para garantir que pegamos os mais recentes
             from datetime import datetime
@@ -641,7 +634,7 @@ async def buscar_cache_instantaneo(
             # Agora reaplicar a ordenação original escolhida pelo usuário
             processos_filtrados = ordenar_processos(
                 processos=processos_filtrados,
-                ordenar_por=ordenar_por
+                ordenar_por=request.ordenar_por
             )
 
             limite_aplicado = True
@@ -676,8 +669,8 @@ async def buscar_cache_instantaneo(
             "pdfs_processados_sucesso": cache["total_pdfs"],
             "data_indexacao": cache["data_indexacao"],
             "ordenacao": {
-                "criterio": ordenar_por,
-                "descricao": ordenacao_desc.get(ordenar_por, "Sem ordenação")
+                "criterio": request.ordenar_por,
+                "descricao": ordenacao_desc.get(request.ordenar_por, "Sem ordenação")
             },
             "estatisticas": {
                 "por_tipo": dict(tipos_count),
