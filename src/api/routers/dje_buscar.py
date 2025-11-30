@@ -578,7 +578,15 @@ async def buscar_cache_instantaneo(
         cache_path = "data/dje_cache.json"
 
         # Verificar se cache existe
+        print(f"DEBUG: Buscando cache em {os.path.abspath(cache_path)}")
         if not os.path.exists(cache_path):
+            print(f"ERROR: Cache file NOT FOUND at {os.path.abspath(cache_path)}")
+            # Listar arquivos na pasta data para debug
+            if os.path.exists("data"):
+                print(f"DEBUG: Conteúdo de data/: {os.listdir('data')}")
+            else:
+                print(f"DEBUG: Pasta data/ não existe!")
+                
             raise HTTPException(
                 status_code=404,
                 detail="Cache não encontrado. Execute /api/dje/reindexar primeiro para gerar o índice."

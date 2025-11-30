@@ -201,17 +201,26 @@ def get_novos_hoje(db: Session = Depends(get_db)):
 @router.get("/comarcas")
 async def listar_comarcas():
     """Retorna lista de todas as comarcas TJSP e TJBA"""
-    from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
-    
-    # Ordenar alfabeticamente
-    tjsp_sorted = sorted(set(COMARCAS_TJSP.values()))
-    tjba_sorted = sorted(set(COMARCAS_TJBA.values()))
-    
-    return {
-        "TJSP": tjsp_sorted,
-        "TJBA": tjba_sorted,
-        "total": len(tjsp_sorted) + len(tjba_sorted)
-    }
+    print(f"DEBUG: Listando comarcas...")
+    try:
+        from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
+        
+        # Ordenar alfabeticamente
+        tjsp_sorted = sorted(set(COMARCAS_TJSP.values()))
+        tjba_sorted = sorted(set(COMARCAS_TJBA.values()))
+        
+        print(f"DEBUG: Encontradas {len(tjsp_sorted)} comarcas TJSP e {len(tjba_sorted)} TJBA")
+        
+        return {
+            "TJSP": tjsp_sorted,
+            "TJBA": tjba_sorted,
+            "total": len(tjsp_sorted) + len(tjba_sorted)
+        }
+    except Exception as e:
+        print(f"ERROR in listar_comarcas: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{process_id}")
 def get_process(process_id: int, db: Session = Depends(get_db)):
