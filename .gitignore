@@ -23,3 +23,5 @@ out/
 *.swp
 *.swo
 backups/
+data/dje_pdfs/
+*.pdf
