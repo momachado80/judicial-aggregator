@@ -42,7 +42,7 @@ export default function DJESearch() {
 
     const carregarComarcas = async () => {
       try {
-        const response = await fetch('/api/processes/comarcas');
+        const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas');
         const data = await response.json();
         // Pegar apenas comarcas TJSP (DJE é só TJSP)
         if (data.TJSP && data.TJSP.length > 0) {

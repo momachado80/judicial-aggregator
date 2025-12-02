@@ -215,3 +215,20 @@ async def limpar_cache_api():
         "caches_removidos": removidos,
         "mensagem": f"Removidos {removidos} caches expirados"
     }
+
+
+@router.get("/comarcas")
+async def listar_comarcas():
+    """
+    Lista todas as comarcas disponíveis para TJSP e TJBA
+    """
+    from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
+    
+    # Extrair apenas os nomes das comarcas (sem códigos duplicados)
+    tjsp_nomes = sorted(set(COMARCAS_TJSP.values()))
+    tjba_nomes = sorted(set(COMARCAS_TJBA.values()))
+    
+    return {
+        "TJSP": tjsp_nomes,
+        "TJBA": tjba_nomes
+    }
