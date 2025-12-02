@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual']);
@@ -9,19 +9,53 @@ export default function Home() {
   const [interesseIds, setInteresseIds] = useState(new Set());
   const [descartadosIds, setDescartadosIds] = useState(new Set());
   const [abaAtiva, setAbaAtiva] = useState('busca');
+  
+  // Filtro de comarcas
+  const [comarcaFiltro, setComarcaFiltro] = useState('');
+  const [comarcasSelecionadas, setComarcasSelecionadas] = useState([]);
+  const [comarcasDisponiveis, setComarcasDisponiveis] = useState([]);
+
+  // Carregar comarcas
+  useEffect(() => {
+    fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
+      .then(res => res.json())
+      .then(data => {
+        if (data.TJSP) {
+          setComarcasDisponiveis(data.TJSP);
+        }
+      })
+      .catch(err => console.error('Erro ao carregar comarcas:', err));
+  }, []);
+
+  const adicionarComarca = (comarca) => {
+    if (comarca && !comarcasSelecionadas.includes(comarca)) {
+      setComarcasSelecionadas([...comarcasSelecionadas, comarca]);
+      setComarcaFiltro('');
+    }
+  };
+
+  const removerComarca = (comarca) => {
+    setComarcasSelecionadas(comarcasSelecionadas.filter(c => c !== comarca));
+  };
 
   const buscarProcessos = async () => {
     setLoading(true);
     try {
+      const body = {
+        tribunais: ['TJSP'],
+        tipos_processo: tiposSelecionados,
+        quantidade: quantidade,
+        usar_cache: false
+      };
+      
+      if (comarcasSelecionadas.length > 0) {
+        body.comarcas = comarcasSelecionadas;
+      }
+
       const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/buscar-processos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tribunais: ['TJSP'],
-          tipos_processo: tiposSelecionados,
-          quantidade: quantidade,
-          usar_cache: false
-        })
+        body: JSON.stringify(body)
       });
       const data = await response.json();
       
@@ -65,6 +99,19 @@ export default function Home() {
     return `${dia}/${mes}/${ano}`;
   };
 
+  const formatarNumeroProcesso = (numero) => {
+    // Formatar: NNNNNNN-DD.AAAA.J.TR.OOOO
+    if (numero && numero.length === 20) {
+      return `${numero.slice(0,7)}-${numero.slice(7,9)}.${numero.slice(9,13)}.${numero.slice(13,14)}.${numero.slice(14,16)}.${numero.slice(16,20)}`;
+    }
+    return numero;
+  };
+
+  const gerarLinkTJSP = (numero) => {
+    const formatado = formatarNumeroProcesso(numero);
+    return `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&numeroDigitoAnoUnificado=${formatado.slice(0,15)}&foroNumeroUnificado=${formatado.slice(21,25)}&dadosConsulta.valorConsultaNuUnificado=${formatado}`;
+  };
+
   const ProcessoCard = ({ processo }) => (
     <div style={{
       backgroundColor: 'white',
@@ -76,12 +123,23 @@ export default function Home() {
       <div style={{ marginBottom: '12px' }}>
         <p style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
         <a 
-          href={processo.url_tjsp} 
+          href={gerarLinkTJSP(processo.numero)} 
           target="_blank" 
           rel="noopener noreferrer"
-          style={{ color: '#2563eb', fontFamily: 'monospace', fontSize: '13px', fontWeight: '600' }}
+          style={{ 
+            color: '#2563eb', 
+            fontFamily: 'monospace', 
+            fontSize: '12px', 
+            fontWeight: '600',
+            textDecoration: 'none',
+            display: 'block',
+            padding: '8px 12px',
+            backgroundColor: '#eff6ff',
+            borderRadius: '6px',
+            border: '1px solid #bfdbfe'
+          }}
         >
-          {processo.numero}
+          🔗 {formatarNumeroProcesso(processo.numero)}
         </a>
       </div>
 
@@ -150,7 +208,7 @@ export default function Home() {
         padding: '20px 24px'
       }}>
         <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>
-          ⚖️ Judicial Aggregator - DataJud
+          ⚖️ Judicial Aggregator - TJSP
         </h1>
       </nav>
 
@@ -164,7 +222,7 @@ export default function Home() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>
-            🔍 Buscar Processos (TJSP)
+            🔍 Buscar Processos
           </h2>
 
           <div style={{ marginBottom: '20px' }}>
@@ -190,6 +248,79 @@ export default function Home() {
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Filtro de Comarcas */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+              Comarcas (opcional - deixe vazio para todas):
+            </label>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              <input
+                type="text"
+                value={comarcaFiltro}
+                onChange={(e) => setComarcaFiltro(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(comarcaFiltro)}
+                placeholder="Digite: São Paulo, Campinas, Piracicaba..."
+                list="comarcas-list"
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid #d1d5db',
+                  fontSize: '14px'
+                }}
+              />
+              <button
+                onClick={() => adicionarComarca(comarcaFiltro)}
+                style={{
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                + Adicionar
+              </button>
+            </div>
+            <datalist id="comarcas-list">
+              {comarcasDisponiveis.map(c => <option key={c} value={c} />)}
+            </datalist>
+
+            {comarcasSelecionadas.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {comarcasSelecionadas.map(c => (
+                  <span key={c} style={{
+                    backgroundColor: '#dbeafe',
+                    color: '#1e40af',
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    {c}
+                    <button 
+                      onClick={() => removerComarca(c)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc2626',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '16px',
+                        padding: 0
+                      }}
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
