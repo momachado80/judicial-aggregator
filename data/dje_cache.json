@@ -9,7 +9,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0114",
-      "comarca": "0114"
+      "comarca": "Campinas"
     },
     {
       "numero": "1009913-42.2024.8.26.0068",
@@ -20,7 +20,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0068",
-      "comarca": "0068"
+      "comarca": "Barueri"
     },
     {
       "numero": "1003477-80.2025.8.26.0602",
@@ -31,7 +31,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0602",
-      "comarca": "0602"
+      "comarca": "Sorocaba"
     },
     {
       "numero": "1037728-02.2016.8.26.0001",
@@ -42,7 +42,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0001",
-      "comarca": "0001"
+      "comarca": "Foro Regional I - Santana"
     },
     {
       "numero": "1015167-66.2025.8.26.0001",
@@ -53,7 +53,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0001",
-      "comarca": "0001"
+      "comarca": "Foro Regional I - Santana"
     },
     {
       "numero": "1012353-07.2022.8.26.0286",
@@ -64,7 +64,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0286",
-      "comarca": "0286"
+      "comarca": "Itu"
     },
     {
       "numero": "1000871-57.2025.8.26.0383",
@@ -75,7 +75,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0383",
-      "comarca": "0383"
+      "comarca": "Nhandeara"
     },
     {
       "numero": "1000495-48.2024.8.26.0596",
@@ -86,7 +86,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0596",
-      "comarca": "0596"
+      "comarca": "Serrana"
     },
     {
       "numero": "1000800-28.2025.8.26.0004",
@@ -97,7 +97,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0004",
-      "comarca": "0004"
+      "comarca": "Foro Regional IV - Lapa"
     },
     {
       "numero": "1011484-84.2025.8.26.0562",
@@ -108,7 +108,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0562",
-      "comarca": "0562"
+      "comarca": "Santos"
     },
     {
       "numero": "1016915-98.2023.8.26.0100",
@@ -119,7 +119,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1004063-56.2024.8.26.0666",
@@ -130,7 +130,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0666",
-      "comarca": "0666"
+      "comarca": "Artur Nogueira"
     },
     {
       "numero": "1032798-22.2021.8.26.0564",
@@ -141,7 +141,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0564",
-      "comarca": "0564"
+      "comarca": "São Bernardo do Campo"
     },
     {
       "numero": "1001265-84.2025.8.26.0150",
@@ -152,7 +152,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0150",
-      "comarca": "0150"
+      "comarca": "Cosmópolis"
     },
     {
       "numero": "0928950-30.1996.8.26.0100",
@@ -163,7 +163,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "0033465-32.2008.8.26.0224",
@@ -174,7 +174,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0224",
-      "comarca": "0224"
+      "comarca": "Guarulhos"
     },
     {
       "numero": "1013811-93.2025.8.26.0564",
@@ -185,7 +185,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0564",
-      "comarca": "0564"
+      "comarca": "São Bernardo do Campo"
     },
     {
       "numero": "1000089-93.2015.8.26.0579",
@@ -196,7 +196,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0579",
-      "comarca": "0579"
+      "comarca": "São Luiz do Paraitinga"
     },
     {
       "numero": "1007944-80.2025.8.26.0577",
@@ -207,7 +207,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0577",
-      "comarca": "0577"
+      "comarca": "São José dos Campos"
     },
     {
       "numero": "1022433-59.2024.8.26.0577",
@@ -218,7 +218,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0577",
-      "comarca": "0577"
+      "comarca": "São José dos Campos"
     },
     {
       "numero": "0035498-37.2012.8.26.0100",
@@ -229,7 +229,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1014819-38.2025.8.26.0554",
@@ -240,7 +240,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0554",
-      "comarca": "0554"
+      "comarca": "Santo André"
     },
     {
       "numero": "0016431-06.2000.8.26.0004",
@@ -251,7 +251,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0004",
-      "comarca": "0004"
+      "comarca": "Foro Regional IV - Lapa"
     },
     {
       "numero": "1074534-15.2025.8.26.0100",
@@ -262,7 +262,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1009065-96.2022.8.26.0562",
@@ -273,7 +273,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0562",
-      "comarca": "0562"
+      "comarca": "Santos"
     },
     {
       "numero": "1001522-93.2024.8.26.0005",
@@ -284,7 +284,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0005",
-      "comarca": "0005"
+      "comarca": "Foro Regional V - São Miguel Paulista"
     },
     {
       "numero": "1001614-03.2025.8.26.0663",
@@ -295,7 +295,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0663",
-      "comarca": "0663"
+      "comarca": "Votorantim"
     },
     {
       "numero": "1117522-22.2023.8.26.0100",
@@ -306,7 +306,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "0024301-52.2010.8.26.0554",
@@ -317,7 +317,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0554",
-      "comarca": "0554"
+      "comarca": "Santo André"
     },
     {
       "numero": "1000742-19.2025.8.26.0006",
@@ -328,7 +328,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0006",
-      "comarca": "0006"
+      "comarca": "Foro Regional VI - Penha de França"
     },
     {
       "numero": "1036274-97.2024.8.26.0003",
@@ -339,7 +339,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0003",
-      "comarca": "0003"
+      "comarca": "Foro Regional III - Jabaquara"
     },
     {
       "numero": "1029005-97.2021.8.26.0007",
@@ -350,7 +350,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0007",
-      "comarca": "0007"
+      "comarca": "Foro Regional VII - Itaquera"
     },
     {
       "numero": "1002588-02.2024.8.26.0008",
@@ -361,7 +361,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0008",
-      "comarca": "0008"
+      "comarca": "Foro Regional VIII - Tatuapé"
     },
     {
       "numero": "1001544-34.2024.8.26.0238",
@@ -372,7 +372,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0238",
-      "comarca": "0238"
+      "comarca": "Ibiúna"
     },
     {
       "numero": "1010811-24.2023.8.26.0510",
@@ -383,7 +383,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0510",
-      "comarca": "0510"
+      "comarca": "Rio Claro"
     },
     {
       "numero": "1044962-70.2019.8.26.0602",
@@ -394,7 +394,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0602",
-      "comarca": "0602"
+      "comarca": "Sorocaba"
     },
     {
       "numero": "1023976-22.2024.8.26.0602",
@@ -405,7 +405,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0602",
-      "comarca": "0602"
+      "comarca": "Sorocaba"
     },
     {
       "numero": "1001225-88.2023.8.26.0533",
@@ -416,7 +416,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0533",
-      "comarca": "0533"
+      "comarca": "Santa Bárbara d'Oeste"
     },
     {
       "numero": "1001638-45.2025.8.26.0238",
@@ -427,7 +427,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0238",
-      "comarca": "0238"
+      "comarca": "Ibiúna"
     },
     {
       "numero": "0000711-78.2025.8.26.0244",
@@ -438,7 +438,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0244",
-      "comarca": "0244"
+      "comarca": "Iguape"
     },
     {
       "numero": "1008161-43.2025.8.26.0248",
@@ -449,7 +449,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0248",
-      "comarca": "0248"
+      "comarca": "Indaiatuba"
     },
     {
       "numero": "1008169-20.2025.8.26.0248",
@@ -460,7 +460,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0248",
-      "comarca": "0248"
+      "comarca": "Indaiatuba"
     },
     {
       "numero": "1008189-11.2025.8.26.0248",
@@ -471,7 +471,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0248",
-      "comarca": "0248"
+      "comarca": "Indaiatuba"
     },
     {
       "numero": "1008197-85.2025.8.26.0248",
@@ -482,7 +482,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0248",
-      "comarca": "0248"
+      "comarca": "Indaiatuba"
     },
     {
       "numero": "1008198-70.2025.8.26.0248",
@@ -493,7 +493,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0248",
-      "comarca": "0248"
+      "comarca": "Indaiatuba"
     },
     {
       "numero": "1001127-05.2025.8.26.0252",
@@ -504,7 +504,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0252",
-      "comarca": "0252"
+      "comarca": "Ipaussu"
     },
     {
       "numero": "1001128-87.2025.8.26.0252",
@@ -515,7 +515,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0252",
-      "comarca": "0252"
+      "comarca": "Ipaussu"
     },
     {
       "numero": "1003872-07.2025.8.26.0268",
@@ -526,7 +526,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1501735-79.2025.8.26.0628",
@@ -537,7 +537,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0628",
-      "comarca": "0628"
+      "comarca": "Foro Plantão - Itapecerica da Serra"
     },
     {
       "numero": "1003927-55.2025.8.26.0268",
@@ -548,7 +548,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1003943-09.2025.8.26.0268",
@@ -559,7 +559,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1501595-58.2025.8.26.0268",
@@ -570,7 +570,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1003951-83.2025.8.26.0268",
@@ -581,7 +581,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1501557-46.2025.8.26.0268",
@@ -592,7 +592,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0268",
-      "comarca": "0268"
+      "comarca": "Itapecerica da Serra"
     },
     {
       "numero": "1005108-82.2025.8.26.0271",
@@ -603,7 +603,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0271",
-      "comarca": "0271"
+      "comarca": "Itapevi"
     },
     {
       "numero": "1000891-49.2025.8.26.0318",
@@ -614,7 +614,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0318",
-      "comarca": "0318"
+      "comarca": "Leme"
     },
     {
       "numero": "1002838-55.2025.8.26.0281",
@@ -625,7 +625,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0281",
-      "comarca": "0281"
+      "comarca": "Itatiba"
     },
     {
       "numero": "1001379-39.2025.8.26.0274",
@@ -636,7 +636,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0274",
-      "comarca": "0274"
+      "comarca": "Itápolis"
     },
     {
       "numero": "1001382-91.2025.8.26.0274",
@@ -647,7 +647,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0274",
-      "comarca": "0274"
+      "comarca": "Itápolis"
     },
     {
       "numero": "1001383-76.2025.8.26.0274",
@@ -658,7 +658,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0274",
-      "comarca": "0274"
+      "comarca": "Itápolis"
     },
     {
       "numero": "1502718-61.2025.8.26.0278",
@@ -669,7 +669,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0278",
-      "comarca": "0278"
+      "comarca": "Itaquaquecetuba"
     },
     {
       "numero": "1005884-61.2025.8.26.0278",
@@ -680,7 +680,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0278",
-      "comarca": "0278"
+      "comarca": "Itaquaquecetuba"
     },
     {
       "numero": "1005908-89.2025.8.26.0278",
@@ -691,7 +691,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0278",
-      "comarca": "0278"
+      "comarca": "Itaquaquecetuba"
     },
     {
       "numero": "1005924-43.2025.8.26.0278",
@@ -702,7 +702,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0278",
-      "comarca": "0278"
+      "comarca": "Itaquaquecetuba"
     },
     {
       "numero": "1005929-65.2025.8.26.0278",
@@ -713,7 +713,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0278",
-      "comarca": "0278"
+      "comarca": "Itaquaquecetuba"
     },
     {
       "numero": "1001519-58.2025.8.26.0279",
@@ -724,7 +724,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0279",
-      "comarca": "0279"
+      "comarca": "Itararé"
     },
     {
       "numero": "1003655-22.2025.8.26.0281",
@@ -735,7 +735,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0281",
-      "comarca": "0281"
+      "comarca": "Itatiba"
     },
     {
       "numero": "1003662-14.2025.8.26.0281",
@@ -746,7 +746,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0281",
-      "comarca": "0281"
+      "comarca": "Itatiba"
     },
     {
       "numero": "1003672-58.2025.8.26.0281",
@@ -757,7 +757,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0281",
-      "comarca": "0281"
+      "comarca": "Itatiba"
     },
     {
       "numero": "1054883-94.2025.8.26.0100",
@@ -768,7 +768,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1003269-59.2025.8.26.0291",
@@ -779,7 +779,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0291",
-      "comarca": "0291"
+      "comarca": "Jaboticabal"
     },
     {
       "numero": "1003285-13.2025.8.26.0291",
@@ -790,7 +790,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0291",
-      "comarca": "0291"
+      "comarca": "Jaboticabal"
     },
     {
       "numero": "1003288-65.2025.8.26.0291",
@@ -801,7 +801,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0291",
-      "comarca": "0291"
+      "comarca": "Jaboticabal"
     },
     {
       "numero": "1002824-57.2025.8.26.0318",
@@ -812,7 +812,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0318",
-      "comarca": "0318"
+      "comarca": "Leme"
     },
     {
       "numero": "1009305-30.2025.8.26.0320",
@@ -823,7 +823,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0320",
-      "comarca": "0320"
+      "comarca": "Limeira"
     },
     {
       "numero": "1009307-97.2025.8.26.0320",
@@ -834,7 +834,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0320",
-      "comarca": "0320"
+      "comarca": "Limeira"
     },
     {
       "numero": "1009301-90.2025.8.26.0320",
@@ -845,7 +845,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0320",
-      "comarca": "0320"
+      "comarca": "Limeira"
     },
     {
       "numero": "1003738-12.2025.8.26.0322",
@@ -856,7 +856,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0322",
-      "comarca": "0322"
+      "comarca": "Lins"
     },
     {
       "numero": "1005962-60.2025.8.26.0438",
@@ -867,7 +867,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0438",
-      "comarca": "0438"
+      "comarca": "Penápolis"
     },
     {
       "numero": "1003755-48.2025.8.26.0322",
@@ -878,7 +878,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0322",
-      "comarca": "0322"
+      "comarca": "Lins"
     },
     {
       "numero": "1003803-07.2025.8.26.0322",
@@ -889,7 +889,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0322",
-      "comarca": "0322"
+      "comarca": "Lins"
     },
     {
       "numero": "1503205-89.2025.8.26.0388",
@@ -900,7 +900,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0388",
-      "comarca": "0388"
+      "comarca": "Foro de Monte Mor"
     },
     {
       "numero": "1003813-51.2025.8.26.0322",
@@ -911,7 +911,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0322",
-      "comarca": "0322"
+      "comarca": "Lins"
     },
     {
       "numero": "1003827-35.2025.8.26.0322",
@@ -922,7 +922,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0322",
-      "comarca": "0322"
+      "comarca": "Lins"
     },
     {
       "numero": "1002113-92.2025.8.26.0337",
@@ -933,7 +933,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0337",
-      "comarca": "0337"
+      "comarca": "Mairinque"
     },
     {
       "numero": "1009426-83.2025.8.26.0344",
@@ -944,7 +944,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0344",
-      "comarca": "0344"
+      "comarca": "Marília"
     },
     {
       "numero": "1010671-32.2025.8.26.0344",
@@ -955,7 +955,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0344",
-      "comarca": "0344"
+      "comarca": "Marília"
     },
     {
       "numero": "1010735-42.2025.8.26.0344",
@@ -966,7 +966,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0344",
-      "comarca": "0344"
+      "comarca": "Marília"
     },
     {
       "numero": "1010738-94.2025.8.26.0344",
@@ -977,7 +977,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0344",
-      "comarca": "0344"
+      "comarca": "Marília"
     },
     {
       "numero": "1003274-10.2025.8.26.0347",
@@ -988,7 +988,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0347",
-      "comarca": "0347"
+      "comarca": "Matão"
     },
     {
       "numero": "1503897-14.2025.8.26.0348",
@@ -999,7 +999,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0348",
-      "comarca": "0348"
+      "comarca": "Mauá"
     },
     {
       "numero": "1503898-96.2025.8.26.0348",
@@ -1010,7 +1010,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0348",
-      "comarca": "0348"
+      "comarca": "Mauá"
     },
     {
       "numero": "1008370-03.2025.8.26.0348",
@@ -1021,7 +1021,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0348",
-      "comarca": "0348"
+      "comarca": "Mauá"
     },
     {
       "numero": "1008392-61.2025.8.26.0348",
@@ -1032,7 +1032,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0348",
-      "comarca": "0348"
+      "comarca": "Mauá"
     },
     {
       "numero": "1008393-46.2025.8.26.0348",
@@ -1043,7 +1043,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0348",
-      "comarca": "0348"
+      "comarca": "Mauá"
     },
     {
       "numero": "1001932-34.2025.8.26.0356",
@@ -1054,7 +1054,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0356",
-      "comarca": "0356"
+      "comarca": "Mirandópolis"
     },
     {
       "numero": "1004183-19.2025.8.26.0358",
@@ -1065,7 +1065,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0358",
-      "comarca": "0358"
+      "comarca": "Mirassol"
     },
     {
       "numero": "1006089-32.2025.8.26.0362",
@@ -1076,7 +1076,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006094-54.2025.8.26.0362",
@@ -1087,7 +1087,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006103-16.2025.8.26.0362",
@@ -1098,7 +1098,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006171-63.2025.8.26.0362",
@@ -1109,7 +1109,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006175-03.2025.8.26.0362",
@@ -1120,7 +1120,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006186-32.2025.8.26.0362",
@@ -1131,7 +1131,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006191-54.2025.8.26.0362",
@@ -1142,7 +1142,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006201-98.2025.8.26.0362",
@@ -1153,7 +1153,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1006206-23.2025.8.26.0362",
@@ -1164,7 +1164,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0362",
-      "comarca": "0362"
+      "comarca": "Mogi Guaçu"
     },
     {
       "numero": "1002832-93.2025.8.26.0363",
@@ -1175,7 +1175,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0363",
-      "comarca": "0363"
+      "comarca": "Mogi Mirim"
     },
     {
       "numero": "1002274-09.2025.8.26.0368",
@@ -1186,7 +1186,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0368",
-      "comarca": "0368"
+      "comarca": "Monte Alto"
     },
     {
       "numero": "1002281-98.2025.8.26.0368",
@@ -1197,7 +1197,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0368",
-      "comarca": "0368"
+      "comarca": "Monte Alto"
     },
     {
       "numero": "1002310-51.2025.8.26.0368",
@@ -1208,7 +1208,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0368",
-      "comarca": "0368"
+      "comarca": "Monte Alto"
     },
     {
       "numero": "1002320-95.2025.8.26.0368",
@@ -1219,7 +1219,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0368",
-      "comarca": "0368"
+      "comarca": "Monte Alto"
     },
     {
       "numero": "1001375-24.2025.8.26.0396",
@@ -1230,7 +1230,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0396",
-      "comarca": "0396"
+      "comarca": "Novo Horizonte"
     },
     {
       "numero": "1001377-91.2025.8.26.0396",
@@ -1241,7 +1241,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0396",
-      "comarca": "0396"
+      "comarca": "Novo Horizonte"
     },
     {
       "numero": "1020539-45.2025.8.26.0405",
@@ -1252,7 +1252,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020548-07.2025.8.26.0405",
@@ -1263,7 +1263,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020554-14.2025.8.26.0405",
@@ -1274,7 +1274,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020585-34.2025.8.26.0405",
@@ -1285,7 +1285,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020626-98.2025.8.26.0405",
@@ -1296,7 +1296,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020646-89.2025.8.26.0405",
@@ -1307,7 +1307,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020647-74.2025.8.26.0405",
@@ -1318,7 +1318,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1020674-57.2025.8.26.0405",
@@ -1329,7 +1329,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0405",
-      "comarca": "0405"
+      "comarca": "Osasco"
     },
     {
       "numero": "1004481-55.2025.8.26.0408",
@@ -1340,7 +1340,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0408",
-      "comarca": "0408"
+      "comarca": "Ourinhos"
     },
     {
       "numero": "1001267-32.2025.8.26.0416",
@@ -1351,7 +1351,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0416",
-      "comarca": "0416"
+      "comarca": "Panorama"
     },
     {
       "numero": "1001581-06.2025.8.26.0439",
@@ -1362,7 +1362,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0439",
-      "comarca": "0439"
+      "comarca": "Pereira Barreto"
     },
     {
       "numero": "1001588-95.2025.8.26.0439",
@@ -1373,7 +1373,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0439",
-      "comarca": "0439"
+      "comarca": "Pereira Barreto"
     },
     {
       "numero": "1001591-50.2025.8.26.0439",
@@ -1384,7 +1384,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0439",
-      "comarca": "0439"
+      "comarca": "Pereira Barreto"
     },
     {
       "numero": "1002867-13.2025.8.26.0441",
@@ -1395,7 +1395,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002889-71.2025.8.26.0441",
@@ -1406,7 +1406,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002900-03.2025.8.26.0441",
@@ -1417,7 +1417,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1015033-05.2025.8.26.0562",
@@ -1428,7 +1428,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0562",
-      "comarca": "0562"
+      "comarca": "Santos"
     },
     {
       "numero": "1002927-83.2025.8.26.0441",
@@ -1439,7 +1439,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002931-23.2025.8.26.0441",
@@ -1450,7 +1450,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002945-07.2025.8.26.0441",
@@ -1461,7 +1461,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002946-89.2025.8.26.0441",
@@ -1472,7 +1472,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "1002986-71.2025.8.26.0441",
@@ -1483,7 +1483,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0441",
-      "comarca": "0441"
+      "comarca": "Peruíbe"
     },
     {
       "numero": "0010216-31.2000.8.26.0451",
@@ -1494,7 +1494,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1505373-69.2025.8.26.0451",
@@ -1505,7 +1505,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1014142-26.2025.8.26.0451",
@@ -1516,7 +1516,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1014145-78.2025.8.26.0451",
@@ -1527,7 +1527,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1505376-24.2025.8.26.0451",
@@ -1538,7 +1538,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1014166-54.2025.8.26.0451",
@@ -1549,7 +1549,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1014187-30.2025.8.26.0451",
@@ -1560,7 +1560,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0451",
-      "comarca": "0451"
+      "comarca": "Piracicaba"
     },
     {
       "numero": "1001521-79.2025.8.26.0456",
@@ -1571,7 +1571,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0456",
-      "comarca": "0456"
+      "comarca": "Pirapozinho"
     },
     {
       "numero": "1001529-56.2025.8.26.0456",
@@ -1582,7 +1582,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0456",
-      "comarca": "0456"
+      "comarca": "Pirapozinho"
     },
     {
       "numero": "1001759-53.2025.8.26.0471",
@@ -1593,7 +1593,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0471",
-      "comarca": "0471"
+      "comarca": "Porto Feliz"
     },
     {
       "numero": "1001761-23.2025.8.26.0471",
@@ -1604,7 +1604,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0471",
-      "comarca": "0471"
+      "comarca": "Porto Feliz"
     },
     {
       "numero": "1001824-45.2025.8.26.0472",
@@ -1615,7 +1615,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0472",
-      "comarca": "0472"
+      "comarca": "Porto Ferreira"
     },
     {
       "numero": "1015344-42.2025.8.26.0482",
@@ -1626,7 +1626,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0482",
-      "comarca": "0482"
+      "comarca": "Presidente Prudente"
     },
     {
       "numero": "1015360-93.2025.8.26.0482",
@@ -1637,7 +1637,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0482",
-      "comarca": "0482"
+      "comarca": "Presidente Prudente"
     },
     {
       "numero": "1015364-33.2025.8.26.0482",
@@ -1648,7 +1648,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0482",
-      "comarca": "0482"
+      "comarca": "Presidente Prudente"
     },
     {
       "numero": "1015365-18.2025.8.26.0482",
@@ -1659,7 +1659,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0482",
-      "comarca": "0482"
+      "comarca": "Presidente Prudente"
     },
     {
       "numero": "1015376-47.2025.8.26.0482",
@@ -1670,7 +1670,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0482",
-      "comarca": "0482"
+      "comarca": "Presidente Prudente"
     },
     {
       "numero": "1002331-70.2025.8.26.0483",
@@ -1681,7 +1681,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0483",
-      "comarca": "0483"
+      "comarca": "Presidente Venceslau"
     },
     {
       "numero": "1002332-55.2025.8.26.0483",
@@ -1692,7 +1692,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0483",
-      "comarca": "0483"
+      "comarca": "Presidente Venceslau"
     },
     {
       "numero": "1002337-77.2025.8.26.0483",
@@ -1703,7 +1703,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0483",
-      "comarca": "0483"
+      "comarca": "Presidente Venceslau"
     },
     {
       "numero": "1002186-75.2025.8.26.0010",
@@ -1714,7 +1714,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0010",
-      "comarca": "0010"
+      "comarca": "Foro Regional X - Ipiranga"
     },
     {
       "numero": "1100498-10.2025.8.26.0100",
@@ -1725,7 +1725,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1011103-80.2025.8.26.0011",
@@ -1736,7 +1736,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0011",
-      "comarca": "0011"
+      "comarca": "Foro Regional XI - Pinheiros"
     },
     {
       "numero": "1100553-58.2025.8.26.0100",
@@ -1747,7 +1747,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1100561-35.2025.8.26.0100",
@@ -1758,7 +1758,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1008860-81.2025.8.26.0006",
@@ -1769,7 +1769,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0006",
-      "comarca": "0006"
+      "comarca": "Foro Regional VI - Penha de França"
     },
     {
       "numero": "1100695-62.2025.8.26.0100",
@@ -1780,7 +1780,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1100714-68.2025.8.26.0100",
@@ -1791,7 +1791,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1100726-82.2025.8.26.0100",
@@ -1802,7 +1802,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1099810-48.2025.8.26.0100",
@@ -1813,7 +1813,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1100889-62.2025.8.26.0100",
@@ -1824,7 +1824,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1100925-07.2025.8.26.0100",
@@ -1835,7 +1835,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101063-71.2025.8.26.0100",
@@ -1846,7 +1846,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101228-21.2025.8.26.0100",
@@ -1857,7 +1857,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101288-91.2025.8.26.0100",
@@ -1868,7 +1868,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101296-68.2025.8.26.0100",
@@ -1879,7 +1879,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101363-33.2025.8.26.0100",
@@ -1890,7 +1890,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101378-02.2025.8.26.0100",
@@ -1901,7 +1901,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101407-52.2025.8.26.0100",
@@ -1912,7 +1912,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     },
     {
       "numero": "1101422-21.2025.8.26.0100",
@@ -1923,7 +1923,7 @@
       "tem_imovel": false,
       "esta_ativo": true,
       "codigo_comarca": "0100",
-      "comarca": "São Paulo"
+      "comarca": "Foro Central Cível"
     }
   ],
   "version": "v4",

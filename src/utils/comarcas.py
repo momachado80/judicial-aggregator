@@ -213,6 +213,8 @@ COMARCAS_TJSP = {
     "0374": "Morro Agudo",
     "0382": "Neves Paulista",
     "0383": "Nhandeara",
+    "0388": "Foro de Monte Mor",
+    "0628": "Foro Plantão - Itapecerica da Serra",
     "0390": "Nova Granada",
     "0394": "Nova Odessa",
     "0396": "Novo Horizonte",
