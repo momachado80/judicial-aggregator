@@ -47,4 +47,4 @@ COPY --from=frontend-builder /app/web/out /app/web/out
 EXPOSE 8080
 
 # Comando para iniciar
-CMD uvicorn src.main:app --host 0.0.0.0 --port $PORT
+CMD uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
