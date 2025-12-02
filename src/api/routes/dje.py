@@ -8,15 +8,20 @@ from typing import List, Optional
 from pydantic import BaseModel
 import os
 
-router = APIRouter(prefix="/dje", tags=["DJE"])
+router = APIRouter(prefix="/api/dje", tags=["DJE"])
 
-# Database
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/judicial_aggregator")
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-engine = create_engine(DATABASE_URL)
+# Database - LAZY LOADING
+_engine = None
 Base = declarative_base()
+
+def get_engine():
+    global _engine
+    if _engine is None:
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/judicial_aggregator")
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        _engine = create_engine(DATABASE_URL)
+    return _engine
 
 class ProcessoDJE(Base):
     __tablename__ = "processos_dje"
@@ -59,7 +64,7 @@ class ProcessoDJEResponse(ProcessoDJECreate):
 # Dependency
 def get_db():
     from sqlalchemy.orm import sessionmaker
-    SessionLocal = sessionmaker(bind=engine)
+    SessionLocal = sessionmaker(bind=get_engine())
     db = SessionLocal()
     try:
         yield db
