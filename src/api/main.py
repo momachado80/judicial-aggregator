@@ -38,3 +38,4 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy", "port": os.getenv("PORT", "8000")}
+# v2.1
