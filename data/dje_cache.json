@@ -1926,5 +1926,8 @@
       "comarca": "São Paulo"
     }
   ],
-  "version": "v4"
+  "version": "v4",
+  "total_processos": 175,
+  "total_pdfs": 2073,
+  "data_indexacao": "2025-12-01T22:51:21.449744"
 }
