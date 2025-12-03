@@ -7,12 +7,26 @@ interface BuscarBody {
   quantidade: number;
   usar_cache: boolean;
   comarcas?: string[];
+  incluir_extintos?: boolean;
+}
+
+interface Processo {
+  numero: string;
+  tribunal: string;
+  tipo: string;
+  comarca: string;
+  data_ajuizamento: string;
+  valor_causa: number | null;
+  ultimo_movimento: string;
+  data_ultimo_movimento: string;
+  ativo: boolean;
+  url_tjsp: string;
 }
 
 export default function Home() {
   const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual']);
   const [quantidade, setQuantidade] = useState(100);
-  const [processos, setProcessos] = useState<any[]>([]);
+  const [processos, setProcessos] = useState<Processo[]>([]);
   const [loading, setLoading] = useState(false);
   const [interesseIds, setInteresseIds] = useState(new Set<string>());
   const [descartadosIds, setDescartadosIds] = useState(new Set<string>());
@@ -21,6 +35,7 @@ export default function Home() {
   const [comarcaFiltro, setComarcaFiltro] = useState('');
   const [comarcasSelecionadas, setComarcasSelecionadas] = useState<string[]>([]);
   const [comarcasDisponiveis, setComarcasDisponiveis] = useState<string[]>([]);
+  const [valorMinimo, setValorMinimo] = useState<number>(0);
 
   useEffect(() => {
     fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
@@ -49,7 +64,8 @@ export default function Home() {
         tribunais: ['TJSP'],
         tipos_processo: tiposSelecionados,
         quantidade: quantidade,
-        usar_cache: false
+        usar_cache: false,
+        incluir_extintos: false
       };
       
       if (comarcasSelecionadas.length > 0) {
@@ -93,9 +109,17 @@ export default function Home() {
     setInteresseIds(inter);
   };
 
-  const processosBusca = processos.filter(p => !interesseIds.has(p.numero) && !descartadosIds.has(p.numero));
-  const processosInteresse = processos.filter(p => interesseIds.has(p.numero));
-  const processosDescartados = processos.filter(p => descartadosIds.has(p.numero));
+  // Filtrar por valor mínimo
+  const processosFilrados = processos.filter(p => {
+    if (valorMinimo > 0 && p.valor_causa) {
+      return p.valor_causa >= valorMinimo;
+    }
+    return true;
+  });
+
+  const processosBusca = processosFilrados.filter(p => !interesseIds.has(p.numero) && !descartadosIds.has(p.numero));
+  const processosInteresse = processosFilrados.filter(p => interesseIds.has(p.numero));
+  const processosDescartados = processosFilrados.filter(p => descartadosIds.has(p.numero));
 
   const formatarData = (data: string) => {
     if (!data) return '-';
@@ -109,46 +133,81 @@ export default function Home() {
     return n;
   };
 
-  const linkTJSP = (numero: string) => {
-    const f = formatarNumero(numero);
-    return `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&numeroDigitoAnoUnificado=${f.slice(0,15)}&foroNumeroUnificado=${f.slice(21,25)}&dadosConsulta.valorConsultaNuUnificado=${f}`;
+  const formatarValor = (valor: number | null) => {
+    if (!valor) return 'Não informado';
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  const ProcessoCard = ({ processo }: { processo: any }) => (
-    <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: '1px solid #e5e7eb' }}>
-      <div style={{ marginBottom: '12px' }}>
-        <p style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
-        <a href={linkTJSP(processo.numero)} target="_blank" rel="noopener noreferrer"
-          style={{ color: '#2563eb', fontFamily: 'monospace', fontSize: '12px', fontWeight: '600', textDecoration: 'none', display: 'block', padding: '8px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe' }}>
-          🔗 {formatarNumero(processo.numero)}
-        </a>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-        <div>
-          <p style={{ fontSize: '11px', color: '#6b7280' }}>Tipo:</p>
-          <p style={{ fontWeight: '600', fontSize: '14px', margin: 0 }}>{processo.tipo}</p>
+  const ProcessoCard = ({ processo }: { processo: Processo }) => {
+    const temValorAlto = processo.valor_causa && processo.valor_causa >= 100000;
+    
+    return (
+      <div style={{ 
+        backgroundColor: 'white', 
+        padding: '20px', 
+        borderRadius: '12px', 
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+        border: temValorAlto ? '2px solid #10b981' : '1px solid #e5e7eb'
+      }}>
+        {temValorAlto && (
+          <div style={{ backgroundColor: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', marginBottom: '12px', display: 'inline-block' }}>
+            💰 ALTO VALOR - PROVÁVEL IMÓVEL
+          </div>
+        )}
+        
+        <div style={{ marginBottom: '12px' }}>
+          <p style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Número:</p>
+          <a href={processo.url_tjsp} target="_blank" rel="noopener noreferrer"
+            style={{ color: '#2563eb', fontFamily: 'monospace', fontSize: '12px', fontWeight: '600', textDecoration: 'none', display: 'block', padding: '8px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe' }}>
+            🔗 {formatarNumero(processo.numero)}
+          </a>
         </div>
-        <div>
-          <p style={{ fontSize: '11px', color: '#6b7280' }}>Data:</p>
-          <p style={{ fontWeight: '600', fontSize: '14px', margin: 0 }}>{formatarData(processo.data_ajuizamento)}</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+          <div>
+            <p style={{ fontSize: '11px', color: '#6b7280' }}>Tipo:</p>
+            <p style={{ fontWeight: '600', fontSize: '14px', margin: 0 }}>{processo.tipo}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '11px', color: '#6b7280' }}>Data:</p>
+            <p style={{ fontWeight: '600', fontSize: '14px', margin: 0 }}>{formatarData(processo.data_ajuizamento)}</p>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '12px' }}>
+          <p style={{ fontSize: '11px', color: '#6b7280' }}>Comarca:</p>
+          <p style={{ fontWeight: '600', color: '#7c3aed', fontSize: '14px', margin: 0 }}>{processo.comarca}</p>
+        </div>
+
+        <div style={{ marginBottom: '12px', padding: '10px', backgroundColor: temValorAlto ? '#dcfce7' : '#f9fafb', borderRadius: '8px' }}>
+          <p style={{ fontSize: '11px', color: '#6b7280' }}>Valor da Causa:</p>
+          <p style={{ fontWeight: 'bold', fontSize: '16px', margin: 0, color: temValorAlto ? '#166534' : '#374151' }}>
+            {formatarValor(processo.valor_causa)}
+          </p>
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <p style={{ fontSize: '11px', color: '#6b7280' }}>Último Movimento ({processo.data_ultimo_movimento}):</p>
+          <p style={{ fontSize: '13px', margin: 0, color: '#374151' }}>{processo.ultimo_movimento || '-'}</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+          <button onClick={() => marcarInteresse(processo.numero)} style={{ backgroundColor: '#10b981', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>⭐ Interesse</button>
+          <a href={processo.url_tjsp} target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#3b82f6', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px', textAlign: 'center', textDecoration: 'none' }}>🔍 Ver TJSP</a>
+          <button onClick={() => marcarDescartado(processo.numero)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>🗑️ Descartar</button>
         </div>
       </div>
-      <div style={{ marginBottom: '16px' }}>
-        <p style={{ fontSize: '11px', color: '#6b7280' }}>Comarca:</p>
-        <p style={{ fontWeight: '600', color: '#7c3aed', fontSize: '14px', margin: 0 }}>{processo.comarca}</p>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-        <button onClick={() => marcarInteresse(processo.numero)} style={{ backgroundColor: '#10b981', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>⭐ Interesse</button>
-        <button onClick={() => marcarDescartado(processo.numero)} style={{ backgroundColor: '#ef4444', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '13px' }}>🗑️ Descartar</button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const getProcessosAba = () => {
     if (abaAtiva === 'interesse') return processosInteresse;
     if (abaAtiva === 'descartados') return processosDescartados;
     return processosBusca;
   };
+
+  const processosComValor = processos.filter(p => p.valor_causa && p.valor_causa > 0).length;
+  const processosAltoValor = processos.filter(p => p.valor_causa && p.valor_causa >= 100000).length;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
@@ -193,11 +252,27 @@ export default function Home() {
             )}
           </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade:</label>
-            <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-              <option value={50}>50</option><option value={100}>100</option><option value={200}>200</option><option value={500}>500</option><option value={1000}>1000</option>
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade:</label>
+              <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
+                <option value={100}>100</option>
+                <option value={200}>200</option>
+                <option value={500}>500</option>
+                <option value={1000}>1000</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor mínimo da causa:</label>
+              <select value={valorMinimo} onChange={(e) => setValorMinimo(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
+                <option value={0}>Todos os valores</option>
+                <option value={50000}>Acima de R$ 50.000</option>
+                <option value={100000}>Acima de R$ 100.000</option>
+                <option value={200000}>Acima de R$ 200.000</option>
+                <option value={500000}>Acima de R$ 500.000</option>
+                <option value={1000000}>Acima de R$ 1.000.000</option>
+              </select>
+            </div>
           </div>
 
           <button onClick={buscarProcessos} disabled={loading || tiposSelecionados.length === 0} style={{ width: '100%', background: loading ? '#9ca3af' : 'linear-gradient(to right, #4f46e5, #7c3aed)', color: 'white', padding: '16px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer' }}>
@@ -207,11 +282,33 @@ export default function Home() {
 
         {processos.length > 0 && (
           <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '20px' }}>
-              <div style={{ backgroundColor: '#dcfce7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}><p style={{ fontSize: '28px', fontWeight: 'bold', color: '#166534', margin: 0 }}>{processos.length}</p><p style={{ fontSize: '13px', color: '#166534', margin: 0 }}>Total</p></div>
-              <div style={{ backgroundColor: '#fef3c7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}><p style={{ fontSize: '28px', fontWeight: 'bold', color: '#92400e', margin: 0 }}>{processosInteresse.length}</p><p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Interesse</p></div>
-              <div style={{ backgroundColor: '#fee2e2', padding: '16px', borderRadius: '8px', textAlign: 'center' }}><p style={{ fontSize: '28px', fontWeight: 'bold', color: '#991b1b', margin: 0 }}>{processosDescartados.length}</p><p style={{ fontSize: '13px', color: '#991b1b', margin: 0 }}>Descartados</p></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
+              <div style={{ backgroundColor: '#dcfce7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#166534', margin: 0 }}>{processos.length}</p>
+                <p style={{ fontSize: '13px', color: '#166534', margin: 0 }}>Total Ativos</p>
+              </div>
+              <div style={{ backgroundColor: '#d1fae5', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#065f46', margin: 0 }}>{processosAltoValor}</p>
+                <p style={{ fontSize: '13px', color: '#065f46', margin: 0 }}>Alto Valor (&gt;100k)</p>
+              </div>
+              <div style={{ backgroundColor: '#fef3c7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#92400e', margin: 0 }}>{processosInteresse.length}</p>
+                <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Interesse</p>
+              </div>
+              <div style={{ backgroundColor: '#fee2e2', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#991b1b', margin: 0 }}>{processosDescartados.length}</p>
+                <p style={{ fontSize: '13px', color: '#991b1b', margin: 0 }}>Descartados</p>
+              </div>
             </div>
+
+            {processosComValor < processos.length && (
+              <div style={{ backgroundColor: '#fef3c7', padding: '12px', borderRadius: '8px', marginBottom: '20px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
+                  ⚠️ {processos.length - processosComValor} processos não têm valor da causa informado na API.
+                  Use o botão "Ver TJSP" para verificar detalhes.
+                </p>
+              </div>
+            )}
 
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
               <button onClick={() => setAbaAtiva('busca')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'busca' ? '#4f46e5' : '#e5e7eb', color: abaAtiva === 'busca' ? 'white' : '#374151' }}>📋 Busca ({processosBusca.length})</button>
@@ -219,7 +316,7 @@ export default function Home() {
               <button onClick={() => setAbaAtiva('descartados')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'descartados' ? '#6b7280' : '#e5e7eb', color: abaAtiva === 'descartados' ? 'white' : '#374151' }}>🗑️ Descartados ({processosDescartados.length})</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '16px' }}>
               {getProcessosAba().map(p => <ProcessoCard key={p.numero} processo={p} />)}
             </div>
 
