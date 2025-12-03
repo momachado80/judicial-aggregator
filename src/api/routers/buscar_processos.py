@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 import requests
-from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, formatar_numero_cnj
-from src.utils.cache_datajud import ler_cache, salvar_cache, filtrar_processos, status_cache
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP
 
 router = APIRouter()
 
@@ -11,171 +10,153 @@ class BuscarProcessosRequest(BaseModel):
     tribunais: List[str]
     tipos_processo: List[str]
     comarcas: Optional[List[str]] = None
-    valor_causa_min: Optional[float] = None
-    valor_causa_max: Optional[float] = None
-    data_inicio: Optional[str] = None  # YYYY-MM-DD
-    data_fim: Optional[str] = None     # YYYY-MM-DD
-    ano: Optional[int] = None
-    quantidade: int = 50
-    usar_cache: bool = True  # Novo: permite desabilitar cache
+    quantidade: int = 100
+    usar_cache: bool = True
+    incluir_extintos: bool = False  # Por padrão, exclui extintos
 
 TIPOS_PROCESSO_MAPPING = {
     "Inventário": 39,
-    "Divórcio Litigioso": 12541, 
+    "Divórcio Litigioso": 12541,
     "Divórcio Consensual": 12372
 }
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
+# Movimentos que indicam processo extinto/arquivado
+MOVIMENTOS_EXTINTOS = {"Definitivo", "Arquivado", "Baixa Definitiva", "Trânsito em Julgado"}
 
-async def _buscar_api_cnj(tribunal: str, tipo: str, quantidade: int = 1000) -> List[Dict]:
-    """
-    Busca processos diretamente na API do CNJ (SEM CACHE)
 
-    Returns:
-        Lista de processos
-    """
-    tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, "289")
+def get_codigo_comarca_por_nome(nome: str) -> Optional[str]:
+    nome_lower = nome.lower().strip()
+    for codigo, nome_comarca in COMARCAS_TJSP.items():
+        if nome_lower == nome_comarca.lower():
+            return codigo
+    for codigo, nome_comarca in COMARCAS_TJSP.items():
+        if nome_lower in nome_comarca.lower() or nome_comarca.lower() in nome_lower:
+            return codigo
+    return None
 
+
+def processo_esta_ativo(movimentos: List[Dict]) -> bool:
+    """Verifica se processo está ativo baseado no último movimento"""
+    if not movimentos:
+        return True  # Sem movimentos = assumir ativo
+    ultimo = movimentos[-1]
+    nome_mov = ultimo.get("nome", "")
+    return nome_mov not in MOVIMENTOS_EXTINTOS
+
+
+def extrair_dados_processo(source: Dict, tribunal: str, tipo: str) -> Optional[Dict]:
+    """Extrai dados do processo do resultado da API"""
+    numero = source.get("numeroProcesso", "")
+    if not numero:
+        return None
+    
+    movimentos = source.get("movimentos", [])
+    ultimo_mov = movimentos[-1] if movimentos else {}
+    
+    codigo = extrair_codigo_comarca(numero)
+    nome_comarca = get_comarca_nome(codigo, tribunal)
+    
+    return {
+        "numero": numero,
+        "tribunal": tribunal,
+        "tipo": tipo,
+        "comarca": nome_comarca,
+        "codigo_comarca": codigo,
+        "valor_causa": source.get("valorCausa"),
+        "data_ajuizamento": source.get("dataAjuizamento"),
+        "ultimo_movimento": ultimo_mov.get("nome", ""),
+        "ativo": processo_esta_ativo(movimentos),
+        "total_movimentos": len(movimentos),
+        "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
+    }
+
+
+async def _buscar_api_cnj(tribunal: str, tipo: str, codigo_comarca: Optional[str], quantidade: int) -> List[Dict]:
+    """Busca processos na API DataJud"""
+    tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
-
+    
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"APIKey {DATAJUD_API_KEY}"
     }
-
+    
+    must_clauses = [{"term": {"classe.codigo": tipo_cod}}]
+    if codigo_comarca:
+        must_clauses.append({"wildcard": {"numeroProcesso": f"*{codigo_comarca}"}})
+    
     query = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"term": {"classe.codigo": tipo_cod}}
-                ]
-            }
-        },
+        "query": {"bool": {"must": must_clauses}},
         "size": min(quantidade, 1000),
         "sort": [{"dataAjuizamento": {"order": "desc"}}]
     }
-
+    
     try:
-        response = requests.post(url, headers=headers, json=query, timeout=30)
-
+        response = requests.post(url, headers=headers, json=query, timeout=60)
         if response.status_code != 200:
-            print(f"❌ Erro API CNJ: {response.status_code}")
+            print(f"❌ Erro API: {response.status_code}")
             return []
-
+        
         data = response.json()
         hits = data.get("hits", {}).get("hits", [])
-
-        print(f"✅ API CNJ retornou {len(hits)} processos")
-
+        
         processos = []
         for hit in hits:
-            source = hit.get("_source", {})
-            numero = source.get("numeroProcesso", "")
-
-            if not numero:
-                continue
-
-            # Extrair comarca
-            codigo_comarca = extrair_codigo_comarca(numero)
-            nome_comarca = get_comarca_nome(codigo_comarca, tribunal)
-
-            # Número limpo (sem formatação)
-            numero_limpo = numero.replace("-", "").replace(".", "")
-
-            # URL corrigida para TJSP
-            url_tjsp = None
-            if tribunal == "TJSP":
-                url_tjsp = f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo={numero_limpo}"
-
-            processo = {
-                "numero": numero,
-                "tribunal": tribunal,
-                "tipo": tipo,
-                "comarca": nome_comarca,
-                "codigo_comarca": codigo_comarca,
-                "valor_causa": source.get("valorCausa"),
-                "data_ajuizamento": source.get("dataAjuizamento"),
-                "url_tjsp": url_tjsp
-            }
-
-            processos.append(processo)
-
+            proc = extrair_dados_processo(hit.get("_source", {}), tribunal, tipo)
+            if proc:
+                processos.append(proc)
+        
         return processos
-
     except Exception as e:
-        print(f"❌ Erro ao chamar API CNJ: {e}")
+        print(f"❌ Erro: {e}")
         return []
+
 
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
-    """
-    🚀 Busca processos na API DataJud com CACHE INTELIGENTE
-
-    VELOCIDADE:
-    - Primeira busca: 5-30s (chama API CNJ)
-    - Buscas seguintes: < 1s (usa cache local válido por 24h)
-
-    FILTROS:
-    - Tribunal, tipo, comarca, valor, data
-    - Expandir "São Paulo" para todos foros da capital
-    """
+    """Busca processos na API DataJud"""
     try:
-        print(f"\n{'='*80}")
-        print(f"🔍 BUSCA API DATAJUD")
-        print(f"Comarcas: {request.comarcas}")
-        print(f"Cache: {'Habilitado' if request.usar_cache else 'Desabilitado'}")
-        print(f"{'='*80}")
-
-        # Expandir "São Paulo" para todos os foros da capital
-        from src.utils.comarcas import expandir_sao_paulo
-        if request.comarcas:
-            request.comarcas = expandir_sao_paulo(request.comarcas)
-
         todos_processos = []
-
-        for tribunal in request.tribunais:
-            for tipo in request.tipos_processo:
-                # TENTAR LER DO CACHE PRIMEIRO
-                cache_data = None
-                if request.usar_cache:
-                    cache_data = ler_cache(tribunal, tipo)
-
-                if cache_data:
-                    # CACHE VÁLIDO - BUSCA INSTANTÂNEA!
-                    print(f"⚡ Usando cache para {tribunal} - {tipo}")
-                    processos_cache = cache_data.get("processos", [])
-                else:
-                    # CACHE INVÁLIDO - CHAMAR API CNJ
-                    print(f"🌐 Chamando API CNJ para {tribunal} - {tipo}...")
-                    processos_cache = await _buscar_api_cnj(tribunal, tipo, request.quantidade)
-
-                    # Salvar no cache
-                    if processos_cache:
-                        salvar_cache(tribunal, tipo, processos_cache)
-
-                # Adicionar processos
-                todos_processos.extend(processos_cache)
-
-        # APLICAR FILTROS (comarca, valor, data) - INSTANTÂNEO!
-        print(f"\n📊 Total antes de filtros: {len(todos_processos)}")
-
-        processos_filtrados = filtrar_processos(
-            processos=todos_processos,
-            comarcas=request.comarcas,
-            valor_min=request.valor_causa_min,
-            valor_max=request.valor_causa_max,
-            data_inicio=request.data_inicio,
-            data_fim=request.data_fim
-        )
-
-        print(f"✅ Total após filtros: {len(processos_filtrados)}")
-        print(f"{'='*80}\n")
-
-        # Limitar quantidade
-        resultado = processos_filtrados[:request.quantidade]
-
-        return resultado
+        qtd_por_tipo = max(request.quantidade // len(request.tipos_processo), 100)
+        
+        if request.comarcas and len(request.comarcas) > 0:
+            for comarca_nome in request.comarcas:
+                codigo = get_codigo_comarca_por_nome(comarca_nome)
+                if not codigo:
+                    print(f"⚠️ Comarca não encontrada: {comarca_nome}")
+                    continue
+                
+                for tribunal in request.tribunais:
+                    for tipo in request.tipos_processo:
+                        # Buscar mais para compensar os extintos que serão filtrados
+                        processos = await _buscar_api_cnj(tribunal, tipo, codigo, qtd_por_tipo * 3)
+                        todos_processos.extend(processos)
+        else:
+            for tribunal in request.tribunais:
+                for tipo in request.tipos_processo:
+                    processos = await _buscar_api_cnj(tribunal, tipo, None, qtd_por_tipo)
+                    todos_processos.extend(processos)
+        
+        # Filtrar extintos se necessário
+        if not request.incluir_extintos:
+            antes = len(todos_processos)
+            todos_processos = [p for p in todos_processos if p.get("ativo", True)]
+            print(f"📊 Filtrados {antes - len(todos_processos)} processos extintos")
+        
+        # Remover duplicados
+        vistos = set()
+        unicos = []
+        for p in todos_processos:
+            if p["numero"] not in vistos:
+                vistos.add(p["numero"])
+                unicos.append(p)
+        
+        # Ordenar por data
+        unicos.sort(key=lambda x: x.get("data_ajuizamento", ""), reverse=True)
+        
+        return unicos[:request.quantidade]
         
     except Exception as e:
         print(f"💥 ERRO: {e}")
@@ -184,51 +165,10 @@ async def buscar_processos(request: BuscarProcessosRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/cache/status")
-async def cache_status_api():
-    """
-    📊 Status do cache DataJud
-
-    Retorna informações sobre caches existentes:
-    - Total de arquivos
-    - Tamanho total
-    - Validade (24h)
-    - Lista de caches com detalhes
-    """
-    return status_cache()
-
-
-@router.post("/cache/limpar")
-async def limpar_cache_api():
-    """
-    🗑️ Limpar caches expirados (> 24h)
-
-    Remove apenas caches expirados.
-    Caches válidos são mantidos para buscas instantâneas.
-    """
-    from src.utils.cache_datajud import limpar_cache_expirado
-
-    removidos = limpar_cache_expirado()
-
-    return {
-        "status": "concluído",
-        "caches_removidos": removidos,
-        "mensagem": f"Removidos {removidos} caches expirados"
-    }
-
-
 @router.get("/comarcas")
 async def listar_comarcas():
-    """
-    Lista todas as comarcas disponíveis para TJSP e TJBA
-    """
     from src.utils.comarcas import COMARCAS_TJSP, COMARCAS_TJBA
-    
-    # Extrair apenas os nomes das comarcas (sem códigos duplicados)
-    tjsp_nomes = sorted(set(COMARCAS_TJSP.values()))
-    tjba_nomes = sorted(set(COMARCAS_TJBA.values()))
-    
     return {
-        "TJSP": tjsp_nomes,
-        "TJBA": tjba_nomes
+        "TJSP": sorted(set(COMARCAS_TJSP.values())),
+        "TJBA": sorted(set(COMARCAS_TJBA.values()))
     }
