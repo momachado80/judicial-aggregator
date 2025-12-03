@@ -2,9 +2,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 import requests
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP
 
 router = APIRouter()
+executor = ThreadPoolExecutor(max_workers=10)
 
 class BuscarProcessosRequest(BaseModel):
     tribunais: List[str]
@@ -12,7 +15,7 @@ class BuscarProcessosRequest(BaseModel):
     comarcas: Optional[List[str]] = None
     quantidade: int = 100
     usar_cache: bool = True
-    incluir_extintos: bool = False  # Por padrão, exclui extintos
+    incluir_extintos: bool = False
 
 TIPOS_PROCESSO_MAPPING = {
     "Inventário": 39,
@@ -21,9 +24,7 @@ TIPOS_PROCESSO_MAPPING = {
 }
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
-
-# Movimentos que indicam processo extinto/arquivado
-MOVIMENTOS_EXTINTOS = {"Definitivo", "Arquivado", "Baixa Definitiva", "Trânsito em Julgado"}
+MOVIMENTOS_EXTINTOS = {"Definitivo", "Arquivado", "Baixa Definitiva"}
 
 
 def get_codigo_comarca_por_nome(nome: str) -> Optional[str]:
@@ -32,49 +33,20 @@ def get_codigo_comarca_por_nome(nome: str) -> Optional[str]:
         if nome_lower == nome_comarca.lower():
             return codigo
     for codigo, nome_comarca in COMARCAS_TJSP.items():
-        if nome_lower in nome_comarca.lower() or nome_comarca.lower() in nome_lower:
+        if nome_lower in nome_comarca.lower():
             return codigo
     return None
 
 
 def processo_esta_ativo(movimentos: List[Dict]) -> bool:
-    """Verifica se processo está ativo baseado no último movimento"""
     if not movimentos:
-        return True  # Sem movimentos = assumir ativo
+        return True
     ultimo = movimentos[-1]
-    nome_mov = ultimo.get("nome", "")
-    return nome_mov not in MOVIMENTOS_EXTINTOS
+    return ultimo.get("nome", "") not in MOVIMENTOS_EXTINTOS
 
 
-def extrair_dados_processo(source: Dict, tribunal: str, tipo: str) -> Optional[Dict]:
-    """Extrai dados do processo do resultado da API"""
-    numero = source.get("numeroProcesso", "")
-    if not numero:
-        return None
-    
-    movimentos = source.get("movimentos", [])
-    ultimo_mov = movimentos[-1] if movimentos else {}
-    
-    codigo = extrair_codigo_comarca(numero)
-    nome_comarca = get_comarca_nome(codigo, tribunal)
-    
-    return {
-        "numero": numero,
-        "tribunal": tribunal,
-        "tipo": tipo,
-        "comarca": nome_comarca,
-        "codigo_comarca": codigo,
-        "valor_causa": source.get("valorCausa"),
-        "data_ajuizamento": source.get("dataAjuizamento"),
-        "ultimo_movimento": ultimo_mov.get("nome", ""),
-        "ativo": processo_esta_ativo(movimentos),
-        "total_movimentos": len(movimentos),
-        "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
-    }
-
-
-async def _buscar_api_cnj(tribunal: str, tipo: str, codigo_comarca: Optional[str], quantidade: int) -> List[Dict]:
-    """Busca processos na API DataJud"""
+def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quantidade: int) -> List[Dict]:
+    """Busca síncrona para usar com ThreadPoolExecutor"""
     tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
@@ -94,9 +66,8 @@ async def _buscar_api_cnj(tribunal: str, tipo: str, codigo_comarca: Optional[str
     }
     
     try:
-        response = requests.post(url, headers=headers, json=query, timeout=60)
+        response = requests.post(url, headers=headers, json=query, timeout=30)
         if response.status_code != 200:
-            print(f"❌ Erro API: {response.status_code}")
             return []
         
         data = response.json()
@@ -104,9 +75,26 @@ async def _buscar_api_cnj(tribunal: str, tipo: str, codigo_comarca: Optional[str
         
         processos = []
         for hit in hits:
-            proc = extrair_dados_processo(hit.get("_source", {}), tribunal, tipo)
-            if proc:
-                processos.append(proc)
+            source = hit.get("_source", {})
+            numero = source.get("numeroProcesso", "")
+            if not numero:
+                continue
+            
+            movimentos = source.get("movimentos", [])
+            ultimo_mov = movimentos[-1] if movimentos else {}
+            codigo = extrair_codigo_comarca(numero)
+            
+            processos.append({
+                "numero": numero,
+                "tribunal": tribunal,
+                "tipo": tipo,
+                "comarca": get_comarca_nome(codigo, tribunal),
+                "codigo_comarca": codigo,
+                "data_ajuizamento": source.get("dataAjuizamento"),
+                "ultimo_movimento": ultimo_mov.get("nome", ""),
+                "ativo": processo_esta_ativo(movimentos),
+                "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
+            })
         
         return processos
     except Exception as e:
@@ -116,39 +104,57 @@ async def _buscar_api_cnj(tribunal: str, tipo: str, codigo_comarca: Optional[str
 
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
-    """Busca processos na API DataJud"""
+    """Busca processos em paralelo para máxima velocidade"""
     try:
-        todos_processos = []
-        qtd_por_tipo = max(request.quantidade // len(request.tipos_processo), 100)
+        loop = asyncio.get_event_loop()
+        tasks = []
         
-        if request.comarcas and len(request.comarcas) > 0:
-            for comarca_nome in request.comarcas:
-                codigo = get_codigo_comarca_por_nome(comarca_nome)
-                if not codigo:
-                    print(f"⚠️ Comarca não encontrada: {comarca_nome}")
-                    continue
-                
+        codigos_comarca = []
+        if request.comarcas:
+            for nome in request.comarcas:
+                codigo = get_codigo_comarca_por_nome(nome)
+                if codigo:
+                    codigos_comarca.append(codigo)
+        
+        # Criar tasks para busca em paralelo
+        if codigos_comarca:
+            for codigo in codigos_comarca:
                 for tribunal in request.tribunais:
                     for tipo in request.tipos_processo:
-                        # Buscar mais para compensar os extintos que serão filtrados
-                        processos = await _buscar_api_cnj(tribunal, tipo, codigo, qtd_por_tipo * 3)
-                        todos_processos.extend(processos)
+                        task = loop.run_in_executor(
+                            executor, 
+                            _buscar_sync, 
+                            tribunal, tipo, codigo, 
+                            request.quantidade
+                        )
+                        tasks.append(task)
         else:
             for tribunal in request.tribunais:
                 for tipo in request.tipos_processo:
-                    processos = await _buscar_api_cnj(tribunal, tipo, None, qtd_por_tipo)
-                    todos_processos.extend(processos)
+                    task = loop.run_in_executor(
+                        executor,
+                        _buscar_sync,
+                        tribunal, tipo, None,
+                        request.quantidade // len(request.tipos_processo)
+                    )
+                    tasks.append(task)
         
-        # Filtrar extintos se necessário
+        # Executar todas em paralelo
+        resultados = await asyncio.gather(*tasks)
+        
+        # Combinar resultados
+        todos = []
+        for r in resultados:
+            todos.extend(r)
+        
+        # Filtrar extintos
         if not request.incluir_extintos:
-            antes = len(todos_processos)
-            todos_processos = [p for p in todos_processos if p.get("ativo", True)]
-            print(f"📊 Filtrados {antes - len(todos_processos)} processos extintos")
+            todos = [p for p in todos if p.get("ativo", True)]
         
         # Remover duplicados
         vistos = set()
         unicos = []
-        for p in todos_processos:
+        for p in todos:
             if p["numero"] not in vistos:
                 vistos.add(p["numero"])
                 unicos.append(p)
