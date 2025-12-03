@@ -25,13 +25,17 @@ TIPOS_PROCESSO_MAPPING = {
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
-# Movimentos que indicam processo extinto/arquivado
-MOVIMENTOS_EXTINTOS = {
-    "Definitivo", 
-    "Baixa Definitiva", 
-    "Arquivado",
-    "Arquivamento",
-    "Trânsito em Julgado"
+# Movimentos que indicam processo NÃO ATIVO
+MOVIMENTOS_INATIVOS = {
+    "definitivo", 
+    "baixa definitiva", 
+    "arquivado",
+    "arquivamento",
+    "trânsito em julgado",
+    "suspenso",
+    "suspensão",
+    "arquivado provisoriamente",
+    "provisório"  # "Arquivado Provisoriamente" aparece como "Provisório" às vezes
 }
 
 
@@ -47,35 +51,29 @@ def get_codigo_comarca_por_nome(nome: str) -> Optional[str]:
 
 
 def get_ultimo_movimento(movimentos: List[Dict]) -> Dict:
-    """Retorna o movimento mais recente ordenando por data"""
     if not movimentos:
         return {}
-    
-    # Ordenar por dataHora (mais recente primeiro)
-    movs_ordenados = sorted(
-        movimentos, 
-        key=lambda m: m.get("dataHora", ""), 
-        reverse=True
-    )
+    movs_ordenados = sorted(movimentos, key=lambda m: m.get("dataHora", ""), reverse=True)
     return movs_ordenados[0] if movs_ordenados else {}
 
 
 def processo_esta_ativo(movimentos: List[Dict]) -> bool:
-    """Verifica se processo está ativo baseado no movimento MAIS RECENTE"""
+    """Verifica se processo está REALMENTE ativo"""
     ultimo = get_ultimo_movimento(movimentos)
     if not ultimo:
-        return True  # Sem movimentos = assumir ativo
+        return True
     
-    nome_mov = ultimo.get("nome", "")
-    # Verificar se contém algum termo de extinção
-    for termo in MOVIMENTOS_EXTINTOS:
-        if termo.lower() in nome_mov.lower():
+    nome_mov = ultimo.get("nome", "").lower()
+    
+    # Se o movimento contém qualquer termo de inativo, não é ativo
+    for termo in MOVIMENTOS_INATIVOS:
+        if termo in nome_mov:
             return False
+    
     return True
 
 
 def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quantidade: int) -> List[Dict]:
-    """Busca síncrona para usar com ThreadPoolExecutor"""
     tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
@@ -121,6 +119,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
                 "comarca": get_comarca_nome(codigo, tribunal),
                 "codigo_comarca": codigo,
                 "data_ajuizamento": source.get("dataAjuizamento"),
+                "valor_causa": source.get("valorCausa"),
                 "ultimo_movimento": ultimo_mov.get("nome", ""),
                 "data_ultimo_movimento": ultimo_mov.get("dataHora", "")[:10] if ultimo_mov.get("dataHora") else "",
                 "ativo": ativo,
@@ -135,10 +134,12 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
 
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
-    """Busca processos em paralelo"""
     try:
         loop = asyncio.get_event_loop()
         tasks = []
+        
+        # Buscar 1000 por tipo (máximo da API) para ter mais resultados
+        qtd_por_busca = 1000
         
         codigos_comarca = []
         if request.comarcas:
@@ -153,7 +154,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                     for tipo in request.tipos_processo:
                         task = loop.run_in_executor(
                             executor, _buscar_sync, 
-                            tribunal, tipo, codigo, request.quantidade
+                            tribunal, tipo, codigo, qtd_por_busca
                         )
                         tasks.append(task)
         else:
@@ -161,8 +162,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 for tipo in request.tipos_processo:
                     task = loop.run_in_executor(
                         executor, _buscar_sync,
-                        tribunal, tipo, None,
-                        request.quantidade // len(request.tipos_processo)
+                        tribunal, tipo, None, qtd_por_busca
                     )
                     tasks.append(task)
         
@@ -172,11 +172,11 @@ async def buscar_processos(request: BuscarProcessosRequest):
         for r in resultados:
             todos.extend(r)
         
-        # Filtrar extintos (agora com ordenação correta por data!)
+        # Filtrar inativos (extintos, suspensos, arquivados)
         if not request.incluir_extintos:
-            ativos = [p for p in todos if p.get("ativo", True)]
-            print(f"📊 Total: {len(todos)} | Ativos: {len(ativos)} | Extintos filtrados: {len(todos) - len(ativos)}")
-            todos = ativos
+            antes = len(todos)
+            todos = [p for p in todos if p.get("ativo", True)]
+            print(f"📊 Total: {antes} | Ativos: {len(todos)} | Filtrados: {antes - len(todos)}")
         
         # Remover duplicados
         vistos = set()
