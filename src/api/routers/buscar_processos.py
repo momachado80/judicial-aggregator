@@ -4,7 +4,7 @@ from typing import List, Optional, Dict
 import requests
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP, expandir_sao_paulo, FOROS_SAO_PAULO_CAPITAL
 
 router = APIRouter()
 executor = ThreadPoolExecutor(max_workers=10)
@@ -33,15 +33,25 @@ MOVIMENTOS_ENCERRADOS = {
 }
 
 
-def get_codigo_comarca_por_nome(nome: str) -> Optional[str]:
+def get_codigos_comarca_por_nome(nome: str) -> List[str]:
+    """Retorna lista de códigos de comarca. Para São Paulo, retorna todos os foros da capital."""
     nome_lower = nome.lower().strip()
+    
+    # Caso especial: São Paulo Capital
+    if nome_lower in ["são paulo", "sao paulo", "sp capital", "são paulo (capital)", "sao paulo (capital)", "capital"]:
+        return list(FOROS_SAO_PAULO_CAPITAL)
+    
+    # Busca exata
     for codigo, nome_comarca in COMARCAS_TJSP.items():
         if nome_lower == nome_comarca.lower():
-            return codigo
+            return [codigo]
+    
+    # Busca parcial
     for codigo, nome_comarca in COMARCAS_TJSP.items():
-        if nome_lower in nome_comarca.lower():
-            return codigo
-    return None
+        if nome_lower in nome_comarca.lower() or nome_comarca.lower() in nome_lower:
+            return [codigo]
+    
+    return []
 
 
 def get_ultimo_movimento(movimentos: List[Dict]) -> Dict:
@@ -145,9 +155,8 @@ async def buscar_processos(request: BuscarProcessosRequest):
         codigos_comarca = []
         if request.comarcas:
             for nome in request.comarcas:
-                codigo = get_codigo_comarca_por_nome(nome)
-                if codigo:
-                    codigos_comarca.append(codigo)
+                codigos = get_codigos_comarca_por_nome(nome)
+                codigos_comarca.extend(codigos)
         
         if codigos_comarca:
             for codigo in codigos_comarca:
