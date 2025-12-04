@@ -1,0 +1,3162 @@
+{
+  "total": 526,
+  "com_imovel": 49,
+  "processos": [
+    {
+      "numero": "1001529-56.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "0001682-54.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1006187-17.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1001580-21.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1020674-57.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001126-20.2025.8.26.0252",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0252"
+    },
+    {
+      "numero": "1002274-09.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1001588-95.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1003695-04.2025.8.26.0281",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1008197-85.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1003267-89.2025.8.26.0291",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1001383-76.2025.8.26.0274",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1003870-37.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002866-28.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1003974-29.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1010735-42.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1004480-70.2025.8.26.0408",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0408"
+    },
+    {
+      "numero": "1008370-03.2025.8.26.0348",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1003927-55.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1501557-46.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1001382-16.2025.8.26.0396",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1001531-26.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "1008199-55.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1003274-10.2025.8.26.0347",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0347"
+    },
+    {
+      "numero": "1015342-72.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1006169-93.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1002832-93.2025.8.26.0363",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0363"
+    },
+    {
+      "numero": "1006205-38.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1005929-65.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1002332-55.2025.8.26.0483",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1005905-37.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1014165-69.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1006101-46.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1002888-86.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1005927-95.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1002308-81.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1505371-02.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1014166-54.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1015359-11.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1001377-69.2025.8.26.0274",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1002944-22.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001266-47.2025.8.26.0416",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0416"
+    },
+    {
+      "numero": "1003803-07.2025.8.26.0322",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1010734-57.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1502721-16.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1002420-47.2025.8.26.0272",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0272"
+    },
+    {
+      "numero": "1020554-14.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001589-80.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1008189-11.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1015365-18.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1002113-92.2025.8.26.0337",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0337"
+    },
+    {
+      "numero": "1020552-44.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1014112-88.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1002927-83.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1003871-22.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1020553-29.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001267-32.2025.8.26.0416",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0416"
+    },
+    {
+      "numero": "1003943-09.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002422-17.2025.8.26.0272",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0272"
+    },
+    {
+      "numero": "1004181-49.2025.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "1002925-16.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1505378-91.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1002764-84.2025.8.26.0318",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "1002282-83.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "0001649-64.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1006206-23.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1001378-54.2025.8.26.0274",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1002930-38.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1008159-73.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1002899-18.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1503205-89.2025.8.26.0388",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0388"
+    },
+    {
+      "numero": "1005925-28.2025.8.26.0278",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "0010216-31.2000.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1015358-26.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1003672-58.2025.8.26.0281",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1002280-16.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1020645-07.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1002986-71.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001581-06.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1003285-13.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1010695-60.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1003288-65.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1020673-72.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001824-45.2025.8.26.0472",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0472"
+    },
+    {
+      "numero": "1003283-43.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1003813-51.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1003737-27.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1003808-29.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1020548-07.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1002991-93.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001377-91.2025.8.26.0396",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1001382-91.2025.8.26.0274",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1000348-09.2025.8.26.0201",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0201"
+    },
+    {
+      "numero": "1002901-85.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001518-73.2025.8.26.0279",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0279"
+    },
+    {
+      "numero": "1006171-63.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1001587-13.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1001526-04.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "1002786-45.2025.8.26.0318",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "1008198-70.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1001637-60.2025.8.26.0238",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0238"
+    },
+    {
+      "numero": "1003284-28.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1006204-53.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1001759-53.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1020538-60.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1003755-48.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1003662-14.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1003287-80.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1020547-22.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001379-39.2025.8.26.0274",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1002336-92.2025.8.26.0483",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1014145-78.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1014143-11.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1020624-31.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1002880-12.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1003754-63.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1001591-50.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1001521-79.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "1002321-80.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1003926-70.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1505381-46.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1004183-19.2025.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "1003811-81.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1008385-69.2025.8.26.0348",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1002273-24.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1502720-31.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1505373-69.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1005924-43.2025.8.26.0278",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1020539-45.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1503898-96.2025.8.26.0348",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1001932-34.2025.8.26.0356",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0356"
+    },
+    {
+      "numero": "1003812-66.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1010670-47.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1003661-29.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1505377-09.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1001127-05.2025.8.26.0252",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0252"
+    },
+    {
+      "numero": "1001520-94.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "1003655-22.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1010655-78.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1006200-16.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1002867-13.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1008169-20.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1001768-15.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1005962-60.2025.8.26.0438",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0438"
+    },
+    {
+      "numero": "1001760-38.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1005922-73.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1003653-52.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1501735-79.2025.8.26.0628",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0628"
+    },
+    {
+      "numero": "1001636-75.2025.8.26.0238",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0238"
+    },
+    {
+      "numero": "1002931-23.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1003654-37.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1001373-54.2025.8.26.0396",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1002112-10.2025.8.26.0337",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0337"
+    },
+    {
+      "numero": "1014127-57.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1001822-75.2025.8.26.0472",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0472"
+    },
+    {
+      "numero": "1002997-95.2025.8.26.0281",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1003269-59.2025.8.26.0291",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1006094-54.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1008195-18.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1002943-37.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1008393-46.2025.8.26.0348",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1004182-34.2025.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "1002337-77.2025.8.26.0483",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1505375-39.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1005884-61.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1009301-90.2025.8.26.0320",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1008161-43.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1002945-07.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1003753-78.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1001128-87.2025.8.26.0252",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0252"
+    },
+    {
+      "numero": "1001579-36.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1014186-45.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1002310-51.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1006088-47.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1008168-35.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1010671-32.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1010737-12.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1005928-80.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1009303-60.2025.8.26.0320",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1005906-22.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1002272-39.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1005882-91.2025.8.26.0278",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1003950-98.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002824-57.2025.8.26.0318",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "1002220-40.2025.8.26.0272",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0272"
+    },
+    {
+      "numero": "1002330-85.2025.8.26.0483",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1003890-28.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1020583-64.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1503067-35.2025.8.26.0320",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1002311-36.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1003949-16.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002279-31.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1003925-85.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1003801-37.2025.8.26.0322",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1503896-29.2025.8.26.0348",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1009305-30.2025.8.26.0320",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1006199-31.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1002320-95.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1008392-61.2025.8.26.0348",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1002823-72.2025.8.26.0318",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "1010736-27.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1005108-82.2025.8.26.0271",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0271"
+    },
+    {
+      "numero": "1001407-07.2025.8.26.0274",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1015343-57.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1008200-40.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1014188-15.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1003940-54.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002946-89.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1008186-56.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1002990-02.2025.8.26.0347",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0347"
+    },
+    {
+      "numero": "1002889-71.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1020625-16.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1008384-84.2025.8.26.0348",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1001758-68.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1002318-28.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1001823-60.2025.8.26.0472",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0472"
+    },
+    {
+      "numero": "1001590-65.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1001638-45.2025.8.26.0238",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0238"
+    },
+    {
+      "numero": "1002994-48.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001931-49.2025.8.26.0356",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0356"
+    },
+    {
+      "numero": "1015033-05.2025.8.26.0562",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0562"
+    },
+    {
+      "numero": "1004481-55.2025.8.26.0408",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0408"
+    },
+    {
+      "numero": "1006175-03.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1020672-87.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1009306-15.2025.8.26.0320",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1003888-58.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1006191-54.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1002319-13.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1006190-69.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1001380-24.2025.8.26.0274",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1006170-78.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1005923-58.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1003670-88.2025.8.26.0281",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1008196-03.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1503897-14.2025.8.26.0348",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1014187-30.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1020646-89.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1501595-58.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1002900-03.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1015375-62.2025.8.26.0482",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1002926-98.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1020546-37.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1015360-93.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1001409-74.2025.8.26.0274",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0274"
+    },
+    {
+      "numero": "1014138-86.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1001582-88.2025.8.26.0439",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0439"
+    },
+    {
+      "numero": "1001761-23.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1001587-16.2025.8.26.0244",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0244"
+    },
+    {
+      "numero": "1005881-09.2025.8.26.0278",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1501593-88.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1003951-83.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1505380-61.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1008160-58.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1008369-18.2025.8.26.0348",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0348"
+    },
+    {
+      "numero": "1001376-09.2025.8.26.0396",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1003736-42.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1015364-33.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1006198-46.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1008167-50.2025.8.26.0248",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1002830-26.2025.8.26.0363",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0363"
+    },
+    {
+      "numero": "1014142-26.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1003802-22.2025.8.26.0322",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1010694-75.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1020584-49.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "0000711-78.2025.8.26.0244",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0244"
+    },
+    {
+      "numero": "1020648-59.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1001381-31.2025.8.26.0396",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1002331-70.2025.8.26.0483",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1020585-34.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1005908-89.2025.8.26.0278",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1001588-98.2025.8.26.0244",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0244"
+    },
+    {
+      "numero": "0000416-78.2024.8.26.0146",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0146"
+    },
+    {
+      "numero": "1014114-58.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1501211-86.2025.8.26.0271",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0271"
+    },
+    {
+      "numero": "1002838-55.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0281"
+    },
+    {
+      "numero": "1010738-94.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1015344-42.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1054883-94.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1507474-83.2025.8.26.0385",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0385"
+    },
+    {
+      "numero": "1003872-07.2025.8.26.0268",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1500749-69.2025.8.26.0291",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1009307-97.2025.8.26.0320",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1002281-98.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1002329-03.2025.8.26.0483",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0483"
+    },
+    {
+      "numero": "1006089-32.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1006103-16.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1003862-60.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1015374-77.2025.8.26.0482",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1014141-41.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1001586-31.2025.8.26.0244",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0244"
+    },
+    {
+      "numero": "1003826-50.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1001525-19.2025.8.26.0456",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0456"
+    },
+    {
+      "numero": "1003738-12.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0322"
+    },
+    {
+      "numero": "1001374-39.2025.8.26.0396",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1000891-49.2025.8.26.0318",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "1502718-61.2025.8.26.0278",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0278"
+    },
+    {
+      "numero": "1002984-04.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1001757-83.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1010669-62.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1001265-62.2025.8.26.0416",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0416"
+    },
+    {
+      "numero": "1020647-74.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1003947-46.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1003268-74.2025.8.26.0291",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0291"
+    },
+    {
+      "numero": "1009426-83.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1008188-26.2025.8.26.0248",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0248"
+    },
+    {
+      "numero": "1014113-73.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1002831-11.2025.8.26.0363",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0363"
+    },
+    {
+      "numero": "1001375-24.2025.8.26.0396",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0396"
+    },
+    {
+      "numero": "1002879-27.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0441"
+    },
+    {
+      "numero": "1014144-93.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1003894-65.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1003893-80.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0268"
+    },
+    {
+      "numero": "1003273-25.2025.8.26.0347",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0347"
+    },
+    {
+      "numero": "1002309-66.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368"
+    },
+    {
+      "numero": "1002421-32.2025.8.26.0272",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0272"
+    },
+    {
+      "numero": "1001762-08.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0471"
+    },
+    {
+      "numero": "1006201-98.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1006186-32.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1505376-24.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0451"
+    },
+    {
+      "numero": "1006100-61.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0362"
+    },
+    {
+      "numero": "1009304-45.2025.8.26.0320",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0320"
+    },
+    {
+      "numero": "1001519-58.2025.8.26.0279",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0279"
+    },
+    {
+      "numero": "1504479-97.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1015376-47.2025.8.26.0482",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0482"
+    },
+    {
+      "numero": "1100483-41.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100714-68.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101228-21.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101296-68.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101287-09.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100925-07.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101406-67.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1093718-54.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1099810-48.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101295-83.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100712-98.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101191-91.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100888-77.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100553-58.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101362-48.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101378-02.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100923-37.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101422-21.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101363-33.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101227-36.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100561-35.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100498-10.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1002186-75.2025.8.26.0010",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0010"
+    },
+    {
+      "numero": "1101286-24.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101063-71.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101288-91.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100560-50.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1008860-81.2025.8.26.0006",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0006"
+    },
+    {
+      "numero": "1100695-62.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101421-36.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101061-04.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100725-97.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1003191-35.2025.8.26.0010",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0010"
+    },
+    {
+      "numero": "1011103-80.2025.8.26.0011",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0011"
+    },
+    {
+      "numero": "1100889-62.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100693-92.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1098259-33.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101361-63.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101405-82.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100497-25.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100887-92.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101183-17.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100924-22.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100484-26.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100586-48.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100694-77.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100529-30.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1099498-72.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101226-51.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101192-76.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100726-82.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101377-17.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1002682-82.2025.8.26.0082",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0082"
+    },
+    {
+      "numero": "1011200-80.2025.8.26.0011",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0011"
+    },
+    {
+      "numero": "1101376-32.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101062-86.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1100552-73.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1101407-52.2025.8.26.0100",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "0022405-75.2010.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "0928950-30.1996.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1000588-34.2025.8.26.0480",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0480"
+    },
+    {
+      "numero": "2223000-40.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1004063-56.2024.8.26.0666",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0666"
+    },
+    {
+      "numero": "1117522-22.2023.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1010055-22.2023.8.26.0152",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0152"
+    },
+    {
+      "numero": "1012353-07.2022.8.26.0286",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0286"
+    },
+    {
+      "numero": "1000990-87.2023.8.26.0318",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0318"
+    },
+    {
+      "numero": "2223781-62.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1001685-73.2025.8.26.0123",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0123"
+    },
+    {
+      "numero": "1000925-19.2022.8.26.0095",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0095"
+    },
+    {
+      "numero": "3009933-72.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223676-85.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1000800-28.2025.8.26.0004",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0004"
+    },
+    {
+      "numero": "2223915-89.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1019312-16.2022.8.26.0602",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0602"
+    },
+    {
+      "numero": "0018851-87.2024.8.26.0506",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0506"
+    },
+    {
+      "numero": "0024301-52.2010.8.26.0554",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0554"
+    },
+    {
+      "numero": "1015167-66.2025.8.26.0001",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0001"
+    },
+    {
+      "numero": "2223982-54.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2224305-59.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "3009910-29.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223578-03.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1011484-84.2025.8.26.0562",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0562"
+    },
+    {
+      "numero": "2222198-42.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223022-98.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1027961-46.2024.8.26.0554",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0554"
+    },
+    {
+      "numero": "1000742-19.2025.8.26.0006",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0006"
+    },
+    {
+      "numero": "1014819-38.2025.8.26.0554",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0554"
+    },
+    {
+      "numero": "1006839-53.2023.8.26.0152",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0152"
+    },
+    {
+      "numero": "2223802-38.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223025-53.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1002588-02.2024.8.26.0008",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0008"
+    },
+    {
+      "numero": "2224300-37.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222938-97.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223090-48.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1036274-97.2024.8.26.0003",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0003"
+    },
+    {
+      "numero": "2224171-32.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1027827-89.2025.8.26.0002",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0002"
+    },
+    {
+      "numero": "1001265-84.2025.8.26.0150",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0150"
+    },
+    {
+      "numero": "1029005-97.2021.8.26.0007",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0007"
+    },
+    {
+      "numero": "2223637-88.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223930-58.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2221638-03.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2224167-92.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1010811-24.2023.8.26.0510",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0510"
+    },
+    {
+      "numero": "0016630-07.2024.8.26.0224",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0224"
+    },
+    {
+      "numero": "2223595-39.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1013811-93.2025.8.26.0564",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0564"
+    },
+    {
+      "numero": "1000495-48.2024.8.26.0596",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0596"
+    },
+    {
+      "numero": "2223784-17.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1027303-53.2024.8.26.0576",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0576"
+    },
+    {
+      "numero": "1009913-42.2024.8.26.0068",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0068"
+    },
+    {
+      "numero": "0016431-06.2000.8.26.0004",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0004"
+    },
+    {
+      "numero": "1001614-03.2025.8.26.0663",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0663"
+    },
+    {
+      "numero": "2223047-14.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1023976-22.2024.8.26.0602",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0602"
+    },
+    {
+      "numero": "1003477-80.2025.8.26.0602",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0602"
+    },
+    {
+      "numero": "1000089-93.2015.8.26.0579",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0579"
+    },
+    {
+      "numero": "2223793-76.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223675-03.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223914-07.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223980-84.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223794-61.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222182-88.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223186-63.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1022433-59.2024.8.26.0577",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0577"
+    },
+    {
+      "numero": "0079282-50.2001.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "2163164-39.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1007944-80.2025.8.26.0577",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0577"
+    },
+    {
+      "numero": "2223104-32.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223955-71.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223071-42.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "0035498-37.2012.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "2223584-10.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1009065-96.2022.8.26.0562",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0562"
+    },
+    {
+      "numero": "1005984-93.2023.8.26.0663",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0663"
+    },
+    {
+      "numero": "2222937-15.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1044962-70.2019.8.26.0602",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0602"
+    },
+    {
+      "numero": "1000712-71.2023.8.26.0032",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0032"
+    },
+    {
+      "numero": "1000871-57.2025.8.26.0383",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0383"
+    },
+    {
+      "numero": "1000283-23.2023.8.26.0447",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0447"
+    },
+    {
+      "numero": "1004608-41.2021.8.26.0114",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0114"
+    },
+    {
+      "numero": "2223067-05.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1006981-40.2024.8.26.0114",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0114"
+    },
+    {
+      "numero": "2223430-89.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1025800-97.2023.8.26.0554",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0554"
+    },
+    {
+      "numero": "1036273-41.2022.8.26.0114",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0114"
+    },
+    {
+      "numero": "0033465-32.2008.8.26.0224",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0224"
+    },
+    {
+      "numero": "2223932-28.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1000389-18.2022.8.26.0027",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0027"
+    },
+    {
+      "numero": "2223097-40.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222624-54.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223912-37.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223883-84.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222987-41.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223096-55.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1001544-34.2024.8.26.0238",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0238"
+    },
+    {
+      "numero": "1074534-15.2025.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "2223751-27.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222995-18.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223957-41.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223954-86.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223225-60.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1001522-93.2024.8.26.0005",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0005"
+    },
+    {
+      "numero": "0001477-75.2024.8.26.0565",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0565"
+    },
+    {
+      "numero": "1136541-58.2016.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "1000600-96.2020.8.26.0650",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0650"
+    },
+    {
+      "numero": "2222130-92.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1001225-88.2023.8.26.0533",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0533"
+    },
+    {
+      "numero": "2223227-30.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1031712-79.2023.8.26.0003",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0003"
+    },
+    {
+      "numero": "2223638-73.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223885-54.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222793-41.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223412-68.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223678-55.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1037728-02.2016.8.26.0001",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0001"
+    },
+    {
+      "numero": "2222057-23.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2223526-07.2025.8.26.0000",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "2222802-03.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1032798-22.2021.8.26.0564",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0564"
+    },
+    {
+      "numero": "0021628-21.2011.8.26.0047",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0047"
+    },
+    {
+      "numero": "2223111-24.2025.8.26.0000",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0000"
+    },
+    {
+      "numero": "1016915-98.2023.8.26.0100",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0100"
+    },
+    {
+      "numero": "2050017-88.1989.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "1032177-76.2023.8.26.0007",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0007"
+    },
+    {
+      "numero": "4006877-80.2013.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0405"
+    },
+    {
+      "numero": "1500529-34.2025.8.26.0562",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0562"
+    },
+    {
+      "numero": "0002646-21.1996.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "0003615-02.1997.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "2050018-05.1991.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "0001181-49.2011.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    },
+    {
+      "numero": "1027225-69.2023.8.26.0196",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0196"
+    },
+    {
+      "numero": "1017570-17.2023.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0344"
+    },
+    {
+      "numero": "1001217-97.2025.8.26.0127",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0127"
+    },
+    {
+      "numero": "1010451-12.2024.8.26.0007",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0007"
+    },
+    {
+      "numero": "1004857-86.2024.8.26.0663",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0663"
+    },
+    {
+      "numero": "1008307-74.2015.8.26.0009",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0009"
+    },
+    {
+      "numero": "1002001-03.2021.8.26.0099",
+      "tipo": "Inventário",
+      "tem_imovel": false,
+      "codigo_comarca": "0099"
+    },
+    {
+      "numero": "0001357-92.1994.8.26.0400",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0400"
+    },
+    {
+      "numero": "0009706-97.2011.8.26.0009",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0009"
+    },
+    {
+      "numero": "3003353-39.2013.8.26.0358",
+      "tipo": "Divórcio",
+      "tem_imovel": false,
+      "codigo_comarca": "0358"
+    }
+  ]
+}
