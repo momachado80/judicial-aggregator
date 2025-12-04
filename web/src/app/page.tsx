@@ -36,6 +36,7 @@ export default function Home() {
   const [comarcasSelecionadas, setComarcasSelecionadas] = useState<string[]>([]);
   const [comarcasDisponiveis, setComarcasDisponiveis] = useState<string[]>([]);
   const [valorMinimo, setValorMinimo] = useState<number>(0);
+  const [mostrandoImoveis, setMostrandoImoveis] = useState(false);
 
   useEffect(() => {
     fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
@@ -87,6 +88,37 @@ export default function Home() {
     } catch (error) {
       console.error('Erro:', error);
       alert('Erro ao buscar');
+    }
+    setLoading(false);
+  };
+
+  const buscarProcessosComImoveis = async () => {
+    setLoading(true);
+    setMostrandoImoveis(true);
+    try {
+      const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/processos-com-imoveis');
+      const data = await response.json();
+      
+      if (data.processos) {
+        // Converter para o formato esperado
+        const processosFormatados = data.processos.map((p: any) => ({
+          numero: p.numero,
+          tribunal: 'TJSP',
+          tipo: p.tipo,
+          comarca: p.codigo_comarca,
+          data_ajuizamento: '',
+          valor_causa: null,
+          ultimo_movimento: '',
+          data_ultimo_movimento: '',
+          ativo: true,
+          url_tjsp: p.url_tjsp,
+          tem_imovel: true
+        }));
+        setProcessos(processosFormatados);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro ao buscar processos com imóveis');
     }
     setLoading(false);
   };
@@ -277,6 +309,25 @@ export default function Home() {
 
           <button onClick={buscarProcessos} disabled={loading || tiposSelecionados.length === 0} style={{ width: '100%', background: loading ? '#9ca3af' : 'linear-gradient(to right, #4f46e5, #7c3aed)', color: 'white', padding: '16px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer' }}>
             {loading ? '⏳ Buscando...' : '🔍 BUSCAR PROCESSOS'}
+          </button>
+
+          <button
+            onClick={buscarProcessosComImoveis}
+            disabled={loading}
+            style={{
+              width: '100%',
+              marginTop: '12px',
+              background: loading ? '#9ca3af' : 'linear-gradient(to right, #10b981, #059669)',
+              color: 'white',
+              padding: '16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {loading ? '⏳ Buscando...' : '🏠 VER PROCESSOS COM IMÓVEIS (49)'}
           </button>
         </div>
 
