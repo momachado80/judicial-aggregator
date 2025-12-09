@@ -13,7 +13,7 @@ class BuscarProcessosRequest(BaseModel):
     tribunais: List[str]
     tipos_processo: List[str]
     comarcas: Optional[List[str]] = None
-    quantidade: int = 100
+    quantidade: int = 500
     usar_cache: bool = True
     incluir_extintos: bool = False
 
@@ -25,28 +25,29 @@ TIPOS_PROCESSO_MAPPING = {
 
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
-# Movimentos que DEFINITIVAMENTE indicam processo encerrado
-MOVIMENTOS_ENCERRADOS = {
+MOVIMENTOS_INATIVOS = {
     "baixa definitiva",
     "arquivado definitivamente",
     "trânsito em julgado",
+    "processo suspenso",
+    "suspensão do processo",
+    "sobrestamento",
+    "processo suspenso",
+    "suspensão do processo",
+    "sobrestamento",
 }
 
 
 def get_codigos_comarca_por_nome(nome: str) -> List[str]:
-    """Retorna lista de códigos de comarca. Para São Paulo, retorna todos os foros da capital."""
     nome_lower = nome.lower().strip()
     
-    # Caso especial: São Paulo Capital
     if nome_lower in ["são paulo", "sao paulo", "sp capital", "são paulo (capital)", "sao paulo (capital)", "capital"]:
         return list(FOROS_SAO_PAULO_CAPITAL)
     
-    # Busca exata
     for codigo, nome_comarca in COMARCAS_TJSP.items():
         if nome_lower == nome_comarca.lower():
             return [codigo]
     
-    # Busca parcial
     for codigo, nome_comarca in COMARCAS_TJSP.items():
         if nome_lower in nome_comarca.lower() or nome_comarca.lower() in nome_lower:
             return [codigo]
@@ -62,22 +63,16 @@ def get_ultimo_movimento(movimentos: List[Dict]) -> Dict:
 
 
 def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
-    """
-    Verifica se processo está ativo.
-    Retorna (ativo, motivo)
-    """
     ultimo = get_ultimo_movimento(movimentos)
     if not ultimo:
         return True, "sem_movimentos"
     
     nome_mov = ultimo.get("nome", "").lower().strip()
     
-    # Verificar movimento "Definitivo" isolado (indica arquivamento definitivo)
     if nome_mov == "definitivo":
         return False, "definitivo"
     
-    # Verificar termos específicos de encerramento
-    for termo in MOVIMENTOS_ENCERRADOS:
+    for termo in MOVIMENTOS_INATIVOS:
         if termo in nome_mov:
             return False, termo
     
@@ -140,7 +135,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
         
         return processos
     except Exception as e:
-        print(f"❌ Erro: {e}")
+        print(f"Erro busca {tipo} em {codigo_comarca}: {e}")
         return []
 
 
@@ -185,9 +180,9 @@ async def buscar_processos(request: BuscarProcessosRequest):
         if not request.incluir_extintos:
             antes = len(todos)
             todos = [p for p in todos if p.get("ativo", True)]
-            print(f"📊 Total: {antes} | Ativos: {len(todos)} | Filtrados: {antes - len(todos)}")
+            filtrados = antes - len(todos)
+            print(f"Total: {antes} | Ativos: {len(todos)} | Extintos/Suspensos removidos: {filtrados}")
         
-        # Remover duplicados
         vistos = set()
         unicos = []
         for p in todos:
@@ -200,7 +195,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
         return unicos[:request.quantidade]
         
     except Exception as e:
-        print(f"💥 ERRO: {e}")
+        print(f"ERRO: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
