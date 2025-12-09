@@ -1,5 +1,5 @@
 {
-  "total": 1,
+  "total": 48,
   "processos": [
     {
       "numero": "1008307-74.2015.8.26.0009",
@@ -8,6 +8,382 @@
       "codigo_comarca": "0009",
       "comarca": "Vila Prudente",
       "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1008307-74.2015.8.26.0009"
+    },
+    {
+      "numero": "0009706-97.2011.8.26.0009",
+      "tipo": "Arrolamento Sumário",
+      "tem_imovel": true,
+      "codigo_comarca": "0009",
+      "comarca": "Vila Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=0009706-97.2011.8.26.0009"
+    },
+    {
+      "numero": "1020553-29.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020553-29.2025.8.26.0405"
+    },
+    {
+      "numero": "1020552-44.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020552-44.2025.8.26.0405"
+    },
+    {
+      "numero": "1010694-75.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010694-75.2025.8.26.0344"
+    },
+    {
+      "numero": "1002279-31.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002279-31.2025.8.26.0368"
+    },
+    {
+      "numero": "1002309-66.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002309-66.2025.8.26.0368"
+    },
+    {
+      "numero": "1015358-26.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482",
+      "comarca": "Presidente Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1015358-26.2025.8.26.0482"
+    },
+    {
+      "numero": "1010695-60.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010695-60.2025.8.26.0344"
+    },
+    {
+      "numero": "1015360-93.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482",
+      "comarca": "Presidente Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1015360-93.2025.8.26.0482"
+    },
+    {
+      "numero": "1003813-51.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0322",
+      "comarca": "Lins",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1003813-51.2025.8.26.0322"
+    },
+    {
+      "numero": "1001932-34.2025.8.26.0356",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0356",
+      "comarca": "Mirandópolis",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1001932-34.2025.8.26.0356"
+    },
+    {
+      "numero": "1015359-11.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482",
+      "comarca": "Presidente Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1015359-11.2025.8.26.0482"
+    },
+    {
+      "numero": "1010736-27.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010736-27.2025.8.26.0344"
+    },
+    {
+      "numero": "1002220-40.2025.8.26.0272",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0272",
+      "comarca": "Itapetininga",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002220-40.2025.8.26.0272"
+    },
+    {
+      "numero": "1002943-37.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0441",
+      "comarca": "Pereira Barreto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002943-37.2025.8.26.0441"
+    },
+    {
+      "numero": "1020646-89.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020646-89.2025.8.26.0405"
+    },
+    {
+      "numero": "1006088-47.2025.8.26.0362",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0362",
+      "comarca": "Mogi das Cruzes",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1006088-47.2025.8.26.0362"
+    },
+    {
+      "numero": "1015343-57.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482",
+      "comarca": "Presidente Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1015343-57.2025.8.26.0482"
+    },
+    {
+      "numero": "1010738-94.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010738-94.2025.8.26.0344"
+    },
+    {
+      "numero": "1002838-55.2025.8.26.0281",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0281",
+      "comarca": "Itapira",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002838-55.2025.8.26.0281"
+    },
+    {
+      "numero": "1020585-34.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020585-34.2025.8.26.0405"
+    },
+    {
+      "numero": "1001768-15.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471",
+      "comarca": "Porto Feliz",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1001768-15.2025.8.26.0471"
+    },
+    {
+      "numero": "1003950-98.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0268",
+      "comarca": "Itapecerica da Serra",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1003950-98.2025.8.26.0268"
+    },
+    {
+      "numero": "1014112-88.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0451",
+      "comarca": "Piracicaba",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1014112-88.2025.8.26.0451"
+    },
+    {
+      "numero": "1002308-81.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002308-81.2025.8.26.0368"
+    },
+    {
+      "numero": "1020645-07.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020645-07.2025.8.26.0405"
+    },
+    {
+      "numero": "1001931-49.2025.8.26.0356",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0356",
+      "comarca": "Mirandópolis",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1001931-49.2025.8.26.0356"
+    },
+    {
+      "numero": "1020647-74.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020647-74.2025.8.26.0405"
+    },
+    {
+      "numero": "1002984-04.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0441",
+      "comarca": "Pereira Barreto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002984-04.2025.8.26.0441"
+    },
+    {
+      "numero": "1002281-98.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002281-98.2025.8.26.0368"
+    },
+    {
+      "numero": "1001761-23.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471",
+      "comarca": "Porto Feliz",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1001761-23.2025.8.26.0471"
+    },
+    {
+      "numero": "1010734-57.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010734-57.2025.8.26.0344"
+    },
+    {
+      "numero": "1020584-49.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020584-49.2025.8.26.0405"
+    },
+    {
+      "numero": "1001760-38.2025.8.26.0471",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0471",
+      "comarca": "Porto Feliz",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1001760-38.2025.8.26.0471"
+    },
+    {
+      "numero": "1003736-42.2025.8.26.0322",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0322",
+      "comarca": "Lins",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1003736-42.2025.8.26.0322"
+    },
+    {
+      "numero": "1006175-03.2025.8.26.0362",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0362",
+      "comarca": "Mogi das Cruzes",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1006175-03.2025.8.26.0362"
+    },
+    {
+      "numero": "1505378-91.2025.8.26.0451",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0451",
+      "comarca": "Piracicaba",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1505378-91.2025.8.26.0451"
+    },
+    {
+      "numero": "1010737-12.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010737-12.2025.8.26.0344"
+    },
+    {
+      "numero": "1010735-42.2025.8.26.0344",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0344",
+      "comarca": "Marília",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1010735-42.2025.8.26.0344"
+    },
+    {
+      "numero": "1015342-72.2025.8.26.0482",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0482",
+      "comarca": "Presidente Prudente",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1015342-72.2025.8.26.0482"
+    },
+    {
+      "numero": "1002280-16.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002280-16.2025.8.26.0368"
+    },
+    {
+      "numero": "1003949-16.2025.8.26.0268",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0268",
+      "comarca": "Itapecerica da Serra",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1003949-16.2025.8.26.0268"
+    },
+    {
+      "numero": "1002282-83.2025.8.26.0368",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0368",
+      "comarca": "Monte Alto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002282-83.2025.8.26.0368"
+    },
+    {
+      "numero": "1020648-59.2025.8.26.0405",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020648-59.2025.8.26.0405"
+    },
+    {
+      "numero": "1002944-22.2025.8.26.0441",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0441",
+      "comarca": "Pereira Barreto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002944-22.2025.8.26.0441"
+    },
+    {
+      "numero": "1020583-64.2025.8.26.0405",
+      "tipo": "Divórcio",
+      "tem_imovel": true,
+      "codigo_comarca": "0405",
+      "comarca": "Osasco",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1020583-64.2025.8.26.0405"
+    },
+    {
+      "numero": "1002986-71.2025.8.26.0441",
+      "tipo": "Inventário",
+      "tem_imovel": true,
+      "codigo_comarca": "0441",
+      "comarca": "Pereira Barreto",
+      "url_tjsp": "https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=1002986-71.2025.8.26.0441"
     }
   ]
 }
