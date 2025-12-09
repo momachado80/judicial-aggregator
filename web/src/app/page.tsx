@@ -36,6 +36,7 @@ export default function Home() {
   const [abaAtiva, setAbaAtiva] = useState('busca');
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalBuscado, setTotalBuscado] = useState(0);
+  const [ordenacao, setOrdenacao] = useState('data_desc');
   
   const [comarcaFiltro, setComarcaFiltro] = useState('');
   const [comarcasSelecionadas, setComarcasSelecionadas] = useState<string[]>([]);
@@ -152,6 +153,51 @@ export default function Home() {
     }
   };
 
+  const exportarExcel = (lista: Processo[], nomeArquivo: string) => {
+    const headers = ['Numero', 'Tipo', 'Comarca', 'Data Ajuizamento', 'Valor Causa', 'Ultimo Movimento', 'Data Movimento', 'Link TJSP'];
+    const rows = lista.map(p => [
+      formatarNumero(p.numero),
+      p.tipo,
+      p.comarca,
+      formatarData(p.data_ajuizamento),
+      p.valor_causa ? p.valor_causa.toString() : '',
+      p.ultimo_movimento,
+      p.data_ultimo_movimento,
+      p.url_tjsp
+    ]);
+    
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => '"' + (cell || '').replace(/"/g, '""') + '"').join(','))
+      .join('\n');
+    
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = nomeArquivo + '.csv';
+    link.click();
+  };
+
+  const ordenarProcessos = (lista: Processo[]) => {
+    const sorted = [...lista];
+    switch (ordenacao) {
+      case 'data_desc':
+        return sorted.sort((a, b) => (b.data_ajuizamento || '').localeCompare(a.data_ajuizamento || ''));
+      case 'data_asc':
+        return sorted.sort((a, b) => (a.data_ajuizamento || '').localeCompare(b.data_ajuizamento || ''));
+      case 'valor_desc':
+        return sorted.sort((a, b) => (b.valor_causa || 0) - (a.valor_causa || 0));
+      case 'valor_asc':
+        return sorted.sort((a, b) => (a.valor_causa || 0) - (b.valor_causa || 0));
+      case 'comarca':
+        return sorted.sort((a, b) => (a.comarca || '').localeCompare(b.comarca || ''));
+      case 'tipo':
+        return sorted.sort((a, b) => (a.tipo || '').localeCompare(b.tipo || ''));
+      default:
+        return sorted;
+    }
+  };
+
   const processosFilrados = processos.filter(p => {
     if (valorMinimo > 0 && p.valor_causa) {
       return p.valor_causa >= valorMinimo;
@@ -159,8 +205,8 @@ export default function Home() {
     return true;
   });
 
-  const processosBusca = processosFilrados.filter(p => !interesseIds.has(p.numero) && !excluidos.has(p.numero));
-  const processosInteresse = processosFilrados.filter(p => interesseIds.has(p.numero));
+  const processosBusca = ordenarProcessos(processosFilrados.filter(p => !interesseIds.has(p.numero) && !excluidos.has(p.numero)));
+  const processosInteresse = ordenarProcessos(processosFilrados.filter(p => interesseIds.has(p.numero)));
 
   const itensPorPagina = quantidade;
   const inicio = (paginaAtual - 1) * itensPorPagina;
@@ -246,6 +292,9 @@ export default function Home() {
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             {interesseIds.size > 0 && (
+              <button onClick={() => exportarExcel(processosInteresse, 'processos_interesse')} style={{ backgroundColor: '#059669', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px' }}>Exportar Excel</button>
+            )}
+            {interesseIds.size > 0 && (
               <button onClick={limparInteresse} style={{ backgroundColor: '#f59e0b', color: 'white', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px' }}>Limpar Interesse</button>
             )}
             {excluidos.size > 0 && (
@@ -286,7 +335,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade por pagina:</label>
               <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
@@ -305,6 +354,17 @@ export default function Home() {
                 <option value={200000}>Acima de R$ 200.000</option>
                 <option value={500000}>Acima de R$ 500.000</option>
                 <option value={1000000}>Acima de R$ 1.000.000</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Ordenar por:</label>
+              <select value={ordenacao} onChange={(e) => setOrdenacao(e.target.value)} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
+                <option value="data_desc">Data (mais recentes)</option>
+                <option value="data_asc">Data (mais antigos)</option>
+                <option value="valor_desc">Valor (maior primeiro)</option>
+                <option value="valor_asc">Valor (menor primeiro)</option>
+                <option value="comarca">Comarca (A-Z)</option>
+                <option value="tipo">Tipo (A-Z)</option>
               </select>
             </div>
           </div>
@@ -339,13 +399,20 @@ export default function Home() {
                 </p>
               </div>
             )}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              <button onClick={() => setAbaAtiva('busca')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'busca' ? '#4f46e5' : '#e5e7eb', color: abaAtiva === 'busca' ? 'white' : '#374151' }}>
-                Para Analisar ({processosBusca.length})
-              </button>
-              <button onClick={() => setAbaAtiva('interesse')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'interesse' ? '#10b981' : '#e5e7eb', color: abaAtiva === 'interesse' ? 'white' : '#374151' }}>
-                Com Interesse ({processosInteresse.length})
-              </button>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button onClick={() => setAbaAtiva('busca')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'busca' ? '#4f46e5' : '#e5e7eb', color: abaAtiva === 'busca' ? 'white' : '#374151' }}>
+                  Para Analisar ({processosBusca.length})
+                </button>
+                <button onClick={() => setAbaAtiva('interesse')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'interesse' ? '#10b981' : '#e5e7eb', color: abaAtiva === 'interesse' ? 'white' : '#374151' }}>
+                  Com Interesse ({processosInteresse.length})
+                </button>
+              </div>
+              {processosBusca.length > 0 && abaAtiva === 'busca' && (
+                <button onClick={() => exportarExcel(processosBusca, 'processos_busca')} style={{ padding: '10px 16px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: '#059669', color: 'white', fontSize: '13px' }}>
+                  Exportar Lista ({processosBusca.length})
+                </button>
+              )}
             </div>
             {abaAtiva === 'busca' && (
               <>
