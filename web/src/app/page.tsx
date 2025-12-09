@@ -55,13 +55,13 @@ export default function Home() {
 
   useEffect(() => {
     if (excluidos.size > 0) {
-      localStorage.setItem(STORAGE_KEY_EXCLUIDOS, JSON.stringify(Array.from(excluidos));
+      localStorage.setItem(STORAGE_KEY_EXCLUIDOS, JSON.stringify(Array.from(excluidos)));
     }
   }, [excluidos]);
 
   useEffect(() => {
     if (interesseIds.size > 0) {
-      localStorage.setItem(STORAGE_KEY_INTERESSE, JSON.stringify(Array.from(interesseIds));
+      localStorage.setItem(STORAGE_KEY_INTERESSE, JSON.stringify(Array.from(interesseIds)));
     }
   }, [interesseIds]);
 
