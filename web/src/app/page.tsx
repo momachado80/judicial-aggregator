@@ -198,15 +198,18 @@ export default function Home() {
     }
   };
 
-  const processosFilrados = processos.filter(p => {
-    if (valorMinimo > 0 && p.valor_causa) {
-      return p.valor_causa >= valorMinimo;
-    }
-    return true;
-  });
+  // Filtrar por valor - mantem processos sem valor informado separados
+  const processosBase = processos.filter(p => !interesseIds.has(p.numero) && !excluidos.has(p.numero));
+  const processosComValor = processosBase.filter(p => p.valor_causa && p.valor_causa > 0);
+  const processosSemValor = processosBase.filter(p => !p.valor_causa || p.valor_causa === 0);
+  
+  // Aplicar filtro de valor minimo apenas nos que tem valor
+  const processosComValorFiltrados = valorMinimo > 0 
+    ? processosComValor.filter(p => p.valor_causa && p.valor_causa >= valorMinimo)
+    : processosComValor;
 
-  const processosBusca = ordenarProcessos(processosFilrados.filter(p => !interesseIds.has(p.numero) && !excluidos.has(p.numero)));
-  const processosInteresse = ordenarProcessos(processosFilrados.filter(p => interesseIds.has(p.numero)));
+  const processosBusca = ordenarProcessos([...processosComValorFiltrados, ...processosSemValor]);
+  const processosInteresse = ordenarProcessos(processos.filter(p => interesseIds.has(p.numero)));
 
   const itensPorPagina = quantidade;
   const inicio = (paginaAtual - 1) * itensPorPagina;
@@ -227,17 +230,26 @@ export default function Home() {
   };
 
   const formatarValor = (valor: number | null) => {
-    if (!valor) return 'Nao informado';
+    if (!valor) return null;
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const ProcessoCard = ({ processo }: { processo: Processo }) => {
+    const temValor = processo.valor_causa && processo.valor_causa > 0;
     const temValorAlto = processo.valor_causa && processo.valor_causa >= 100000;
+    
     return (
       <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: temValorAlto ? '2px solid #10b981' : '1px solid #e5e7eb' }}>
-        {temValorAlto && (
-          <div style={{ backgroundColor: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', marginBottom: '12px', display: 'inline-block' }}>ALTO VALOR</div>
-        )}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          {temValorAlto && (
+            <div style={{ backgroundColor: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>ALTO VALOR</div>
+          )}
+          {temValor ? (
+            <div style={{ backgroundColor: '#3b82f6', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>VALOR INFORMADO</div>
+          ) : (
+            <div style={{ backgroundColor: '#f59e0b', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>VALOR NAO INFORMADO</div>
+          )}
+        </div>
         <div style={{ marginBottom: '12px' }}>
           <p style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Numero:</p>
           <a href={processo.url_tjsp} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontFamily: 'monospace', fontSize: '12px', fontWeight: '600', textDecoration: 'none', display: 'block', padding: '8px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe' }}>
@@ -258,9 +270,13 @@ export default function Home() {
           <p style={{ fontSize: '11px', color: '#6b7280' }}>Comarca:</p>
           <p style={{ fontWeight: '600', color: '#7c3aed', fontSize: '14px', margin: 0 }}>{processo.comarca}</p>
         </div>
-        <div style={{ marginBottom: '12px', padding: '10px', backgroundColor: temValorAlto ? '#dcfce7' : '#f9fafb', borderRadius: '8px' }}>
+        <div style={{ marginBottom: '12px', padding: '10px', backgroundColor: temValor ? (temValorAlto ? '#dcfce7' : '#eff6ff') : '#fef3c7', borderRadius: '8px' }}>
           <p style={{ fontSize: '11px', color: '#6b7280' }}>Valor da Causa:</p>
-          <p style={{ fontWeight: 'bold', fontSize: '16px', margin: 0, color: temValorAlto ? '#166534' : '#374151' }}>{formatarValor(processo.valor_causa)}</p>
+          {temValor ? (
+            <p style={{ fontWeight: 'bold', fontSize: '16px', margin: 0, color: temValorAlto ? '#166534' : '#1e40af' }}>{formatarValor(processo.valor_causa)}</p>
+          ) : (
+            <p style={{ fontWeight: 'bold', fontSize: '14px', margin: 0, color: '#92400e' }}>Verificar no TJSP</p>
+          )}
         </div>
         <div style={{ marginBottom: '16px' }}>
           <p style={{ fontSize: '11px', color: '#6b7280' }}>Ultimo Movimento ({processo.data_ultimo_movimento}):</p>
@@ -275,7 +291,6 @@ export default function Home() {
     );
   };
 
-  const processosComValor = processos.filter(p => p.valor_causa && p.valor_causa > 0).length;
   const processosAltoValor = processos.filter(p => p.valor_causa && p.valor_causa >= 100000).length;
 
   return (
@@ -374,31 +389,37 @@ export default function Home() {
         </div>
         {processos.length > 0 && (
           <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '20px' }}>
               <div style={{ backgroundColor: '#dcfce7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#166534', margin: 0 }}>{processosBusca.length}</p>
-                <p style={{ fontSize: '13px', color: '#166534', margin: 0 }}>Novos para Analisar</p>
+                <p style={{ fontSize: '13px', color: '#166534', margin: 0 }}>Para Analisar</p>
+              </div>
+              <div style={{ backgroundColor: '#dbeafe', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e40af', margin: 0 }}>{processosComValorFiltrados.length}</p>
+                <p style={{ fontSize: '13px', color: '#1e40af', margin: 0 }}>Com Valor Informado</p>
+              </div>
+              <div style={{ backgroundColor: '#fef3c7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#92400e', margin: 0 }}>{processosSemValor.length}</p>
+                <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Sem Valor Informado</p>
               </div>
               <div style={{ backgroundColor: '#d1fae5', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#065f46', margin: 0 }}>{processosAltoValor}</p>
-                <p style={{ fontSize: '13px', color: '#065f46', margin: 0 }}>Alto Valor (maior que 100k)</p>
+                <p style={{ fontSize: '13px', color: '#065f46', margin: 0 }}>Alto Valor (100k+)</p>
               </div>
-              <div style={{ backgroundColor: '#fef3c7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
-                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#92400e', margin: 0 }}>{processosInteresse.length}</p>
-                <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Com Interesse</p>
-              </div>
-              <div style={{ backgroundColor: '#e0e7ff', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
-                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#3730a3', margin: 0 }}>{totalBuscado}</p>
-                <p style={{ fontSize: '13px', color: '#3730a3', margin: 0 }}>Total na API</p>
+              <div style={{ backgroundColor: '#fce7f3', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#9d174d', margin: 0 }}>{processosInteresse.length}</p>
+                <p style={{ fontSize: '13px', color: '#9d174d', margin: 0 }}>Com Interesse</p>
               </div>
             </div>
-            {processosComValor < processos.length && (
-              <div style={{ backgroundColor: '#fef3c7', padding: '12px', borderRadius: '8px', marginBottom: '20px' }}>
-                <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
-                  {processos.length - processosComValor} processos nao tem valor da causa informado. Use Ver TJSP para verificar detalhes.
+            
+            {valorMinimo > 0 && (
+              <div style={{ backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #bfdbfe' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#1e40af' }}>
+                  Filtro ativo: mostrando <strong>{processosComValorFiltrados.length}</strong> processos com valor acima de {formatarValor(valorMinimo)} + <strong>{processosSemValor.length}</strong> processos sem valor informado (precisam verificar no TJSP)
                 </p>
               </div>
             )}
+
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button onClick={() => setAbaAtiva('busca')} style={{ padding: '12px 24px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer', backgroundColor: abaAtiva === 'busca' ? '#4f46e5' : '#e5e7eb', color: abaAtiva === 'busca' ? 'white' : '#374151' }}>
