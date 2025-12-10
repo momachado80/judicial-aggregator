@@ -13,3 +13,8 @@ requests==2.32.3
 # Celery (jobs agendados)
 celery==5.4.0
 redis==5.2.0
+
+# Selenium para verificação de imóveis
+selenium==4.27.1
+webdriver-manager==4.0.2
+beautifulsoup4==4.12.3
