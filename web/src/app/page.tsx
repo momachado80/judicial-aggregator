@@ -25,6 +25,7 @@ interface Processo {
 
 const STORAGE_KEY_EXCLUIDOS = 'judicial_processos_excluidos';
 const STORAGE_KEY_INTERESSE = 'judicial_processos_interesse';
+const STORAGE_KEY_NOTAS = 'judicial_processos_notas';
 
 export default function Home() {
   const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual']);
@@ -33,24 +34,31 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [interesseIds, setInteresseIds] = useState<Set<string>>(new Set());
   const [excluidos, setExcluidos] = useState<Set<string>>(new Set());
+  const [notas, setNotas] = useState<Record<string, string>>({});
   const [abaAtiva, setAbaAtiva] = useState('busca');
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalBuscado, setTotalBuscado] = useState(0);
   const [ordenacao, setOrdenacao] = useState('data_desc');
+  const [tempoBusca, setTempoBusca] = useState<number | null>(null);
   
   const [comarcaFiltro, setComarcaFiltro] = useState('');
   const [comarcasSelecionadas, setComarcasSelecionadas] = useState<string[]>([]);
   const [comarcasDisponiveis, setComarcasDisponiveis] = useState<string[]>([]);
   const [valorMinimo, setValorMinimo] = useState<number>(0);
+  const [periodoFiltro, setPeriodoFiltro] = useState<number>(0);
 
   useEffect(() => {
     const savedExcluidos = localStorage.getItem(STORAGE_KEY_EXCLUIDOS);
     const savedInteresse = localStorage.getItem(STORAGE_KEY_INTERESSE);
+    const savedNotas = localStorage.getItem(STORAGE_KEY_NOTAS);
     if (savedExcluidos) {
       setExcluidos(new Set(JSON.parse(savedExcluidos)));
     }
     if (savedInteresse) {
       setInteresseIds(new Set(JSON.parse(savedInteresse)));
+    }
+    if (savedNotas) {
+      setNotas(JSON.parse(savedNotas));
     }
   }, []);
 
@@ -65,6 +73,12 @@ export default function Home() {
       localStorage.setItem(STORAGE_KEY_INTERESSE, JSON.stringify(Array.from(interesseIds)));
     }
   }, [interesseIds]);
+
+  useEffect(() => {
+    if (Object.keys(notas).length > 0) {
+      localStorage.setItem(STORAGE_KEY_NOTAS, JSON.stringify(notas));
+    }
+  }, [notas]);
 
   useEffect(() => {
     fetch('https://judicial-aggregator-production.up.railway.app/api/comarcas')
@@ -89,6 +103,9 @@ export default function Home() {
   const buscarProcessos = async (pagina: number = 1) => {
     setLoading(true);
     setPaginaAtual(pagina);
+    setTempoBusca(null);
+    const inicio = Date.now();
+    
     try {
       const body: BuscarBody = {
         tribunais: ['TJSP'],
@@ -110,6 +127,7 @@ export default function Home() {
         const processosFiltrados = data.filter((p: Processo) => !excluidos.has(p.numero));
         setProcessos(processosFiltrados);
         setTotalBuscado(data.length);
+        setTempoBusca((Date.now() - inicio) / 1000);
       } else {
         alert('Erro: ' + JSON.stringify(data));
       }
@@ -139,6 +157,16 @@ export default function Home() {
     setProcessos(processos.filter(p => p.numero !== numero));
   };
 
+  const salvarNota = (numero: string, nota: string) => {
+    const novasNotas = { ...notas };
+    if (nota.trim()) {
+      novasNotas[numero] = nota;
+    } else {
+      delete novasNotas[numero];
+    }
+    setNotas(novasNotas);
+  };
+
   const limparExcluidos = () => {
     if (confirm('Limpar ' + excluidos.size + ' processos excluidos? Eles voltarao nas buscas.')) {
       setExcluidos(new Set());
@@ -154,7 +182,7 @@ export default function Home() {
   };
 
   const exportarExcel = (lista: Processo[], nomeArquivo: string) => {
-    const headers = ['Numero', 'Tipo', 'Comarca', 'Data Ajuizamento', 'Valor Causa', 'Ultimo Movimento', 'Data Movimento', 'Link TJSP'];
+    const headers = ['Numero', 'Tipo', 'Comarca', 'Data Ajuizamento', 'Valor Causa', 'Ultimo Movimento', 'Data Movimento', 'Notas', 'Link TJSP'];
     const rows = lista.map(p => [
       formatarNumero(p.numero),
       p.tipo,
@@ -163,6 +191,7 @@ export default function Home() {
       p.valor_causa ? p.valor_causa.toString() : '',
       p.ultimo_movimento,
       p.data_ultimo_movimento,
+      notas[p.numero] || '',
       p.url_tjsp
     ]);
     
@@ -198,12 +227,25 @@ export default function Home() {
     }
   };
 
-  // Filtrar por valor - mantem processos sem valor informado separados
+  const filtrarPorPeriodo = (lista: Processo[]) => {
+    if (periodoFiltro === 0) return lista;
+    
+    const hoje = new Date();
+    const dataLimite = new Date();
+    dataLimite.setDate(hoje.getDate() - periodoFiltro);
+    const limiteStr = dataLimite.toISOString().slice(0, 10).replace(/-/g, '');
+    
+    return lista.filter(p => {
+      if (!p.data_ajuizamento) return false;
+      return p.data_ajuizamento >= limiteStr;
+    });
+  };
+
   const processosBase = processos.filter(p => !interesseIds.has(p.numero) && !excluidos.has(p.numero));
-  const processosComValor = processosBase.filter(p => p.valor_causa && p.valor_causa > 0);
-  const processosSemValor = processosBase.filter(p => !p.valor_causa || p.valor_causa === 0);
+  const processosComPeriodo = filtrarPorPeriodo(processosBase);
+  const processosComValor = processosComPeriodo.filter(p => p.valor_causa && p.valor_causa > 0);
+  const processosSemValor = processosComPeriodo.filter(p => !p.valor_causa || p.valor_causa === 0);
   
-  // Aplicar filtro de valor minimo apenas nos que tem valor
   const processosComValorFiltrados = valorMinimo > 0 
     ? processosComValor.filter(p => p.valor_causa && p.valor_causa >= valorMinimo)
     : processosComValor;
@@ -235,11 +277,19 @@ export default function Home() {
   };
 
   const ProcessoCard = ({ processo }: { processo: Processo }) => {
+    const [notaLocal, setNotaLocal] = useState(notas[processo.numero] || '');
+    const [editandoNota, setEditandoNota] = useState(false);
     const temValor = processo.valor_causa && processo.valor_causa > 0;
     const temValorAlto = processo.valor_causa && processo.valor_causa >= 100000;
+    const temNota = notas[processo.numero] && notas[processo.numero].trim().length > 0;
     
+    const handleSalvarNota = () => {
+      salvarNota(processo.numero, notaLocal);
+      setEditandoNota(false);
+    };
+
     return (
-      <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: temValorAlto ? '2px solid #10b981' : '1px solid #e5e7eb' }}>
+      <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: temValorAlto ? '2px solid #10b981' : temNota ? '2px solid #8b5cf6' : '1px solid #e5e7eb' }}>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
           {temValorAlto && (
             <div style={{ backgroundColor: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>ALTO VALOR</div>
@@ -248,6 +298,9 @@ export default function Home() {
             <div style={{ backgroundColor: '#3b82f6', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>VALOR INFORMADO</div>
           ) : (
             <div style={{ backgroundColor: '#f59e0b', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>VALOR NAO INFORMADO</div>
+          )}
+          {temNota && (
+            <div style={{ backgroundColor: '#8b5cf6', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>TEM NOTA</div>
           )}
         </div>
         <div style={{ marginBottom: '12px' }}>
@@ -278,10 +331,40 @@ export default function Home() {
             <p style={{ fontWeight: 'bold', fontSize: '14px', margin: 0, color: '#92400e' }}>Verificar no TJSP</p>
           )}
         </div>
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '12px' }}>
           <p style={{ fontSize: '11px', color: '#6b7280' }}>Ultimo Movimento ({processo.data_ultimo_movimento}):</p>
           <p style={{ fontSize: '13px', margin: 0, color: '#374151' }}>{processo.ultimo_movimento || '-'}</p>
         </div>
+        
+        <div style={{ marginBottom: '16px', padding: '10px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Notas:</p>
+            {!editandoNota && (
+              <button onClick={() => setEditandoNota(true)} style={{ fontSize: '11px', color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                {temNota ? 'Editar' : '+ Adicionar'}
+              </button>
+            )}
+          </div>
+          {editandoNota ? (
+            <div>
+              <textarea 
+                value={notaLocal} 
+                onChange={(e) => setNotaLocal(e.target.value)}
+                placeholder="Ex: Ligar segunda, imovel em Pinheiros..."
+                style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '13px', minHeight: '60px', resize: 'vertical', boxSizing: 'border-box' }}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button onClick={handleSalvarNota} style={{ flex: 1, backgroundColor: '#6366f1', color: 'white', padding: '6px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>Salvar</button>
+                <button onClick={() => { setNotaLocal(notas[processo.numero] || ''); setEditandoNota(false); }} style={{ flex: 1, backgroundColor: '#e5e7eb', color: '#374151', padding: '6px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>Cancelar</button>
+              </div>
+            </div>
+          ) : (
+            <p style={{ fontSize: '13px', margin: 0, color: temNota ? '#374151' : '#9ca3af', fontStyle: temNota ? 'normal' : 'italic' }}>
+              {temNota ? notas[processo.numero] : 'Nenhuma nota'}
+            </p>
+          )}
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
           <button onClick={() => marcarInteresse(processo.numero)} style={{ backgroundColor: '#10b981', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>Interesse</button>
           <a href={processo.url_tjsp} target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#3b82f6', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px', textAlign: 'center', textDecoration: 'none' }}>Ver TJSP</a>
@@ -292,6 +375,7 @@ export default function Home() {
   };
 
   const processosAltoValor = processos.filter(p => p.valor_causa && p.valor_causa >= 100000).length;
+  const processosComNotas = Object.keys(notas).length;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
@@ -303,7 +387,8 @@ export default function Home() {
         <div style={{ backgroundColor: '#fef3c7', borderRadius: '12px', padding: '16px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '14px', color: '#92400e' }}><strong>{interesseIds.size}</strong> processos de interesse</span>
-            <span style={{ fontSize: '14px', color: '#92400e' }}><strong>{excluidos.size}</strong> processos excluidos (nao aparecem nas buscas)</span>
+            <span style={{ fontSize: '14px', color: '#92400e' }}><strong>{excluidos.size}</strong> excluidos</span>
+            <span style={{ fontSize: '14px', color: '#92400e' }}><strong>{processosComNotas}</strong> com notas</span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             {interesseIds.size > 0 && (
@@ -350,7 +435,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade por pagina:</label>
               <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
@@ -361,31 +446,47 @@ export default function Home() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor minimo da causa:</label>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor minimo:</label>
               <select value={valorMinimo} onChange={(e) => setValorMinimo(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                <option value={0}>Todos os valores</option>
-                <option value={50000}>Acima de R$ 50.000</option>
-                <option value={100000}>Acima de R$ 100.000</option>
-                <option value={200000}>Acima de R$ 200.000</option>
-                <option value={500000}>Acima de R$ 500.000</option>
-                <option value={1000000}>Acima de R$ 1.000.000</option>
+                <option value={0}>Todos</option>
+                <option value={50000}>R$ 50.000+</option>
+                <option value={100000}>R$ 100.000+</option>
+                <option value={200000}>R$ 200.000+</option>
+                <option value={500000}>R$ 500.000+</option>
+                <option value={1000000}>R$ 1.000.000+</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Periodo:</label>
+              <select value={periodoFiltro} onChange={(e) => setPeriodoFiltro(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
+                <option value={0}>Todos</option>
+                <option value={30}>Ultimos 30 dias</option>
+                <option value={60}>Ultimos 60 dias</option>
+                <option value={90}>Ultimos 90 dias</option>
+                <option value={180}>Ultimos 6 meses</option>
+                <option value={365}>Ultimo ano</option>
               </select>
             </div>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Ordenar por:</label>
               <select value={ordenacao} onChange={(e) => setOrdenacao(e.target.value)} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                <option value="data_desc">Data (mais recentes)</option>
-                <option value="data_asc">Data (mais antigos)</option>
-                <option value="valor_desc">Valor (maior primeiro)</option>
-                <option value="valor_asc">Valor (menor primeiro)</option>
-                <option value="comarca">Comarca (A-Z)</option>
-                <option value="tipo">Tipo (A-Z)</option>
+                <option value="data_desc">Data (recentes)</option>
+                <option value="data_asc">Data (antigos)</option>
+                <option value="valor_desc">Valor (maior)</option>
+                <option value="valor_asc">Valor (menor)</option>
+                <option value="comarca">Comarca</option>
+                <option value="tipo">Tipo</option>
               </select>
             </div>
           </div>
           <button onClick={() => buscarProcessos(1)} disabled={loading || tiposSelecionados.length === 0} style={{ width: '100%', background: loading ? '#9ca3af' : 'linear-gradient(to right, #4f46e5, #7c3aed)', color: 'white', padding: '16px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer' }}>
             {loading ? 'Buscando...' : 'BUSCAR PROCESSOS'}
           </button>
+          {tempoBusca !== null && (
+            <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '13px', color: '#6b7280' }}>
+              Busca concluida em {tempoBusca.toFixed(1)} segundos
+            </p>
+          )}
         </div>
         {processos.length > 0 && (
           <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -396,26 +497,30 @@ export default function Home() {
               </div>
               <div style={{ backgroundColor: '#dbeafe', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e40af', margin: 0 }}>{processosComValorFiltrados.length}</p>
-                <p style={{ fontSize: '13px', color: '#1e40af', margin: 0 }}>Com Valor Informado</p>
+                <p style={{ fontSize: '13px', color: '#1e40af', margin: 0 }}>Com Valor</p>
               </div>
               <div style={{ backgroundColor: '#fef3c7', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#92400e', margin: 0 }}>{processosSemValor.length}</p>
-                <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Sem Valor Informado</p>
+                <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>Sem Valor</p>
               </div>
               <div style={{ backgroundColor: '#d1fae5', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#065f46', margin: 0 }}>{processosAltoValor}</p>
-                <p style={{ fontSize: '13px', color: '#065f46', margin: 0 }}>Alto Valor (100k+)</p>
+                <p style={{ fontSize: '13px', color: '#065f46', margin: 0 }}>Alto Valor</p>
               </div>
               <div style={{ backgroundColor: '#fce7f3', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                 <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#9d174d', margin: 0 }}>{processosInteresse.length}</p>
-                <p style={{ fontSize: '13px', color: '#9d174d', margin: 0 }}>Com Interesse</p>
+                <p style={{ fontSize: '13px', color: '#9d174d', margin: 0 }}>Interesse</p>
               </div>
             </div>
             
-            {valorMinimo > 0 && (
+            {(valorMinimo > 0 || periodoFiltro > 0) && (
               <div style={{ backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #bfdbfe' }}>
                 <p style={{ margin: 0, fontSize: '14px', color: '#1e40af' }}>
-                  Filtro ativo: mostrando <strong>{processosComValorFiltrados.length}</strong> processos com valor acima de {formatarValor(valorMinimo)} + <strong>{processosSemValor.length}</strong> processos sem valor informado (precisam verificar no TJSP)
+                  Filtros ativos: 
+                  {valorMinimo > 0 && <span> valor acima de {formatarValor(valorMinimo)}</span>}
+                  {valorMinimo > 0 && periodoFiltro > 0 && <span> | </span>}
+                  {periodoFiltro > 0 && <span> ultimos {periodoFiltro} dias</span>}
+                  {valorMinimo > 0 && <span> (+ {processosSemValor.length} sem valor informado)</span>}
                 </p>
               </div>
             )}
