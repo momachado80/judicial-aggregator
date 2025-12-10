@@ -48,13 +48,15 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libatspi2.0-0 \
     libgtk-3-0 \
+    fonts-liberation \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+# Instalar Chrome usando o método novo (sem apt-key deprecated)
+RUN wget -q -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get update \
-    && apt-get install -y google-chrome-stable \
+    && apt-get install -y /tmp/google-chrome.deb \
+    && rm /tmp/google-chrome.deb \
     && rm -rf /var/lib/apt/lists/*
 
 # Diretório de trabalho
