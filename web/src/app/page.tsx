@@ -1,6 +1,28 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+const Tooltip = ({ texto, children }: { texto: string; children: React.ReactNode }) => {
+  const [mostrar, setMostrar] = useState(false);
+  return (
+    <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      {children}
+      <span
+        onMouseEnter={() => setMostrar(true)}
+        onMouseLeave={() => setMostrar(false)}
+        style={{ cursor: 'help', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '16px', height: '16px', borderRadius: '50%', backgroundColor: '#6b7280', color: 'white', fontSize: '11px', fontWeight: 'bold' }}
+      >
+        ?
+      </span>
+      {mostrar && (
+        <span style={{ position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px', padding: '8px 12px', backgroundColor: '#1f2937', color: 'white', fontSize: '12px', borderRadius: '6px', whiteSpace: 'normal', width: '250px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.3)', lineHeight: '1.4' }}>
+          {texto}
+          <span style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: '6px', borderStyle: 'solid', borderColor: '#1f2937 transparent transparent transparent' }}></span>
+        </span>
+      )}
+    </span>
+  );
+};
+
 interface BuscarBody {
   tribunais: string[];
   tipos_processo: string[];
@@ -405,7 +427,9 @@ export default function Home() {
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Buscar Processos</h2>
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Tipos:</label>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+              <Tooltip texto="Tipos de processo a buscar. Inventario: partilha de bens de pessoa falecida. Divorcio: separacao de bens de casal. Ambos podem envolver imoveis.">Tipos:</Tooltip>
+            </label>
             <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
               {['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual'].map(t => (
                 <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -419,7 +443,9 @@ export default function Home() {
             </div>
           </div>
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Comarcas (opcional):</label>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+              <Tooltip texto="Filtra por cidade/regiao do processo. Se vazio, busca em todo o TJSP. Para Sao Paulo capital, digite 'Sao Paulo' para incluir todos os foros da capital.">Comarcas (opcional):</Tooltip>
+            </label>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
               <input type="text" value={comarcaFiltro} onChange={(e) => setComarcaFiltro(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && adicionarComarca(comarcaFiltro)} placeholder="Sao Paulo, Campinas..." list="comarcas-list" style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db' }} />
               <button onClick={() => adicionarComarca(comarcaFiltro)} style={{ backgroundColor: '#3b82f6', color: 'white', padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600' }}>+ Adicionar</button>
@@ -437,7 +463,9 @@ export default function Home() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Quantidade por pagina:</label>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                <Tooltip texto="Quantos processos mostrar por pagina. A busca sempre traz ate 1000 processos da API, este filtro apenas divide a visualizacao em paginas.">Quantidade por pagina:</Tooltip>
+              </label>
               <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
@@ -446,7 +474,9 @@ export default function Home() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Valor minimo:</label>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                <Tooltip texto="Filtra processos com valor da causa acima do selecionado. IMPORTANTE: Processos sem valor informado continuam aparecendo (precisam ser verificados no TJSP). Este filtro age sobre os resultados ja buscados.">Valor minimo:</Tooltip>
+              </label>
               <select value={valorMinimo} onChange={(e) => setValorMinimo(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                 <option value={0}>Todos</option>
                 <option value={50000}>R$ 50.000+</option>
@@ -457,7 +487,9 @@ export default function Home() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Periodo:</label>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                <Tooltip texto="Filtra processos pela data de ajuizamento. Mostra apenas processos abertos dentro do periodo selecionado. Util para focar em casos mais recentes.">Periodo:</Tooltip>
+              </label>
               <select value={periodoFiltro} onChange={(e) => setPeriodoFiltro(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                 <option value={0}>Todos</option>
                 <option value={30}>Ultimos 30 dias</option>
@@ -468,7 +500,9 @@ export default function Home() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>Ordenar por:</label>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                <Tooltip texto="Define a ordem de exibicao dos processos. Por valor mostra primeiro os de maior valor (que podem ter imoveis).">Ordenar por:</Tooltip>
+              </label>
               <select value={ordenacao} onChange={(e) => setOrdenacao(e.target.value)} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
                 <option value="data_desc">Data (recentes)</option>
                 <option value="data_asc">Data (antigos)</option>
