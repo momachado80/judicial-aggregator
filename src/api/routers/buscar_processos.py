@@ -89,8 +89,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
     }
     
     must_clauses = [{"term": {"classe.codigo": tipo_cod}}]
-    if codigo_comarca:
-        must_clauses.append({"wildcard": {"numeroProcesso": f"*826{codigo_comarca}"}})
+    # Filtro de comarca será aplicado depois nos resultados
     
     query = {
         "query": {"bool": {"must": must_clauses}},
@@ -132,6 +131,10 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
                 "motivo_inativo": motivo if not ativo else None,
                 "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
             })
+        
+        # Filtra por comarca se especificada
+        if codigo_comarca:
+            processos = [p for p in processos if p.get("codigo_comarca") == codigo_comarca]
         
         return processos
     except Exception as e:
