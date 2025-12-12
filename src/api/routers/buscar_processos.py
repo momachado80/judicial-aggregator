@@ -90,7 +90,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
     
     must_clauses = [{"term": {"classe.codigo": tipo_cod}}]
     if codigo_comarca:
-        must_clauses.append({"wildcard": {"numeroProcesso": f"*{codigo_comarca}"}})
+        must_clauses.append({"wildcard": {"numeroProcesso": f"*826{codigo_comarca}"}})
     
     query = {
         "query": {"bool": {"must": must_clauses}},
