@@ -76,9 +76,8 @@ def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
     return True, "ativo"
 
 
-def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quantidade: int, search_after: Optional[List] = None) -> tuple[List[Dict], Optional[List]]:
-    """Busca processos com suporte a paginação via search_after"""
-    tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
+def _buscar_pagina(tribunal: str, tipo_cod: int, from_offset: int) -> List[Dict]:
+    """Busca uma pagina de processos"""
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
     headers = {
@@ -86,31 +85,47 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
         "Authorization": f"APIKey {DATAJUD_API_KEY}"
     }
     
-    must_clauses = [{"term": {"classe.codigo": tipo_cod}}]
-    
     query = {
-        "query": {"bool": {"must": must_clauses}},
+        "query": {"bool": {"must": [{"term": {"classe.codigo": tipo_cod}}]}},
         "size": 1000,
-        "sort": [{"dataAjuizamento": {"order": "desc"}}, {"numeroProcesso": {"order": "desc"}}]
+        "from": from_offset,
+        "sort": [{"dataAjuizamento": {"order": "desc"}}]
     }
-    
-    if search_after:
-        query["search_after"] = search_after
     
     try:
         response = requests.post(url, headers=headers, json=query, timeout=60)
         if response.status_code != 200:
-            return [], None
+            print(f"Erro API: {response.status_code} - {response.text[:200]}")
+            return []
         
         data = response.json()
-        hits = data.get("hits", {}).get("hits", [])
+        return data.get("hits", {}).get("hits", [])
+    except Exception as e:
+        print(f"Erro requisicao: {e}")
+        return []
+
+
+def _buscar_com_paginacao(tribunal: str, tipo: str, codigo_comarca: Optional[str], max_processos: int) -> List[Dict]:
+    """Busca com paginacao para coletar processos de uma comarca especifica"""
+    tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
+    todos_processos = []
+    
+    # Se tem comarca, precisa paginar mais para encontrar processos dela
+    max_paginas = 10 if codigo_comarca else 1
+    
+    for pagina in range(max_paginas):
+        from_offset = pagina * 1000
+        
+        # API do DataJud limita from + size <= 10000
+        if from_offset >= 10000:
+            break
+            
+        hits = _buscar_pagina(tribunal, tipo_cod, from_offset)
         
         if not hits:
-            return [], None
+            print(f"Pagina {pagina+1}: sem resultados, parando")
+            break
         
-        last_sort = hits[-1].get("sort") if hits else None
-        
-        processos = []
         for hit in hits:
             source = hit.get("_source", {})
             numero = source.get("numeroProcesso", "")
@@ -119,6 +134,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
             
             codigo = extrair_codigo_comarca(numero)
             
+            # Filtra por comarca se especificada
             if codigo_comarca and codigo != codigo_comarca:
                 continue
             
@@ -126,7 +142,7 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
             ultimo_mov = get_ultimo_movimento(movimentos)
             ativo, motivo = processo_esta_ativo(movimentos)
             
-            processos.append({
+            todos_processos.append({
                 "numero": numero,
                 "tribunal": tribunal,
                 "tipo": tipo,
@@ -141,28 +157,13 @@ def _buscar_sync(tribunal: str, tipo: str, codigo_comarca: Optional[str], quanti
                 "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
             })
         
-        return processos, last_sort
-    except Exception as e:
-        print(f"Erro busca {tipo}: {e}")
-        return [], None
-
-
-def _buscar_com_paginacao(tribunal: str, tipo: str, codigo_comarca: Optional[str], max_processos: int) -> List[Dict]:
-    """Busca com paginação para coletar mais processos de uma comarca específica"""
-    todos_processos = []
-    search_after = None
-    max_paginas = 20 if codigo_comarca else 1
-    
-    for pagina in range(max_paginas):
-        processos, search_after = _buscar_sync(tribunal, tipo, codigo_comarca, 1000, search_after)
-        todos_processos.extend(processos)
-        
-        print(f"Pagina {pagina+1}: encontrados {len(processos)} processos, total: {len(todos_processos)}")
+        encontrados_pagina = len([h for h in hits if not codigo_comarca or extrair_codigo_comarca(h.get("_source", {}).get("numeroProcesso", "")) == codigo_comarca])
+        print(f"Pagina {pagina+1}: {len(hits)} hits, {encontrados_pagina} da comarca, total acumulado: {len(todos_processos)}")
         
         if len(todos_processos) >= max_processos:
             break
         
-        if not search_after or len(processos) == 0:
+        if len(hits) < 1000:
             break
     
     return todos_processos[:max_processos]
@@ -174,13 +175,14 @@ async def buscar_processos(request: BuscarProcessosRequest):
         loop = asyncio.get_event_loop()
         tasks = []
         
-        max_por_busca = request.quantidade if request.comarcas else 1000
+        max_por_busca = request.quantidade
         
         codigos_comarca = []
         if request.comarcas:
             for nome in request.comarcas:
                 codigos = get_codigos_comarca_por_nome(nome)
                 codigos_comarca.extend(codigos)
+                print(f"Comarca '{nome}' -> codigos: {codigos}")
         
         if codigos_comarca:
             for codigo in codigos_comarca:
