@@ -244,9 +244,9 @@ async def buscar_processos(request: BuscarProcessosRequest):
             periodos = []
             
             # 5 anos em periodos de 6 meses
-            for i in range(10):
-                data_fim = hoje - timedelta(days=i*180)
-                data_inicio = hoje - timedelta(days=(i+1)*180)
+            for i in range(60):
+                data_fim = hoje - timedelta(days=i*30)
+                data_inicio = hoje - timedelta(days=(i+1)*30)
                 periodos.append((data_inicio.strftime("%Y-%m-%d"), data_fim.strftime("%Y-%m-%d")))
             
             # Criar todas as tasks em paralelo
