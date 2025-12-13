@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP, expandir_sao_paulo, FOROS_SAO_PAULO_CAPITAL
 
 router = APIRouter()
-executor = ThreadPoolExecutor(max_workers=10)
+executor = ThreadPoolExecutor(max_workers=20)
 
 class BuscarProcessosRequest(BaseModel):
     tribunais: List[str]
@@ -77,8 +77,8 @@ def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
     return True, "ativo"
 
 
-def _buscar_pagina(tribunal: str, tipo_cod: int, from_offset: int, data_inicio: str = None, data_fim: str = None) -> List[Dict]:
-    """Busca uma pagina de processos com filtro de data opcional"""
+def _buscar_periodo(tribunal: str, tipo_cod: int, codigo_comarca: str, data_inicio: str, data_fim: str, tipo: str) -> List[Dict]:
+    """Busca todos os processos de um periodo especifico"""
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
     headers = {
@@ -86,140 +86,138 @@ def _buscar_pagina(tribunal: str, tipo_cod: int, from_offset: int, data_inicio: 
         "Authorization": f"APIKey {DATAJUD_API_KEY}"
     }
     
-    must_clauses = [{"term": {"classe.codigo": tipo_cod}}]
-    
-    if data_inicio and data_fim:
-        must_clauses.append({
-            "range": {
-                "dataAjuizamento": {
-                    "gte": data_inicio,
-                    "lte": data_fim
-                }
-            }
-        })
-    
-    query = {
-        "query": {"bool": {"must": must_clauses}},
-        "size": 1000,
-        "from": from_offset,
-        "sort": [{"dataAjuizamento": {"order": "desc"}}]
-    }
-    
-    try:
-        response = requests.post(url, headers=headers, json=query, timeout=60)
-        if response.status_code != 200:
-            print(f"Erro API: {response.status_code}")
-            return []
-        
-        data = response.json()
-        return data.get("hits", {}).get("hits", [])
-    except Exception as e:
-        print(f"Erro requisicao: {e}")
-        return []
-
-
-def _processar_hits(hits: List[Dict], tribunal: str, tipo: str, codigo_comarca: Optional[str]) -> List[Dict]:
-    """Processa hits e filtra por comarca se necessario"""
     processos = []
     
-    for hit in hits:
-        source = hit.get("_source", {})
-        numero = source.get("numeroProcesso", "")
-        if not numero:
-            continue
+    for pagina in range(10):
+        from_offset = pagina * 1000
+        if from_offset >= 10000:
+            break
         
-        codigo = extrair_codigo_comarca(numero)
+        query = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"term": {"classe.codigo": tipo_cod}},
+                        {"range": {"dataAjuizamento": {"gte": data_inicio, "lte": data_fim}}}
+                    ]
+                }
+            },
+            "size": 1000,
+            "from": from_offset,
+            "sort": [{"dataAjuizamento": {"order": "desc"}}]
+        }
         
-        if codigo_comarca and codigo != codigo_comarca:
-            continue
-        
-        movimentos = source.get("movimentos", [])
-        ultimo_mov = get_ultimo_movimento(movimentos)
-        ativo, motivo = processo_esta_ativo(movimentos)
-        
-        processos.append({
-            "numero": numero,
-            "tribunal": tribunal,
-            "tipo": tipo,
-            "comarca": get_comarca_nome(codigo, tribunal),
-            "codigo_comarca": codigo,
-            "data_ajuizamento": source.get("dataAjuizamento"),
-            "valor_causa": source.get("valorCausa"),
-            "ultimo_movimento": ultimo_mov.get("nome", ""),
-            "data_ultimo_movimento": ultimo_mov.get("dataHora", "")[:10] if ultimo_mov.get("dataHora") else "",
-            "ativo": ativo,
-            "motivo_inativo": motivo if not ativo else None,
-            "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
-        })
+        try:
+            response = requests.post(url, headers=headers, json=query, timeout=30)
+            if response.status_code != 200:
+                break
+            
+            hits = response.json().get("hits", {}).get("hits", [])
+            if not hits:
+                break
+            
+            for hit in hits:
+                source = hit.get("_source", {})
+                numero = source.get("numeroProcesso", "")
+                if not numero:
+                    continue
+                
+                codigo = extrair_codigo_comarca(numero)
+                if codigo != codigo_comarca:
+                    continue
+                
+                movimentos = source.get("movimentos", [])
+                ultimo_mov = get_ultimo_movimento(movimentos)
+                ativo, motivo = processo_esta_ativo(movimentos)
+                
+                processos.append({
+                    "numero": numero,
+                    "tribunal": tribunal,
+                    "tipo": tipo,
+                    "comarca": get_comarca_nome(codigo, tribunal),
+                    "codigo_comarca": codigo,
+                    "data_ajuizamento": source.get("dataAjuizamento"),
+                    "valor_causa": source.get("valorCausa"),
+                    "ultimo_movimento": ultimo_mov.get("nome", ""),
+                    "data_ultimo_movimento": ultimo_mov.get("dataHora", "")[:10] if ultimo_mov.get("dataHora") else "",
+                    "ativo": ativo,
+                    "motivo_inativo": motivo if not ativo else None,
+                    "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
+                })
+            
+            print(f"Periodo {data_inicio[:7]}: pag {pagina+1}, {len(hits)} hits, {len(processos)} da comarca")
+            
+            if len(hits) < 1000:
+                break
+                
+        except Exception as e:
+            print(f"Erro periodo {data_inicio}: {e}")
+            break
     
     return processos
 
 
-def _buscar_com_paginacao(tribunal: str, tipo: str, codigo_comarca: Optional[str], max_processos: int) -> List[Dict]:
-    """Busca com paginacao por periodos para contornar limite de 10000"""
+def _buscar_simples(tribunal: str, tipo: str, max_processos: int) -> List[Dict]:
+    """Busca simples sem filtro de comarca"""
     tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
-    todos_processos = []
-    numeros_vistos = set()
+    url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
-    if not codigo_comarca:
-        # Sem comarca, busca simples
-        hits = _buscar_pagina(tribunal, tipo_cod, 0)
-        return _processar_hits(hits, tribunal, tipo, None)[:max_processos]
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"APIKey {DATAJUD_API_KEY}"
+    }
     
-    # Com comarca, busca por periodos de 6 meses para pegar mais dados
-    hoje = datetime.now()
-    periodos = []
+    query = {
+        "query": {"bool": {"must": [{"term": {"classe.codigo": tipo_cod}}]}},
+        "size": min(max_processos, 1000),
+        "sort": [{"dataAjuizamento": {"order": "desc"}}]
+    }
     
-    # Ultimos 5 anos em periodos de 6 meses
-    for i in range(10):
-        data_fim = hoje - timedelta(days=i*180)
-        data_inicio = hoje - timedelta(days=(i+1)*180)
-        periodos.append((
-            data_inicio.strftime("%Y-%m-%d"),
-            data_fim.strftime("%Y-%m-%d")
-        ))
-    
-    for data_inicio, data_fim in periodos:
-        if len(todos_processos) >= max_processos:
-            break
+    try:
+        response = requests.post(url, headers=headers, json=query, timeout=30)
+        if response.status_code != 200:
+            return []
         
-        # Busca ate 10 paginas por periodo (limite API)
-        for pagina in range(10):
-            if len(todos_processos) >= max_processos:
-                break
+        hits = response.json().get("hits", {}).get("hits", [])
+        processos = []
+        
+        for hit in hits:
+            source = hit.get("_source", {})
+            numero = source.get("numeroProcesso", "")
+            if not numero:
+                continue
             
-            from_offset = pagina * 1000
-            if from_offset >= 10000:
-                break
+            codigo = extrair_codigo_comarca(numero)
+            movimentos = source.get("movimentos", [])
+            ultimo_mov = get_ultimo_movimento(movimentos)
+            ativo, motivo = processo_esta_ativo(movimentos)
             
-            hits = _buscar_pagina(tribunal, tipo_cod, from_offset, data_inicio, data_fim)
-            
-            if not hits:
-                break
-            
-            novos = _processar_hits(hits, tribunal, tipo, codigo_comarca)
-            
-            # Evita duplicatas
-            for p in novos:
-                if p["numero"] not in numeros_vistos:
-                    numeros_vistos.add(p["numero"])
-                    todos_processos.append(p)
-            
-            print(f"Periodo {data_inicio[:7]}: pag {pagina+1}, {len(hits)} hits, {len(novos)} da comarca, total: {len(todos_processos)}")
-            
-            if len(hits) < 1000:
-                break
-    
-    return todos_processos[:max_processos]
+            processos.append({
+                "numero": numero,
+                "tribunal": tribunal,
+                "tipo": tipo,
+                "comarca": get_comarca_nome(codigo, tribunal),
+                "codigo_comarca": codigo,
+                "data_ajuizamento": source.get("dataAjuizamento"),
+                "valor_causa": source.get("valorCausa"),
+                "ultimo_movimento": ultimo_mov.get("nome", ""),
+                "data_ultimo_movimento": ultimo_mov.get("dataHora", "")[:10] if ultimo_mov.get("dataHora") else "",
+                "ativo": ativo,
+                "motivo_inativo": motivo if not ativo else None,
+                "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
+            })
+        
+        return processos
+        
+    except Exception as e:
+        print(f"Erro busca simples: {e}")
+        return []
 
 
 @router.post("/buscar-processos")
 async def buscar_processos(request: BuscarProcessosRequest):
     try:
         loop = asyncio.get_event_loop()
-        tasks = []
-        
-        max_por_busca = request.quantidade
         
         codigos_comarca = []
         if request.comarcas:
@@ -228,36 +226,56 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 codigos_comarca.extend(codigos)
                 print(f"Comarca '{nome}' -> codigos: {codigos}")
         
-        if codigos_comarca:
+        if not codigos_comarca:
+            # Sem comarca - busca simples
+            tasks = []
+            for tribunal in request.tribunais:
+                for tipo in request.tipos_processo:
+                    task = loop.run_in_executor(executor, _buscar_simples, tribunal, tipo, 1000)
+                    tasks.append(task)
+            
+            resultados = await asyncio.gather(*tasks)
+            todos = []
+            for r in resultados:
+                todos.extend(r)
+        else:
+            # Com comarca - busca paralela por periodos
+            hoje = datetime.now()
+            periodos = []
+            
+            # 5 anos em periodos de 6 meses
+            for i in range(10):
+                data_fim = hoje - timedelta(days=i*180)
+                data_inicio = hoje - timedelta(days=(i+1)*180)
+                periodos.append((data_inicio.strftime("%Y-%m-%d"), data_fim.strftime("%Y-%m-%d")))
+            
+            # Criar todas as tasks em paralelo
+            tasks = []
             for codigo in codigos_comarca:
                 for tribunal in request.tribunais:
                     for tipo in request.tipos_processo:
-                        task = loop.run_in_executor(
-                            executor, _buscar_com_paginacao, 
-                            tribunal, tipo, codigo, max_por_busca
-                        )
-                        tasks.append(task)
-        else:
-            for tribunal in request.tribunais:
-                for tipo in request.tipos_processo:
-                    task = loop.run_in_executor(
-                        executor, _buscar_com_paginacao,
-                        tribunal, tipo, None, 1000
-                    )
-                    tasks.append(task)
+                        tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
+                        for data_inicio, data_fim in periodos:
+                            task = loop.run_in_executor(
+                                executor, _buscar_periodo,
+                                tribunal, tipo_cod, codigo, data_inicio, data_fim, tipo
+                            )
+                            tasks.append(task)
+            
+            print(f"Executando {len(tasks)} buscas em paralelo...")
+            resultados = await asyncio.gather(*tasks)
+            
+            todos = []
+            for r in resultados:
+                todos.extend(r)
         
-        resultados = await asyncio.gather(*tasks)
-        
-        todos = []
-        for r in resultados:
-            todos.extend(r)
-        
+        # Filtrar extintos
         if not request.incluir_extintos:
             antes = len(todos)
             todos = [p for p in todos if p.get("ativo", True)]
-            filtrados = antes - len(todos)
-            print(f"Total: {antes} | Ativos: {len(todos)} | Extintos removidos: {filtrados}")
+            print(f"Total: {antes} | Ativos: {len(todos)} | Extintos removidos: {antes - len(todos)}")
         
+        # Remover duplicatas
         vistos = set()
         unicos = []
         for p in todos:
@@ -265,8 +283,10 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 vistos.add(p["numero"])
                 unicos.append(p)
         
+        # Ordenar por data
         unicos.sort(key=lambda x: x.get("data_ajuizamento", ""), reverse=True)
         
+        print(f"Retornando {min(len(unicos), request.quantidade)} processos")
         return unicos[:request.quantidade]
         
     except Exception as e:
