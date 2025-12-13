@@ -375,7 +375,7 @@ export default function Home() {
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}><Tooltip texto="Processos por pagina.">Quantidade:</Tooltip></label>
               <select value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} style={{ width: '100%', padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-                <option value={50}>50</option><option value={100}>100</option><option value={200}>200</option><option value={500}>500</option>
+                <option value={50}>50</option><option value={100}>100</option><option value={200}>200</option><option value={500}>500</option><option value={1000}>1000</option><option value={2000}>2000</option><option value={5000}>5000</option>
               </select>
             </div>
             <div>
