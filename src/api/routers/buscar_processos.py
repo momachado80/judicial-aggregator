@@ -4,8 +4,7 @@ from typing import List, Optional, Dict
 import requests
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
-from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP, expandir_sao_paulo, FOROS_SAO_PAULO_CAPITAL
+from src.utils.comarcas import get_comarca_nome, extrair_codigo_comarca, COMARCAS_TJSP, FOROS_SAO_PAULO_CAPITAL
 
 router = APIRouter()
 executor = ThreadPoolExecutor(max_workers=20)
@@ -27,78 +26,60 @@ TIPOS_PROCESSO_MAPPING = {
 DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
 MOVIMENTOS_INATIVOS = {
-    "baixa definitiva",
-    "arquivado definitivamente",
-    "trânsito em julgado",
-    "processo suspenso",
-    "suspensão do processo",
-    "sobrestamento",
+    "baixa definitiva", "arquivado definitivamente", "trânsito em julgado",
+    "processo suspenso", "suspensão do processo", "sobrestamento",
 }
 
 
 def get_codigos_comarca_por_nome(nome: str) -> List[str]:
     nome_lower = nome.lower().strip()
-    
-    if nome_lower in ["são paulo", "sao paulo", "sp capital", "são paulo (capital)", "sao paulo (capital)", "capital"]:
+    if nome_lower in ["são paulo", "sao paulo", "sp capital", "capital"]:
         return list(FOROS_SAO_PAULO_CAPITAL)
-    
     for codigo, nome_comarca in COMARCAS_TJSP.items():
         if nome_lower == nome_comarca.lower():
             return [codigo]
-    
     for codigo, nome_comarca in COMARCAS_TJSP.items():
-        if nome_lower in nome_comarca.lower() or nome_comarca.lower() in nome_lower:
+        if nome_lower in nome_comarca.lower():
             return [codigo]
-    
     return []
 
 
 def get_ultimo_movimento(movimentos: List[Dict]) -> Dict:
     if not movimentos:
         return {}
-    movs_ordenados = sorted(movimentos, key=lambda m: m.get("dataHora", ""), reverse=True)
-    return movs_ordenados[0] if movs_ordenados else {}
+    return sorted(movimentos, key=lambda m: m.get("dataHora", ""), reverse=True)[0]
 
 
 def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
     ultimo = get_ultimo_movimento(movimentos)
     if not ultimo:
         return True, "sem_movimentos"
-    
     nome_mov = ultimo.get("nome", "").lower().strip()
-    
     if nome_mov == "definitivo":
         return False, "definitivo"
-    
     for termo in MOVIMENTOS_INATIVOS:
         if termo in nome_mov:
             return False, termo
-    
     return True, "ativo"
 
 
 def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo: str, max_processos: int) -> List[Dict]:
-    """Busca usando wildcard direto na API para filtrar por comarca"""
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
-    
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"APIKey {DATAJUD_API_KEY}"
     }
     
     processos = []
-    numeros_vistos = set()
-    
-    # Wildcard pattern: *826XXXX onde XXXX é o código da comarca
     wildcard_pattern = f"*826{codigo_comarca}"
     
-    # Buscar em múltiplas páginas usando search_after para contornar limite de 10k
-    last_sort = None
-    
-    for pagina in range(20):  # Máximo 20 páginas de 1000 = 20.000 processos
+    # Paginar com from (limite 10k, então max 10 páginas de 1000)
+    for pagina in range(10):
         if len(processos) >= max_processos:
             break
-            
+        
+        from_offset = pagina * 1000
+        
         query = {
             "query": {
                 "bool": {
@@ -109,16 +90,14 @@ def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo
                 }
             },
             "size": 1000,
-            "sort": [{"dataAjuizamento": {"order": "desc"}}, {"numeroProcesso": {"order": "desc"}}]
+            "from": from_offset,
+            "sort": [{"dataAjuizamento": {"order": "desc"}}]
         }
-        
-        if last_sort:
-            query["search_after"] = last_sort
         
         try:
             response = requests.post(url, headers=headers, json=query, timeout=60)
             if response.status_code != 200:
-                print(f"Erro API: {response.status_code}")
+                print(f"Erro API {response.status_code}: {response.text[:200]}")
                 break
             
             hits = response.json().get("hits", {}).get("hits", [])
@@ -128,10 +107,9 @@ def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo
             for hit in hits:
                 source = hit.get("_source", {})
                 numero = source.get("numeroProcesso", "")
-                if not numero or numero in numeros_vistos:
+                if not numero:
                     continue
                 
-                numeros_vistos.add(numero)
                 codigo = extrair_codigo_comarca(numero)
                 movimentos = source.get("movimentos", [])
                 ultimo_mov = get_ultimo_movimento(movimentos)
@@ -152,26 +130,21 @@ def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo
                     "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
                 })
             
-            # Pegar último sort para próxima página
-            last_sort = hits[-1].get("sort")
-            
-            print(f"Wildcard {codigo_comarca} pag {pagina+1}: {len(hits)} hits, total: {len(processos)}")
+            print(f"Wildcard {tipo} pag {pagina+1}: {len(hits)} hits, total: {len(processos)}")
             
             if len(hits) < 1000:
                 break
                 
         except Exception as e:
-            print(f"Erro busca wildcard: {e}")
+            print(f"Erro: {e}")
             break
     
     return processos
 
 
 def _buscar_simples(tribunal: str, tipo: str, max_processos: int) -> List[Dict]:
-    """Busca simples sem filtro de comarca"""
     tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
-    
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"APIKey {DATAJUD_API_KEY}"
@@ -218,7 +191,6 @@ def _buscar_simples(tribunal: str, tipo: str, max_processos: int) -> List[Dict]:
             })
         
         return processos
-        
     except Exception as e:
         print(f"Erro busca simples: {e}")
         return []
@@ -237,19 +209,13 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 print(f"Comarca '{nome}' -> codigos: {codigos}")
         
         if not codigos_comarca:
-            # Sem comarca - busca simples
             tasks = []
             for tribunal in request.tribunais:
                 for tipo in request.tipos_processo:
                     task = loop.run_in_executor(executor, _buscar_simples, tribunal, tipo, 1000)
                     tasks.append(task)
-            
             resultados = await asyncio.gather(*tasks)
-            todos = []
-            for r in resultados:
-                todos.extend(r)
         else:
-            # Com comarca - busca com wildcard direto na API
             tasks = []
             for codigo in codigos_comarca:
                 for tribunal in request.tribunais:
@@ -263,18 +229,16 @@ async def buscar_processos(request: BuscarProcessosRequest):
             
             print(f"Executando {len(tasks)} buscas com wildcard...")
             resultados = await asyncio.gather(*tasks)
-            
-            todos = []
-            for r in resultados:
-                todos.extend(r)
         
-        # Filtrar extintos
+        todos = []
+        for r in resultados:
+            todos.extend(r)
+        
         if not request.incluir_extintos:
             antes = len(todos)
             todos = [p for p in todos if p.get("ativo", True)]
             print(f"Total: {antes} | Ativos: {len(todos)} | Extintos removidos: {antes - len(todos)}")
         
-        # Remover duplicatas
         vistos = set()
         unicos = []
         for p in todos:
@@ -282,7 +246,6 @@ async def buscar_processos(request: BuscarProcessosRequest):
                 vistos.add(p["numero"])
                 unicos.append(p)
         
-        # Ordenar por data
         unicos.sort(key=lambda x: x.get("data_ajuizamento", ""), reverse=True)
         
         print(f"Retornando {min(len(unicos), request.quantidade)} processos")
