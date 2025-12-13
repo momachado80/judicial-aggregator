@@ -77,8 +77,8 @@ def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
     return True, "ativo"
 
 
-def _buscar_periodo(tribunal: str, tipo_cod: int, codigo_comarca: str, data_inicio: str, data_fim: str, tipo: str) -> List[Dict]:
-    """Busca todos os processos de um periodo especifico"""
+def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo: str, max_processos: int) -> List[Dict]:
+    """Busca usando wildcard direto na API para filtrar por comarca"""
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     
     headers = {
@@ -87,29 +87,38 @@ def _buscar_periodo(tribunal: str, tipo_cod: int, codigo_comarca: str, data_inic
     }
     
     processos = []
+    numeros_vistos = set()
     
-    for pagina in range(10):
-        from_offset = pagina * 1000
-        if from_offset >= 10000:
+    # Wildcard pattern: *826XXXX onde XXXX é o código da comarca
+    wildcard_pattern = f"*826{codigo_comarca}"
+    
+    # Buscar em múltiplas páginas usando search_after para contornar limite de 10k
+    last_sort = None
+    
+    for pagina in range(20):  # Máximo 20 páginas de 1000 = 20.000 processos
+        if len(processos) >= max_processos:
             break
-        
+            
         query = {
             "query": {
                 "bool": {
                     "must": [
                         {"term": {"classe.codigo": tipo_cod}},
-                        {"range": {"dataAjuizamento": {"gte": data_inicio, "lte": data_fim}}}
+                        {"wildcard": {"numeroProcesso": wildcard_pattern}}
                     ]
                 }
             },
             "size": 1000,
-            "from": from_offset,
-            "sort": [{"dataAjuizamento": {"order": "desc"}}]
+            "sort": [{"dataAjuizamento": {"order": "desc"}}, {"numeroProcesso": {"order": "desc"}}]
         }
         
+        if last_sort:
+            query["search_after"] = last_sort
+        
         try:
-            response = requests.post(url, headers=headers, json=query, timeout=30)
+            response = requests.post(url, headers=headers, json=query, timeout=60)
             if response.status_code != 200:
+                print(f"Erro API: {response.status_code}")
                 break
             
             hits = response.json().get("hits", {}).get("hits", [])
@@ -119,13 +128,11 @@ def _buscar_periodo(tribunal: str, tipo_cod: int, codigo_comarca: str, data_inic
             for hit in hits:
                 source = hit.get("_source", {})
                 numero = source.get("numeroProcesso", "")
-                if not numero:
+                if not numero or numero in numeros_vistos:
                     continue
                 
+                numeros_vistos.add(numero)
                 codigo = extrair_codigo_comarca(numero)
-                if codigo != codigo_comarca:
-                    continue
-                
                 movimentos = source.get("movimentos", [])
                 ultimo_mov = get_ultimo_movimento(movimentos)
                 ativo, motivo = processo_esta_ativo(movimentos)
@@ -145,13 +152,16 @@ def _buscar_periodo(tribunal: str, tipo_cod: int, codigo_comarca: str, data_inic
                     "url_tjsp": f"https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado={numero[:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13:14]}.{numero[14:16]}.{numero[16:20]}"
                 })
             
-            print(f"Periodo {data_inicio[:7]}: pag {pagina+1}, {len(hits)} hits, {len(processos)} da comarca")
+            # Pegar último sort para próxima página
+            last_sort = hits[-1].get("sort")
+            
+            print(f"Wildcard {codigo_comarca} pag {pagina+1}: {len(hits)} hits, total: {len(processos)}")
             
             if len(hits) < 1000:
                 break
                 
         except Exception as e:
-            print(f"Erro periodo {data_inicio}: {e}")
+            print(f"Erro busca wildcard: {e}")
             break
     
     return processos
@@ -239,30 +249,19 @@ async def buscar_processos(request: BuscarProcessosRequest):
             for r in resultados:
                 todos.extend(r)
         else:
-            # Com comarca - busca paralela por periodos
-            hoje = datetime.now()
-            periodos = []
-            
-            # 5 anos em periodos de 6 meses
-            for i in range(60):
-                data_fim = hoje - timedelta(days=i*30)
-                data_inicio = hoje - timedelta(days=(i+1)*30)
-                periodos.append((data_inicio.strftime("%Y-%m-%d"), data_fim.strftime("%Y-%m-%d")))
-            
-            # Criar todas as tasks em paralelo
+            # Com comarca - busca com wildcard direto na API
             tasks = []
             for codigo in codigos_comarca:
                 for tribunal in request.tribunais:
                     for tipo in request.tipos_processo:
                         tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
-                        for data_inicio, data_fim in periodos:
-                            task = loop.run_in_executor(
-                                executor, _buscar_periodo,
-                                tribunal, tipo_cod, codigo, data_inicio, data_fim, tipo
-                            )
-                            tasks.append(task)
+                        task = loop.run_in_executor(
+                            executor, _buscar_com_wildcard,
+                            tribunal, tipo_cod, codigo, tipo, request.quantidade
+                        )
+                        tasks.append(task)
             
-            print(f"Executando {len(tasks)} buscas em paralelo...")
+            print(f"Executando {len(tasks)} buscas com wildcard...")
             resultados = await asyncio.gather(*tasks)
             
             todos = []
