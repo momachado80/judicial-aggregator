@@ -120,7 +120,7 @@ export default function Home() {
     setTempoBusca(null);
     const inicio = Date.now();
     try {
-      const body: BuscarBody = { tribunais: ['TJSP'], tipos_processo: tiposSelecionados, quantidade: 1000, usar_cache: false, incluir_extintos: false };
+      const body: BuscarBody = { tribunais: ['TJSP'], tipos_processo: tiposSelecionados, quantidade: quantidade, usar_cache: false, incluir_extintos: false };
       if (comarcasSelecionadas.length > 0) body.comarcas = comarcasSelecionadas;
       const response = await fetch('https://judicial-aggregator-production.up.railway.app/api/buscar-processos', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
