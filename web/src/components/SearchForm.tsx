@@ -56,7 +56,12 @@ export function SearchForm({ onSearch, loading }: Props) {
             <label className="block mb-2">Quantidade</label>
             <select className="w-full p-3 border rounded" value={params.limit} onChange={(e) => setParams({...params, limit: Number(e.target.value)})}>
               <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
               <option value="500">500</option>
+              <option value="1000">1000</option>
+              <option value="2000">2000</option>
+              <option value="5000">5000</option>
             </select>
           </div>
         </div>
