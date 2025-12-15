@@ -110,8 +110,8 @@ export default function Home() {
 
   const limparVerificacoes = () => { if (confirm('Limpar verificações?')) { setVerificacoes({}); localStorage.removeItem(STORAGE_KEY_VERIFICACOES); } };
   const limparHistorico = () => { if (confirm('Limpar histórico?')) { setHistorico({}); localStorage.removeItem(STORAGE_KEY_HISTORICO); } };
-  const marcarInteresse = (numero: string) => { setInteresseIds(prev => new Set([...prev, numero])); setExcluidos(prev => { const n = new Set(prev); n.delete(numero); return n; }); };
-  const marcarExcluido = (numero: string) => { setExcluidos(prev => new Set([...prev, numero])); setInteresseIds(prev => { const n = new Set(prev); n.delete(numero); return n; }); setProcessos(processos.filter(p => p.numero !== numero)); };
+  const marcarInteresse = (numero: string) => { setInteresseIds(prev => { const n = new Set(prev); n.add(numero); return n; }); setExcluidos(prev => { const n = new Set(prev); n.delete(numero); return n; }); };
+  const marcarExcluido = (numero: string) => { setExcluidos(prev => { const n = new Set(prev); n.add(numero); return n; }); setInteresseIds(prev => { const n = new Set(prev); n.delete(numero); return n; }); setProcessos(processos.filter(p => p.numero !== numero)); };
   const restaurarExcluido = (numero: string) => { setExcluidos(prev => { const n = new Set(prev); n.delete(numero); localStorage.setItem(STORAGE_KEY_EXCLUIDOS, JSON.stringify(Array.from(n))); return n; }); };
   const salvarNota = (numero: string, nota: string) => { setNotas(prev => { const n = { ...prev }; if (nota.trim()) n[numero] = nota; else delete n[numero]; return n; }); };
   const limparExcluidos = () => { if (confirm('Limpar excluídos?')) { setExcluidos(new Set()); localStorage.removeItem(STORAGE_KEY_EXCLUIDOS); } };
