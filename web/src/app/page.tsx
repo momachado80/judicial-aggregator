@@ -217,7 +217,7 @@ export default function Home() {
   const ExcluidoCard = ({ numero }: { numero: string }) => (
     <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: '2px solid #fca5a5' }}>
       <span style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>EXCLUÍDO</span>
-      <p style={{ fontSize: '12px', fontFamily: 'monospace', margin: '12px 0' }}>{formatarNumero(numero)}</p>
+      <a href={`https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=${numero}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontFamily: 'monospace', margin: '12px 0', display: 'block', color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>{formatarNumero(numero)}</a>
       <button onClick={() => restaurarExcluido(numero)} style={{ width: '100%', backgroundColor: '#3b82f6', color: 'white', padding: '8px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '12px' }}>↩ Restaurar</button>
     </div>
   );
