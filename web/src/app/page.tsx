@@ -207,7 +207,7 @@ export default function Home() {
   const HistoricoCard = ({ item }: { item: ProcessoHistorico }) => (
     <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: item.verificacao.tem_imovel ? '3px solid #22c55e' : '3px solid #ef4444' }}>
       <div style={{ marginBottom: '8px' }}>{item.verificacao.tem_imovel ? <span style={{ backgroundColor: '#22c55e', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>🏠 TEM IMÓVEL</span> : <span style={{ backgroundColor: '#ef4444', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>❌ SEM IMÓVEL</span>}</div>
-      <p style={{ fontSize: '12px', fontFamily: 'monospace', margin: '8px 0' }}>{formatarNumero(item.numero)}</p>
+      <a href={`https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMPROC&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsultaNuUnificado=${item.numero}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontFamily: 'monospace', margin: '8px 0', display: 'block', color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>{formatarNumero(item.numero)}</a>
       {item.comarca && <p style={{ fontSize: '11px', color: '#7c3aed', margin: '4px 0' }}>{item.comarca}</p>}
       {item.tipo && <p style={{ fontSize: '11px', color: '#6b7280', margin: '4px 0' }}>{item.tipo}</p>}
       {item.verificacao.termos_encontrados?.length > 0 && <p style={{ fontSize: '10px', color: '#166534', margin: '4px 0' }}>Termos: {item.verificacao.termos_encontrados.map(t => t.termo).join(', ')}</p>}
