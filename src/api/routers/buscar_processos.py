@@ -265,3 +265,147 @@ async def listar_comarcas():
         "TJSP": sorted(set(COMARCAS_TJSP.values())),
         "TJBA": sorted(set(COMARCAS_TJBA.values()))
     }
+
+
+# ========== BUSCA POR NOME DE PARTE ==========
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+import time
+import re
+
+def _get_chrome_driver():
+    """Configura o Chrome em modo headless"""
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+    return webdriver.Chrome(options=options)
+
+
+def _buscar_por_parte_esaj(nome_parte: str, max_resultados: int = 100) -> List[Dict]:
+    """Busca processos por nome de parte no e-SAJ TJSP"""
+    driver = None
+    processos = []
+    
+    try:
+        driver = _get_chrome_driver()
+        
+        # Acessa a página de busca
+        url = "https://esaj.tjsp.jus.br/cpopg/open.do"
+        driver.get(url)
+        time.sleep(2)
+        
+        # Seleciona busca por nome da parte
+        select_tipo = Select(driver.find_element(By.ID, "cbPesquisa"))
+        select_tipo.select_by_value("NMPARTE")
+        time.sleep(0.5)
+        
+        # Preenche o nome
+        campo_nome = driver.find_element(By.ID, "dadosConsulta.valorConsulta")
+        campo_nome.clear()
+        campo_nome.send_keys(nome_parte)
+        
+        # Clica em pesquisar
+        btn_pesquisar = driver.find_element(By.ID, "botaoConsultarProcessos")
+        btn_pesquisar.click()
+        
+        # Aguarda resultados
+        time.sleep(3)
+        
+        # Verifica se tem resultados
+        try:
+            # Tenta encontrar a lista de processos
+            lista = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#listagemDeProcessos, .resultadoLista, .processoLista"))
+            )
+        except:
+            # Pode ter ido direto para um processo único
+            pass
+        
+        # Extrai os processos da página
+        # Tenta diferentes seletores possíveis
+        linhas = driver.find_elements(By.CSS_SELECTOR, "tr.fundoClaro, tr.fundoEscuro, .linhaProcesso")
+        
+        if not linhas:
+            # Tenta outro seletor
+            linhas = driver.find_elements(By.CSS_SELECTOR, "a.linkProcesso, a[href*='processo.codigo']")
+        
+        for linha in linhas[:max_resultados]:
+            try:
+                # Extrai número do processo
+                texto = linha.text
+                match = re.search(r'(\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})', texto)
+                if match:
+                    numero_formatado = match.group(1)
+                    numero_limpo = numero_formatado.replace("-", "").replace(".", "")
+                    
+                    processos.append({
+                        "numero": numero_limpo,
+                        "numero_formatado": numero_formatado,
+                        "fonte": "e-SAJ",
+                        "url": f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo={numero_limpo}"
+                    })
+            except Exception as e:
+                print(f"Erro extraindo linha: {e}")
+                continue
+        
+        # Se não encontrou com seletores, tenta extrair do HTML bruto
+        if not processos:
+            html = driver.page_source
+            matches = re.findall(r'(\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})', html)
+            for numero_formatado in list(set(matches))[:max_resultados]:
+                numero_limpo = numero_formatado.replace("-", "").replace(".", "")
+                processos.append({
+                    "numero": numero_limpo,
+                    "numero_formatado": numero_formatado,
+                    "fonte": "e-SAJ",
+                    "url": f"https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo={numero_limpo}"
+                })
+        
+        print(f"Busca por parte '{nome_parte}': {len(processos)} processos encontrados")
+        
+    except Exception as e:
+        print(f"Erro na busca por parte: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        if driver:
+            driver.quit()
+    
+    return processos
+
+
+class BuscarPorParteRequest(BaseModel):
+    nome_parte: str
+    max_resultados: int = 100
+
+
+@router.post("/buscar-por-parte")
+async def buscar_por_parte(request: BuscarPorParteRequest):
+    """Busca processos por nome de parte no e-SAJ TJSP"""
+    try:
+        if len(request.nome_parte) < 3:
+            raise HTTPException(status_code=400, detail="Nome deve ter pelo menos 3 caracteres")
+        
+        loop = asyncio.get_event_loop()
+        processos = await loop.run_in_executor(
+            executor, _buscar_por_parte_esaj, 
+            request.nome_parte, request.max_resultados
+        )
+        
+        return {
+            "nome_buscado": request.nome_parte,
+            "total": len(processos),
+            "processos": processos
+        }
+        
+    except Exception as e:
+        print(f"ERRO busca por parte: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
