@@ -18,6 +18,7 @@ class BuscarProcessosRequest(BaseModel):
     incluir_extintos: bool = False
 
 TIPOS_PROCESSO_MAPPING = {
+    "Extinção de Condomínio": {"classe": 7, "assuntos": ["Extinção", "Condomínio"]},
     "Inventário": 39,
     "Divórcio Litigioso": 12541,
     "Divórcio Consensual": 12372
@@ -63,6 +64,21 @@ def processo_esta_ativo(movimentos: List[Dict]) -> tuple[bool, str]:
     return True, "ativo"
 
 
+
+def _get_tipo_codigo(tipo: str) -> int:
+    """Retorna o código da classe para um tipo de processo"""
+    tipo_config = TIPOS_PROCESSO_MAPPING.get(tipo)
+    if isinstance(tipo_config, dict):
+        return tipo_config["classe"]
+    return tipo_config if tipo_config else 39
+
+def _get_assuntos_filtro(tipo: str) -> list:
+    """Retorna os assuntos para filtrar, se houver"""
+    tipo_config = TIPOS_PROCESSO_MAPPING.get(tipo)
+    if isinstance(tipo_config, dict):
+        return tipo_config.get("assuntos", [])
+    return []
+
 def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo: str, max_processos: int) -> List[Dict]:
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     headers = {
@@ -80,13 +96,18 @@ def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo
         
         from_offset = pagina * 1000
         
+        # Construir cláusulas must (inclui assuntos se for tipo especial)
+        must_clauses = [
+            {"term": {"classe.codigo": tipo_cod}},
+            {"wildcard": {"numeroProcesso": wildcard_pattern}}
+        ]
+        for assunto in _get_assuntos_filtro(tipo):
+            must_clauses.append({"match": {"assuntos.nome": assunto}})
+        
         query = {
             "query": {
                 "bool": {
-                    "must": [
-                        {"term": {"classe.codigo": tipo_cod}},
-                        {"wildcard": {"numeroProcesso": wildcard_pattern}}
-                    ]
+                    "must": must_clauses
                 }
             },
             "size": 1000,
@@ -143,7 +164,7 @@ def _buscar_com_wildcard(tribunal: str, tipo_cod: int, codigo_comarca: str, tipo
 
 
 def _buscar_simples(tribunal: str, tipo: str, max_processos: int) -> List[Dict]:
-    tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
+    tipo_cod = _get_tipo_codigo(tipo)
     url = f"https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal.lower()}/_search"
     headers = {
         "Content-Type": "application/json",
@@ -220,7 +241,7 @@ async def buscar_processos(request: BuscarProcessosRequest):
             for codigo in codigos_comarca:
                 for tribunal in request.tribunais:
                     for tipo in request.tipos_processo:
-                        tipo_cod = TIPOS_PROCESSO_MAPPING.get(tipo, 39)
+                        tipo_cod = _get_tipo_codigo(tipo)
                         task = loop.run_in_executor(
                             executor, _buscar_com_wildcard,
                             tribunal, tipo_cod, codigo, tipo, request.quantidade
