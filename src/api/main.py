@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Judicial Aggregator API", version="2.2")
+app = FastAPI(title="Judicial Aggregator API", version="2.3")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,7 +30,7 @@ app.include_router(imoveis_router, prefix="/api", tags=["Imóveis"])
 def root():
     return {
         "message": "Judicial Aggregator API",
-        "version": "2.2",
+        "version": "2.3",
         "docs": "/docs",
         "endpoints": {
             "datajud": "/api/buscar-processos",
