@@ -19,6 +19,7 @@ class BuscarProcessosRequest(BaseModel):
 
 TIPOS_PROCESSO_MAPPING = {
     "Divisão e Demarcação": 34,
+    "Alienação Judicial de Condomínio": {"classe": 52, "assuntos": ["Alienação Judicial", "Condomínio"]},
     "Extinção de Condomínio": {"classe": 7, "assuntos": ["Extinção", "Condomínio"]},
     "Inventário": 39,
     "Divórcio Litigioso": 12541,
