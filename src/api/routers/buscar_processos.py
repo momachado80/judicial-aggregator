@@ -18,6 +18,7 @@ class BuscarProcessosRequest(BaseModel):
     incluir_extintos: bool = False
 
 TIPOS_PROCESSO_MAPPING = {
+    "Divisão e Demarcação": 34,
     "Extinção de Condomínio": {"classe": 7, "assuntos": ["Extinção", "Condomínio"]},
     "Inventário": 39,
     "Divórcio Litigioso": 12541,
