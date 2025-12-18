@@ -24,7 +24,7 @@ const STORAGE_KEY_VERIFICACOES = 'judicial_verificacoes_imoveis';
 const STORAGE_KEY_HISTORICO = 'judicial_historico_processos';
 
 export default function Home() {
-  const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual', 'Extinção de Condomínio', 'Divisão e Demarcação', 'Alienação Judicial de Condomínio', 'Alienação Judicial de Condomínio']);
+  const [tiposSelecionados, setTiposSelecionados] = useState(['Inventário', 'Divórcio Litigioso', 'Divórcio Consensual', 'Extinção de Condomínio', 'Divisão e Demarcação', 'Alienação Judicial de Condomínio']);
   const [quantidade, setQuantidade] = useState(100);
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [loading, setLoading] = useState(false);
