@@ -34,7 +34,7 @@ MOVIMENTOS_INATIVOS = {
 
 def get_codigos_comarca_por_nome(nome: str) -> List[str]:
     nome_lower = nome.lower().strip()
-    if nome_lower in ["são paulo", "sao paulo", "sp capital", "capital"]:
+    if nome_lower in ["são paulo", "sao paulo", "sp capital", "capital", "são paulo (capital)", "sao paulo (capital)"]:
         return list(FOROS_SAO_PAULO_CAPITAL)
     for codigo, nome_comarca in COMARCAS_TJSP.items():
         if nome_lower == nome_comarca.lower():
